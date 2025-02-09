@@ -10,7 +10,7 @@
    - [x] Setup basic Tailwind CSS
    - [x] shadcn/ui + theme
    - [x] dark mode / light mode toggle
-   - [ ] Install next-intl (i18n skeleton)
+   - [x] Install next-intl (i18n skeleton)
    **Files:** `package.json`, `tsconfig.json`, `.eslintrc`, `.prettierrc`, `src/middleware.ts`
 
 2. **Authentication** (4h)

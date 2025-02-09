@@ -1,5 +1,10 @@
 {
   "HomePage": {
     "welcome": "Bienvenue sur ScriptFlow !"
+  },
+  "LocaleSwitcher": {
+    "label": "Langue",
+    "en": "Anglais",
+    "fr": "Français"
   }
 }

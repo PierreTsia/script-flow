@@ -10,7 +10,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
-
+import LocaleSwitcher from "@/components/locale-switcher";
 export default function Home() {
   const t = useTranslations("HomePage");
   return (
@@ -60,6 +60,7 @@ export default function Home() {
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <ThemeToggle />
+        <LocaleSwitcher />
       </footer>
     </div>
   );
