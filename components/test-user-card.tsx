@@ -11,6 +11,8 @@ import {
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 import { useAuth } from "@clerk/nextjs";
 
@@ -18,6 +20,7 @@ export default function TestUserCard() {
   const t = useTranslations("HomePage");
   const { user } = useUser();
   const { signOut } = useAuth();
+  const tasks = useQuery(api.tasks.tasks.get);
   if (!user) {
     return null;
   }
@@ -30,10 +33,7 @@ export default function TestUserCard() {
         <CardDescription>{user.emailAddresses[0].emailAddress}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground">
-          Explore components, experiment with layouts, and build something
-          amazing. Perfect for prototyping and learning.
-        </p>
+        {tasks?.map(({ _id, text }) => <div key={_id}>{text}</div>)}
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button variant="outline" size="sm" onClick={() => signOut()}>

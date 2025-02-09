@@ -22,9 +22,10 @@
    **Files:** `src/auth.ts`, `src/middleware.ts`, `src/app/layout.tsx`
 
 3. **Database Setup** (3h)
-   - [ ] Convex project initialization
+   - [ ] Convex project initialization with mock getTasks
    - [ ] Script/Scene schema definition
    - [ ] Basic CRUD operations
+   - [ ] clerck/convex provider
    **Files:** `convex/`, `.env`, `src/convex/`
 
 4. **PDF Core** (6h)
