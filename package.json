@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "deploy": "vercel deploy --prod",
+    "dev:deploy": "vercel deploy"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.6",

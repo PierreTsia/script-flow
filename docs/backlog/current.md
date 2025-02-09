@@ -11,6 +11,8 @@
    - [x] shadcn/ui + theme
    - [x] dark mode / light mode toggle
    - [x] Install next-intl (i18n skeleton)
+   - [x] add locale switcher
+   - [ ] deploy to vercel
    **Files:** `package.json`, `tsconfig.json`, `.eslintrc`, `.prettierrc`, `src/middleware.ts`
 
 2. **Authentication** (4h)
