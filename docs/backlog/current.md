@@ -5,7 +5,8 @@
 1. **App Foundation** (2h)
    - [x] Create Next.js app with TypeScript
    - [x] Configure ESLint + Prettier
-   - [ ] add remote github repo
+   - [x] add remote github repo
+   - [x] add base CI pipeline : lint, typecheck
    - [x] Setup basic Tailwind CSS
    - [x] shadcn/ui + theme
    - [x] dark mode / light mode toggle
