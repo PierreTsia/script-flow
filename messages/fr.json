@@ -1,6 +1,7 @@
 {
   "HomePage": {
-    "welcome": "Bienvenue sur ScriptFlow !"
+    "welcome": "Bienvenue sur ScriptFlow, {name}!",
+    "logout": "Déconnexion"
   },
   "LocaleSwitcher": {
     "label": "Langue",

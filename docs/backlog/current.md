@@ -12,13 +12,13 @@
    - [x] dark mode / light mode toggle
    - [x] Install next-intl (i18n skeleton)
    - [x] add locale switcher
-   - [ ] deploy to vercel
+   - [x] deploy to vercel
    **Files:** `package.json`, `tsconfig.json`, `.eslintrc`, `.prettierrc`, `src/middleware.ts`
 
 2. **Authentication** (4h)
-   - [ ] Clerk basic integration
-   - [ ] Protected routes (/scripts)
-   - [ ] User state sync with Convex
+   - [x] Clerk basic integration
+   - [x] Protected routes (/scripts)
+   - [ ] User state sync with Convex - TODO: add Convex
    **Files:** `src/auth.ts`, `src/middleware.ts`, `src/app/layout.tsx`
 
 3. **Database Setup** (3h)
