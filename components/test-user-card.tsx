@@ -16,7 +16,7 @@ import { useAuth } from "@clerk/nextjs";
 
 export default function TestUserCard() {
   const t = useTranslations("HomePage");
-  const { user, isLoaded, isSignedIn } = useUser();
+  const { user } = useUser();
   const { signOut } = useAuth();
   if (!user) {
     return null;

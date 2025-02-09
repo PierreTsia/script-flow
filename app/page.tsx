@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import LocaleSwitcher from "@/components/locale-switcher";
 import TestUserCard from "@/components/test-user-card";
-import { useTranslations } from "next-intl";
 
 export default function Home() {
   return (
