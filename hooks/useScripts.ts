@@ -22,7 +22,7 @@ interface Script {
 
 import { mutation } from "@/convex/_generated/server";
 import { api } from "@/convex/_generated/api";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 
 interface UploadScriptPayload {
   file: File;
@@ -31,9 +31,11 @@ interface UploadScriptPayload {
 
 export const useScripts = () => {
   const uploadUrl = useMutation(api.scripts.getUploadUrl);
+
   const createNewScriptFromStorageId = useMutation(
     api.scripts.createNewScriptFromStorageId
   );
+
   const uploadFile = async (file: File, url: string) => {
     const result = await fetch(url, {
       method: "POST",
@@ -60,5 +62,7 @@ export const useScripts = () => {
     createNewScriptFromStorageId({ storageId });
   };
 
-  return { uploadScript };
+  const scripts = useQuery(api.scripts.getAll) ?? [];
+
+  return { uploadScript, scripts };
 };
