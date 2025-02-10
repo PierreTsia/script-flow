@@ -18,13 +18,14 @@
 2. **Authentication** (4h)
    - [x] Clerk basic integration
    - [x] Protected routes (/scripts)
-   - [ ] User state sync with Convex - TODO: add Convex
+   - [x] User state sync with Convex - TODO: add Convex
    **Files:** `src/auth.ts`, `src/middleware.ts`, `src/app/layout.tsx`
 
 3. **Database Setup** (3h)
-   - [ ] Convex project initialization
+   - [x] Convex project initialization with mock getTasks
    - [ ] Script/Scene schema definition
-   - [ ] Basic CRUD operations
+   - [x] Basic CRUD operations
+   - [x] clerck/convex provider
    **Files:** `convex/`, `.env`, `src/convex/`
 
 4. **PDF Core** (6h)

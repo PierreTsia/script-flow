@@ -7,6 +7,7 @@ import { IntlProvider } from "@/components/providers/intl-provider";
 import { getLocale } from "next-intl/server";
 
 import { ClerkProvider } from "@clerk/nextjs";
+import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,16 +39,18 @@ export default async function RootLayout({
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <ClerkProvider>
-          <IntlProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-            </ThemeProvider>
-          </IntlProvider>
+          <ConvexClientProvider>
+            <IntlProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                {children}
+              </ThemeProvider>
+            </IntlProvider>
+          </ConvexClientProvider>
         </ClerkProvider>
       </body>
     </html>

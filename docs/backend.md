@@ -1,28 +1,28 @@
 # Backend Documentation
 
-## 1. Architecture Overview
-A layered backend architecture:
-1. Next.js API Routes (Backend for Frontend)
-   - Handle client requests
-   - Manage session state
-   - Route to Convex operations
-2. Convex Backend (Core Business Logic)
-   - PDF storage and processing
-   - AI-powered scene analysis
-   - Database operations
-   - Real-time updates
+## 1. Architecture Overview (Simplified)
+A streamlined backend architecture:
+1. **React Frontend** 
+   - Uses auto-generated Convex hooks (`useQuery/useMutation`)
+   - Directly calls backend operations
+   - Manages local state
+
+2. **Convex Backend** (Full-stack TypeScript)
+   - Contains all business logic
+   - Handles auth, database, and real-time updates
+   - Directly integrates with AI services/storage
 
 ## 2. Technical Stack
 ### Core Platform
-- **Next.js API Routes**: Backend-for-Frontend layer
-  - Type-safe API endpoints
-  - Session management
-  - Request validation
-- **Convex**: Core backend platform
-  - TypeScript-first approach
-  - Real-time data synchronization
-  - Built-in PDF file handling
-  - AI/Vector search capabilities
+- **Convex**: Full-stack TypeScript platform
+  - Real-time database with automatic reactivity
+  - Built-in auth integration (Auth0, Clerk, etc)
+  - File storage and AI capabilities
+  - Type-safe client hooks generation
+
+- **React**: Frontend library
+  - Uses `useQuery`/`useMutation` for data fetching
+  - Automatic UI updates on data changes
 
 ### Database Schema
 ```typescript
@@ -178,33 +178,26 @@ interface Scene {
 sequenceDiagram
     actor U as User
     participant F as Frontend
-    participant N as Next.js API
-    participant C as Convex DB
+    participant C as Convex
     participant AI as AI Service
     
     U->>F: Upload PDF
-    F->>N: POST /api/scripts
-    N->>C: uploadScript()
+    F->>C: uploadScript()
     Note over C: Stores PDF file<br/>Creates script record
-    C-->>N: scriptId + fileUrl
-    N-->>F: scriptId
+    C-->>F: scriptId
     
     F-->>U: Display PDF
     
     U->>F: Select Scene Text
-    F->>N: POST /api/scenes/analyze
-    N->>AI: analyzeScene()
-    AI-->>N: Proposed Entities JSON
-    Note over N,F: Returns analyzed scene with<br/>detected characters, props,<br/>and location
+    F->>AI: analyzeScene()
+    AI-->>F: Proposed Entities JSON
     
     F->>U: Display for Review
     
     U->>F: Confirm/Edit
-    F->>N: POST /api/scenes
-    N->>C: createSceneFromSelection()
-    Note over C: Creates:<br/>1. Scene<br/>2. New Entities<br/>3. Links Entities to Scene
-    C-->>N: Updated Scene Data
-    N-->>F: Scene + Entities
+    F->>C: createSceneWithEntities()
+    Note over C: Creates scene record<br/>Links entities
+    C-->>F: Scene + Entities
     F-->>U: Show Breakdown
 ```
 
