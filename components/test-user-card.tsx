@@ -11,8 +11,6 @@ import {
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 
 import { useAuth } from "@clerk/nextjs";
 
@@ -20,7 +18,6 @@ export default function TestUserCard() {
   const t = useTranslations("HomePage");
   const { user } = useUser();
   const { signOut } = useAuth();
-  const tasks = useQuery(api.tasks.list);
   if (!user) {
     return null;
   }
