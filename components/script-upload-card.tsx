@@ -2,12 +2,13 @@
 
 import { FileDropZone } from "@/components/file-drop-zone";
 import { useScripts } from "@/hooks/useScripts";
+
 export function ScriptUploadCard() {
   const { uploadScript } = useScripts();
 
-  const handleFileAccepted = (file: File) => {
+  const handleFileAccepted = async (file: File) => {
     // TODO add try catch and a toast feedback
-    uploadScript(file);
+    await uploadScript(file);
   };
 
   return (

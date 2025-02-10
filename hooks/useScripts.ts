@@ -53,13 +53,14 @@ export const useScripts = () => {
   };
 
   const uploadScript = async (file: File) => {
+    const name = file.name.replace(/\.[^/.]+$/, ""); // Strip file extension
     const url = await uploadUrl();
     const storageId = await uploadFile(file, url);
-    createScript(storageId);
+    createScript(storageId, name);
   };
 
-  const createScript = (storageId: string) => {
-    createNewScriptFromStorageId({ storageId });
+  const createScript = (storageId: string, name: string) => {
+    createNewScriptFromStorageId({ fileId: storageId, name });
   };
 
   const scripts = useQuery(api.scripts.getAll) ?? [];

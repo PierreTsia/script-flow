@@ -16,6 +16,8 @@ export default defineSchema({
   }).index("by_user", ["userId"]),
   scripts: defineTable({
     userId: v.string(),
-    storageId: v.string(),
+    fileId: v.string(),
+    name: v.string(),
+    uploadedAt: v.number(),
   }).index("by_user", ["userId"]),
 });

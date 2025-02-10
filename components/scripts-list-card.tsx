@@ -27,9 +27,12 @@ export function ScriptsListCard() {
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <FileText className="h-5 w-5 text-muted-foreground" />
-                    <span className="font-mono text-sm">
-                      {script.storageId}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                      <span>{script.name}</span>
+                      <span className="text-xs text-muted-foreground font-mono truncate max-w-[200px]">
+                        {script.fileId}
+                      </span>
+                    </div>
                   </div>
                   <div className="flex justify-end gap-2">
                     <Button

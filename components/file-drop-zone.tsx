@@ -1,21 +1,24 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { UploadCloud } from "lucide-react";
-
+import { UploadCloud, FileText, Check, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { formatFileSize } from "@/lib/files";
 interface FileDropZoneProps {
-  onFileAccepted: (file: File) => void;
+  onFileAccepted: (file: File) => Promise<void>;
 }
 
 export function FileDropZone({ onFileAccepted }: FileDropZoneProps) {
+  const [file, setFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      if (acceptedFiles.length > 0) {
-        onFileAccepted(acceptedFiles[0]);
+    (droppedFiles: File[]) => {
+      if (droppedFiles.length > 0) {
+        setFile(droppedFiles[0]);
       }
     },
-    [onFileAccepted]
+    [setFile]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -27,23 +30,55 @@ export function FileDropZone({ onFileAccepted }: FileDropZoneProps) {
   });
 
   return (
-    <div
-      {...getRootProps()}
-      className={`h-full w-full p-4 flex flex-col items-center justify-center cursor-pointer transition-colors ${
-        isDragActive ? "  bg-primary/10" : "hover:border-muted-foreground/50"
-      }`}
-    >
-      <input {...getInputProps()} />
-      <UploadCloud
-        className={`h-12 w-12 mb-4 ${
-          isDragActive ? "text-primary" : "text-muted-foreground"
-        }`}
-      />
-      <p className="text-center text-muted-foreground">
-        {isDragActive
-          ? "Drop the PDF here"
-          : "Drag & drop script PDF, or click to select"}
-      </p>
-    </div>
+    <>
+      {file ? (
+        <div className="flex flex-col items-center justify-center gap-4 p-6">
+          <FileText className="h-16 w-16 text-primary" />
+          <div className="text-center">
+            <p className="font-medium">{file.name}</p>
+            <p className="text-sm text-muted-foreground">
+              {formatFileSize(file.size)}
+            </p>
+          </div>
+          <Button
+            onClick={async () => {
+              setIsUploading(true);
+              await onFileAccepted(file);
+              setFile(null);
+              setIsUploading(false);
+            }}
+            className="gap-2"
+          >
+            {isUploading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Check className="h-4 w-4" />
+            )}
+            {isUploading ? "Uploading..." : "Confirm Upload"}
+          </Button>
+        </div>
+      ) : (
+        <div
+          {...getRootProps()}
+          className={`h-full w-full p-4 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+            isDragActive
+              ? "  bg-primary/10"
+              : "hover:border-muted-foreground/50"
+          }`}
+        >
+          <input {...getInputProps()} />
+          <UploadCloud
+            className={`h-12 w-12 mb-4 ${
+              isDragActive ? "text-primary" : "text-muted-foreground"
+            }`}
+          />
+          <p className="text-center text-muted-foreground">
+            {isDragActive
+              ? "Drop the PDF here"
+              : "Drag & drop script PDF, or click to select"}
+          </p>
+        </div>
+      )}
+    </>
   );
 }

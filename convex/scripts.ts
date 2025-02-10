@@ -11,7 +11,8 @@ export const getUploadUrl = mutation({
 
 export const createNewScriptFromStorageId = mutation({
   args: {
-    storageId: v.string(),
+    fileId: v.string(),
+    name: v.string(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -21,7 +22,9 @@ export const createNewScriptFromStorageId = mutation({
     const userId = identity.subject;
     await ctx.db.insert("scripts", {
       userId,
-      storageId: args.storageId,
+      fileId: args.fileId,
+      name: args.name,
+      uploadedAt: Date.now(),
     });
   },
 });
@@ -56,6 +59,6 @@ export const deleteScript = mutation({
     }
 
     await ctx.db.delete(args.scriptId);
-    await ctx.storage.delete(script.storageId);
+    await ctx.storage.delete(script.fileId);
   },
 });
