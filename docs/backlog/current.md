@@ -28,19 +28,24 @@
    - [x] clerck/convex provider
    **Files:** `convex/`, `.env`, `src/convex/`
 
-4. **PDF Core** (6h)
+4. **PDF Core 1** (6h)
+   - [ ] basic / home page UI with upload button and script list datatable
    - [ ] PDF upload functionality
+   **Files:** `src/app/page.tsx`
+   
+5. **PDF Core 2** (6h)
+   - [ ] script id details page
    - [ ] PDF.js viewer integration
    - [ ] Text selection capture
-   **Files:** `src/components/pdf-viewer.tsx`, `src/hooks/use-pdf.ts`
+   **Files:** `src/app/[scriptId]/page.tsx`
 
-5. **AI Integration** (5h)
+6. **AI Integration** (5h)
    - [ ] LLM provider interface
    - [ ] Mistral API wrapper
    - [ ] Scene analysis service
    **Files:** `src/lib/llm-provider.ts`, `src/convex/ai.ts`
 
-6. **Basic UI** (4h)
+7. **Basic UI** (4h)
    - [ ] Upload button
    - [ ] Script view layout
    - [ ] Analysis modal
