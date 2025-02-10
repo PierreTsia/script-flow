@@ -5,11 +5,14 @@ import { useDropzone } from "react-dropzone";
 import { UploadCloud, FileText, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatFileSize } from "@/lib/files";
+import { useTranslations } from "next-intl";
+
 interface FileDropZoneProps {
   onFileAccepted: (file: File) => Promise<void>;
 }
 
 export function FileDropZone({ onFileAccepted }: FileDropZoneProps) {
+  const t = useTranslations("Scripts");
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const onDrop = useCallback(
@@ -54,7 +57,7 @@ export function FileDropZone({ onFileAccepted }: FileDropZoneProps) {
             ) : (
               <Check className="h-4 w-4" />
             )}
-            {isUploading ? "Uploading..." : "Confirm Upload"}
+            {isUploading ? t("dropzone.uploading") : t("dropzone.confirm")}
           </Button>
         </div>
       ) : (
@@ -73,9 +76,7 @@ export function FileDropZone({ onFileAccepted }: FileDropZoneProps) {
             }`}
           />
           <p className="text-center text-muted-foreground">
-            {isDragActive
-              ? "Drop the PDF here"
-              : "Drag & drop script PDF, or click to select"}
+            {isDragActive ? t("dropzone.dropPrompt") : t("dropzone.dragPrompt")}
           </p>
         </div>
       )}

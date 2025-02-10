@@ -4,18 +4,21 @@ import { Button } from "@/components/ui/button";
 import { useScripts } from "@/hooks/useScripts";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileText, Eye, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function ScriptsListCard() {
   const { scripts, deleteScriptById } = useScripts();
+  const t = useTranslations("Scripts");
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Recent Scripts</h3>
+        <h3 className="text-lg font-medium">{t("recentScripts")}</h3>
       </div>
       <div className="h-96 bg-muted/50 rounded-lg border p-4 overflow-y-auto">
         {!scripts?.length ? (
           <div className="flex h-full items-center justify-center">
-            <p className="text-muted-foreground">No scripts uploaded yet</p>
+            <p className="text-muted-foreground">{t("noScripts")}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -39,7 +42,7 @@ export function ScriptsListCard() {
                       variant="ghost"
                       size="sm"
                       className="text-muted-foreground h-8 w-8 p-0"
-                      title="View script"
+                      title={t("actions.view")}
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
@@ -48,7 +51,7 @@ export function ScriptsListCard() {
                       size="sm"
                       className="text-muted-foreground h-8 w-8 p-0"
                       onClick={() => deleteScriptById(script._id)}
-                      title="Delete script"
+                      title={t("actions.delete")}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

@@ -29,8 +29,8 @@
    **Files:** `convex/`, `.env`, `src/convex/`
 
 4. **PDF Core 1** (6h)
-   - [ ] basic / home page UI with upload button and script list datatable
-   - [ ] PDF upload functionality
+   - [x] basic / home page UI with upload button and script list datatable
+   - [x] PDF upload functionality
    **Files:** `src/app/page.tsx`
    
 5. **PDF Core 2** (6h)
