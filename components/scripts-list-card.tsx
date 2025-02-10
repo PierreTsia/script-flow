@@ -3,10 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { useScripts } from "@/hooks/useScripts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText } from "lucide-react";
+import { FileText, Eye, Trash2 } from "lucide-react";
 
 export function ScriptsListCard() {
-  const { scripts } = useScripts();
+  const { scripts, deleteScriptById } = useScripts();
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -31,13 +31,25 @@ export function ScriptsListCard() {
                       {script.storageId}
                     </span>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground"
-                  >
-                    View
-                  </Button>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground h-8 w-8 p-0"
+                      title="View script"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground h-8 w-8 p-0"
+                      onClick={() => deleteScriptById(script._id)}
+                      title="Delete script"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}

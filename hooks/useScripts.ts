@@ -23,7 +23,7 @@ interface Script {
 import { mutation } from "@/convex/_generated/server";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
-
+import { Id } from "@/convex/_generated/dataModel";
 interface UploadScriptPayload {
   file: File;
   name: string;
@@ -64,5 +64,11 @@ export const useScripts = () => {
 
   const scripts = useQuery(api.scripts.getAll) ?? [];
 
-  return { uploadScript, scripts };
+  const deleteScript = useMutation(api.scripts.deleteScript);
+
+  const deleteScriptById = (scriptId: Id<"scripts">) => {
+    deleteScript({ scriptId });
+  };
+
+  return { uploadScript, scripts, deleteScriptById };
 };

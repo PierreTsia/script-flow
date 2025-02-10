@@ -38,3 +38,24 @@ export const getAll = query({
     return scripts;
   },
 });
+
+export const deleteScript = mutation({
+  args: {
+    scriptId: v.id("scripts"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    const userId = identity?.subject;
+    const script = await ctx.db.get(args.scriptId);
+    if (!script) {
+      throw new Error("Script not found");
+    }
+    if (script.userId !== userId) {
+      throw new Error("Unauthorized");
+    }
+
+    await ctx.db.delete(args.scriptId);
+    await ctx.storage.delete(script.storageId);
+  },
+});
