@@ -33,7 +33,10 @@ export default function TestUserCard() {
         <CardDescription>{user.emailAddresses[0].emailAddress}</CardDescription>
       </CardHeader>
       <CardContent>
-        {tasks?.map(({ _id, title }) => <div key={_id}>{title}</div>)}
+        <p className="text-muted-foreground">
+          Explore components, experiment with layouts, and build something
+          amazing. Perfect for prototyping and learning.
+        </p>
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button variant="outline" size="sm" onClick={() => signOut()}>

@@ -6,5 +6,9 @@ export const useTasks = () => {
 
   const tasks = useQuery(api.tasks.list) ?? [];
 
-  return { tasks, createTask };
+  const removeTask = useMutation(api.tasks.remove);
+
+  const updateTaskStatus = useMutation(api.tasks.updateTaskStatus);
+
+  return { tasks, createTask, removeTask, updateTaskStatus };
 };

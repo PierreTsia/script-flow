@@ -1,105 +1,81 @@
-## API Communication
+## API Communication (Convex Direct)
 
-### 1. Core Endpoints (Phase 1)
+### 1. Core Operations (Phase 1)
 
 #### Upload Script
 ```typescript
-// Request
-POST /api/scripts
-Content-Type: multipart/form-data
+// Convex Mutation: scripts.upload
+const uploadScript = useMutation(api.scripts.upload);
 
-Body:
-- file: PDF file (binary)
-- name: string
-
-// Response 201
-{
-  "id": "script_123",
-  "name": "My Screenplay",
-  "status": "processing",
-  "pageCount": 90
+// Usage
+const handleUpload = async (file: File) => {
+  const scriptId = await uploadScript({
+    name: file.name,
+    file: await storeFile(file) // Using Convex file storage
+  });
 }
 ```
 
 #### Analyze Scene
 ```typescript
-// Request
-POST /api/scenes/analyze
-Content-Type: application/json
+// Convex Action: scenes.analyze
+const analyzeScene = useAction(api.scenes.analyze);
 
-{
-  "text": "INT. COFFEE SHOP - DAY\nJohn enters, looks around...",
-  "scriptId": "script_123"
-}
+// Usage
+const analysis = await analyzeScene({
+  text: selectedText,
+  scriptId: currentScriptId
+});
 
-// Response 200 (Matches DB schema + confidence)
-{
-  "characters": [
-    {
-      "mentionedAs": "John",
-      "confidence": 0.92,
-      "existingId": "char_456" // If match found
-    }
-  ],
-  "props": [
-    {
-      "mentionedAs": "coffee cup",
-      "confidence": 0.87
-    }
-  ],
-  "location": {
-    "mentionedAs": "COFFEE SHOP",
-    "confidence": 0.95,
-    "existingId": "loc_789"
-  }
-}
+// Response matches existing schema
 ```
 
-### 2. Error Handling (Basic)
+### 2. Error Handling
 ```typescript
-// Standard Error Format
-{
-  "error": {
-    "code": "invalid_pdf",
-    "message": "Unsupported PDF version"
-  }
+// Convex Error Format (try/catch example)
+try {
+  await createScene({ ... });
+} catch (error) {
+  console.error({
+    code: error.data?.code, // Custom error codes
+    message: error.message
+  });
 }
 
 // Common Codes:
-- invalid_pdf
-- text_selection_too_small
+- insufficient_permissions
+- invalid_entity_reference
 - ai_processing_timeout
 ```
 
 ### 3. Real-Time Updates
 ```typescript
-// Using SSE for script processing status
-GET /api/scripts/{id}/events
+// Using Convex React hook
+const scriptStatus = useQuery(api.scripts.getStatus, { scriptId });
 
-// Example event:
-data: {
-  "status": "processing",
-  "progress": 75,
-  "scenesProcessed": 42
+// Real-time status object:
+{
+  status: "processing",
+  progress: 75,
+  scenesProcessed: 42
 }
 ```
 
-### 4. Payload Guidelines
-1. Use `snake_case` for all JSON fields
-2. Include `scriptId` in all scene-related requests
-3. Return minimal viable responses
-4. Match DB schema structure where possible
+### 4. Data Guidelines
+1. Use `camelCase` for all JSON fields
+2. Include `scriptId` in all scene-related operations
+3. Return Convex document structures directly
+4. Use Convex IDs (`Id<"scripts">`) for references
 
-### 5. Implementation Details
+### 5. Implementation Notes
 
-The API routes structure and backend implementation can be found in the [Backend Documentation](./backend.md#7-api-routes-structure). Key implementation notes:
-
-1. All endpoints route through Next.js API before reaching Convex
-2. Real-time updates powered by Convex's data synchronization
-3. Error codes map to specific backend validation checks
+Key architecture changes from previous version:
+1. **No API middleware** - Frontend uses Convex directly via auto-generated hooks
+2. **Type-safe operations** - All mutations/queries have validated args
+3. **Automatic real-time** - Data sync handled by Convex reactivity
+4. **Security internalized** - Auth checks happen within Convex functions
 
 ### Future Considerations
-- Rate limiting (Phase 2)
-- Detailed error codes (Phase 2)
-- Request validation middleware
-- API versioning 
+- Optimistic UI updates using Convex mutations
+- Pagination patterns for large scripts
+- Batch operations for entity management 

@@ -1,23 +1,21 @@
 "use client";
 import { useState } from "react";
 import { useTasks } from "@/hooks/useTasks";
-import { useAuth } from "@clerk/nextjs";
+import { Trash2 } from "lucide-react";
+
 export function TaskList() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const { tasks, createTask } = useTasks();
-  const { userId } = useAuth();
+  const { tasks, createTask, removeTask, updateTaskStatus } = useTasks();
+
   const handleSubmit = async () => {
-    //e.preventDefault();
     if (!newTaskTitle.trim()) return;
-    console.log("newTaskTitle", newTaskTitle);
     try {
-      /*      const data = await createTask({
+      await createTask({
         title: newTaskTitle,
-        userId: userId!,
         status: "todo",
         createdAt: Date.now(),
         updatedAt: Date.now(),
-      }); */
+      });
       setNewTaskTitle(""); // Clear input on success
     } catch (error) {
       console.error("Failed to create task:", error);
@@ -49,11 +47,21 @@ export function TaskList() {
           >
             <input
               type="checkbox"
-              checked={false}
-              onChange={() => {}}
+              checked={task.status === "done"}
+              onChange={() => {
+                updateTaskStatus({
+                  id: task._id,
+                  status: task.status === "done" ? "todo" : "done",
+                });
+              }}
               className="h-4 w-4 rounded border-primary/50"
             />
-            <span className={""}>{task.title}</span>
+            <span className={`${task.status === "done" ? "line-through" : ""}`}>
+              {task.title}
+            </span>
+            <button onClick={() => removeTask({ id: task._id })}>
+              <Trash2 />
+            </button>
           </li>
         ))}
       </ul>
