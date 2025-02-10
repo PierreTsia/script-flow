@@ -14,4 +14,10 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
+  scripts: defineTable({
+    userId: v.string(),
+    fileId: v.string(),
+    name: v.string(),
+    uploadedAt: v.number(),
+  }).index("by_user", ["userId"]),
 });

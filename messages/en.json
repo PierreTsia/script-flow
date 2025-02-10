@@ -7,5 +7,20 @@
     "label": "Language",
     "en": "English",
     "fr": "French"
+  },
+  "Scripts": {
+    "recentScripts": "Recent Scripts",
+    "noScripts": "No scripts uploaded yet",
+    "actions": {
+      "view": "View script",
+      "delete": "Delete script"
+    },
+    "upload": "Upload Script",
+    "dropzone": {
+      "confirm": "Confirm Upload",
+      "uploading": "Uploading...",
+      "dropPrompt": "Drop the PDF here",
+      "dragPrompt": "Drag & drop script PDF, or click to select"
+    }
   }
 }

@@ -7,5 +7,20 @@
     "label": "Langue",
     "en": "Anglais",
     "fr": "Français"
+  },
+  "Scripts": {
+    "recentScripts": "Scripts récents",
+    "noScripts": "Aucun script téléchargé",
+    "actions": {
+      "view": "Voir le script",
+      "delete": "Supprimer le script"
+    },
+    "upload": "Envoyer un script",
+    "dropzone": {
+      "confirm": "Confirmer l'envoi",
+      "uploading": "Envoi en cours...",
+      "dropPrompt": "Déposer le PDF ici",
+      "dragPrompt": "Glisser-déposer un PDF ou cliquer pour sélectionner"
+    }
   }
 }
