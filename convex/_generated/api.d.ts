@@ -13,7 +13,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as tasks_tasks from "../tasks/tasks.js";
+import type * as tasks from "../tasks.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -24,7 +24,7 @@ import type * as tasks_tasks from "../tasks/tasks.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  "tasks/tasks": typeof tasks_tasks;
+  tasks: typeof tasks;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

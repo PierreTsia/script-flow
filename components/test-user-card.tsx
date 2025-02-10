@@ -20,7 +20,7 @@ export default function TestUserCard() {
   const t = useTranslations("HomePage");
   const { user } = useUser();
   const { signOut } = useAuth();
-  const tasks = useQuery(api.tasks.tasks.get);
+  const tasks = useQuery(api.tasks.list);
   if (!user) {
     return null;
   }
@@ -33,7 +33,7 @@ export default function TestUserCard() {
         <CardDescription>{user.emailAddresses[0].emailAddress}</CardDescription>
       </CardHeader>
       <CardContent>
-        {tasks?.map(({ _id, text }) => <div key={_id}>{text}</div>)}
+        {tasks?.map(({ _id, title }) => <div key={_id}>{title}</div>)}
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button variant="outline" size="sm" onClick={() => signOut()}>

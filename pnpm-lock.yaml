@@ -11,6 +11,9 @@ dependencies:
   '@radix-ui/react-dropdown-menu':
     specifier: ^2.1.6
     version: 2.1.6(@types/react-dom@19.0.3)(@types/react@19.0.8)(react-dom@19.0.0)(react@19.0.0)
+  '@radix-ui/react-label':
+    specifier: ^2.1.2
+    version: 2.1.2(@types/react-dom@19.0.3)(@types/react@19.0.8)(react-dom@19.0.0)(react@19.0.0)
   '@radix-ui/react-slot':
     specifier: ^1.1.2
     version: 1.1.2(@types/react@19.0.8)(react@19.0.0)
@@ -41,6 +44,9 @@ dependencies:
   react-dom:
     specifier: ^19.0.0
     version: 19.0.0(react@19.0.0)
+  react-hook-form:
+    specifier: ^7.54.2
+    version: 7.54.2(react@19.0.0)
   tailwind-merge:
     specifier: ^3.0.1
     version: 3.0.1
@@ -1068,6 +1074,26 @@ packages:
       '@radix-ui/react-use-layout-effect': 1.1.0(@types/react@19.0.8)(react@19.0.0)
       '@types/react': 19.0.8
       react: 19.0.0
+    dev: false
+
+  /@radix-ui/react-label@2.1.2(@types/react-dom@19.0.3)(@types/react@19.0.8)(react-dom@19.0.0)(react@19.0.0):
+    resolution: {integrity: sha512-zo1uGMTaNlHehDyFQcDZXRJhUPDuukcnHz0/jnrup0JA6qL+AFpAnty+7VKa9esuU5xTblAZzTGYJKSKaBxBhw==, tarball: https://registry.npmjs.org/@radix-ui/react-label/-/react-label-2.1.2.tgz}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@radix-ui/react-primitive': 2.0.2(@types/react-dom@19.0.3)(@types/react@19.0.8)(react-dom@19.0.0)(react@19.0.0)
+      '@types/react': 19.0.8
+      '@types/react-dom': 19.0.3(@types/react@19.0.8)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
     dev: false
 
   /@radix-ui/react-menu@2.1.6(@types/react-dom@19.0.3)(@types/react@19.0.8)(react-dom@19.0.0)(react@19.0.0):
@@ -3492,6 +3518,15 @@ packages:
     dependencies:
       react: 19.0.0
       scheduler: 0.25.0
+    dev: false
+
+  /react-hook-form@7.54.2(react@19.0.0):
+    resolution: {integrity: sha512-eHpAUgUjWbZocoQYUHposymRb4ZP6d0uwUnooL2uOybA9/3tPUvoAKqEWK1WaSiTxxOfTpffNZP7QwlnM3/gEg==, tarball: https://registry.npmjs.org/react-hook-form/-/react-hook-form-7.54.2.tgz}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18 || ^19
+    dependencies:
+      react: 19.0.0
     dev: false
 
   /react-is@16.13.1:
