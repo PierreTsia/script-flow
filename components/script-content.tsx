@@ -1,6 +1,5 @@
 "use client";
 
-import type { DataModel } from "@/convex/_generated/dataModel";
 import {
   Sheet,
   SheetContent,
@@ -8,8 +7,6 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { PanelLeftOpen } from "lucide-react";
 import { useState } from "react";
 import ScriptTopBar from "./script-top-bar";
 import { ScriptDocument } from "@/hooks/useScripts";

@@ -7,6 +7,8 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Spinner } from "@/components/ui/spinner";
 import { ScriptContent } from "@/components/script-content";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
+
 interface Props {
   scriptId: Id<"scripts">;
 }
@@ -45,19 +47,29 @@ function ScriptNotFound() {
   return (
     <div className="flex flex-col h-full items-center justify-center gap-4 p-8 text-center w-full mt-12">
       {/* Light mode image */}
-      <img
-        src="/assets/no-script-found-light.svg"
-        className="w-[200px] opacity-75 dark:hidden"
-        aria-hidden="true"
-        alt=""
-      />
+      <div className="relative w-[200px] h-[195px] opacity-75 dark:hidden">
+        <Image
+          src="/assets/no-script-found-light.svg"
+          alt=""
+          fill
+          priority
+          className="object-contain"
+          aria-hidden="true"
+        />
+      </div>
+
       {/* Dark mode image */}
-      <img
-        src="/assets/no-script-found-dark.svg"
-        className="w-[200px] hidden dark:block opacity-65"
-        aria-hidden="true"
-        alt=""
-      />
+      <div className="relative w-[200px] h-[195px] hidden dark:block opacity-25">
+        <Image
+          src="/assets/no-script-found-dark.svg"
+          alt=""
+          fill
+          priority
+          className="object-contain"
+          aria-hidden="true"
+        />
+      </div>
+
       <div className="space-y-2">
         <h3 className="text-lg font-medium text-foreground">{t("title")}</h3>
         <p className="text-sm text-muted-foreground">{t("description")}</p>

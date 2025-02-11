@@ -1,13 +1,8 @@
 "use client";
 
-import {
-  NavigationMenu,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
+import { NavigationMenu } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { MenuIcon } from "lucide-react";
-import { useScripts } from "@/hooks/useScripts";
-import { DataModel } from "@/convex/_generated/dataModel";
 import { ScriptDocument } from "@/hooks/useScripts";
 
 export default function ScriptTopBar({
