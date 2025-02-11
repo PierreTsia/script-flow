@@ -1,10 +1,8 @@
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
-import { Id } from "@/convex/_generated/dataModel";
-interface UploadScriptPayload {
-  file: File;
-  name: string;
-}
+import { Id, DataModel } from "@/convex/_generated/dataModel";
+
+export type ScriptDocument = DataModel["scripts"]["document"];
 
 export const useScripts = () => {
   const uploadUrl = useMutation(api.scripts.getUploadUrl);

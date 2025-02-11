@@ -23,6 +23,10 @@
       "uploading": "Uploading...",
       "dropPrompt": "Drop the PDF here",
       "dragPrompt": "Drag & drop script PDF, or click to select"
+    },
+    "notFound": {
+      "title": "Script vanished into the void",
+      "description": "This script either never existed or was deleted by interdimensional gnomes"
     }
   }
 }

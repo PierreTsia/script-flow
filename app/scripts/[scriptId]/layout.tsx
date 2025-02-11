@@ -9,10 +9,5 @@ export default function ScriptLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="flex h-full">
-      {/* Shared layout elements */}
-      {children}
-    </div>
-  );
+  return <div className="flex flex-col h-[100vh]">{children}</div>;
 }
