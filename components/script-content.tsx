@@ -13,13 +13,14 @@ import { ScriptDocument } from "@/hooks/useScripts";
 import { usePDFSlick } from "@pdfslick/react";
 import "@pdfslick/react/dist/pdf_viewer.css";
 import { Button } from "@/components/ui/button";
-
+import { useScene } from "@/hooks/useScene";
 interface ScriptContentProps {
   script: ScriptDocument;
   fileUrl: string;
 }
 
 export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
+  const { analyze } = useScene();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedText, setSelectedText] = useState("");
   const [selectedPages, setSelectedPages] = useState<number[]>([]);
@@ -113,7 +114,7 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
                       <Button
                         className="mt-4"
                         onClick={() => {
-                          /* TODO: Add handler */
+                          analyze(selectedText, selectedPages[0]);
                         }}
                       >
                         🤖 Analyze Selection
