@@ -2,7 +2,7 @@ import ScriptViewer from "@/components/script-viewer";
 import { Id } from "@/convex/_generated/dataModel";
 import { notFound } from "next/navigation";
 interface PageProps {
-  params: { scriptId: string };
+  params: Promise<{ scriptId: string }>;
 }
 
 export default async function ScriptPage({ params }: PageProps) {
