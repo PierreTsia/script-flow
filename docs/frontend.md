@@ -30,17 +30,18 @@ A modern, dashboard-based web application built with Next.js, focusing on profes
 
 ### Script View Layout
 ```
-Desktop (>768px):
-+------------------+------------------+
-|   PDF (70%)      |  Scenes (30%)    |
-+------------------+------------------+
+All Viewports:
++----------------------------+
+|         Top Bar            |
++----------------------------+
+|                            |
+|       Full-width PDF       |
+|                            |
++----------------------------+
+|  Scenes Bottom Sheet (60%) |
++----------------------------+
 
-Mobile (≤768px):
-+------------------+
-|     PDF          |
-|  (100% width)    |
-+------------------+
-| [Scene Toggle]   | // Floating button
+
 ```
 
 ### Analysis Modal
@@ -403,4 +404,16 @@ export default function ScriptPage({ params }: { params: { scriptId: string } })
 - Adds 23kb to bundle size (gzip) vs raw PDF.js
 - Less low-level control than vanilla implementation
 - Reliant on PDFSlick's active maintenance
+
+### Key Changes from Phase 1:
+1. Unified bottom sheet approach for all devices
+2. PDF viewer uses full width regardless of viewport
+3. Scenes panel becomes persistent bottom bar on desktop
+4. Simplified layout hierarchy
+
+### Tradeoffs:
+- Desktop users get less vertical PDF space
+- Consistent bottom-up interaction pattern
+- Reduced layout complexity
+- Better mobile-first experience
 

@@ -9,5 +9,9 @@ export default function ScriptLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="flex flex-col h-[100vh]">{children}</div>;
+  return (
+    <div className="flex flex-col h-[calc(100vh-4rem)]">
+      <div className="flex-1 overflow-hidden">{children}</div>
+    </div>
+  );
 }

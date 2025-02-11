@@ -24,7 +24,7 @@ export default function ScriptTopBar({
           </p>
         </div>
 
-        <Button onClick={toggleSidebar} className="block lg:hidden ">
+        <Button onClick={toggleSidebar}>
           <MenuIcon className="w-4 h-4" />
         </Button>
       </ul>

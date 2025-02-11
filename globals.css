@@ -1,0 +1,4 @@
+.pdfSlick .textLayer {
+  @apply text-blue-600/75 dark:text-blue-300/75;
+  cursor: text;
+} 
