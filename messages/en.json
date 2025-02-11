@@ -11,6 +11,8 @@
   "Scripts": {
     "recentScripts": "Recent Scripts",
     "noScripts": "No scripts uploaded yet",
+    "uploadError": "Error uploading script",
+    "uploadSuccess": "Script uploaded",
     "actions": {
       "view": "View script",
       "delete": "Delete script"
@@ -21,6 +23,10 @@
       "uploading": "Uploading...",
       "dropPrompt": "Drop the PDF here",
       "dragPrompt": "Drag & drop script PDF, or click to select"
+    },
+    "notFound": {
+      "title": "Script vanished into the void",
+      "description": "This script either never existed or was deleted by interdimensional gnomes"
     }
   }
 }

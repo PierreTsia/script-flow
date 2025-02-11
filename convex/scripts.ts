@@ -62,3 +62,23 @@ export const deleteScript = mutation({
     await ctx.storage.delete(script.fileId);
   },
 });
+
+export const getScript = query({
+  args: { scriptId: v.id("scripts") },
+
+  handler: async (ctx, { scriptId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    const script = await ctx.db.get(scriptId);
+
+    if (!script) return null;
+
+    const fileUrl = await ctx.storage.getUrl(script.fileId);
+
+    return {
+      data: identity?.subject === script.userId ? script : null,
+      accessLevel: identity?.subject === script.userId ? "owner" : "viewer",
+      authStatus: identity ? "authenticated" : "unauthenticated",
+      fileUrl: identity?.subject === script.userId ? fileUrl : null,
+    };
+  },
+});

@@ -38,6 +38,7 @@ interface Script {
     status: "processing" | "ready" | "error"
     lastModified: number
   }
+  // should probably not be in the script table, but the result of a composite query
   entities: {
     characters: Id<"characters">[]
     props: Id<"props">[]

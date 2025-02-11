@@ -1,33 +1,8 @@
-/* 
-interface Script {
-  id: Id<"scripts">
-  userId: string
-  name: string
-  uploadedAt: number
-  fileId: string
-  metadata: {
-    pageCount: number
-    version?: string
-    status: "processing" | "ready" | "error"
-    lastModified: number
-  }
-  entities: {
-    characters: Id<"characters">[]
-    props: Id<"props">[]
-    costumes: Id<"costumes">[]
-    locations: Id<"locations">[]
-  }
-}
-*/
-
-import { mutation } from "@/convex/_generated/server";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
-import { Id } from "@/convex/_generated/dataModel";
-interface UploadScriptPayload {
-  file: File;
-  name: string;
-}
+import { Id, DataModel } from "@/convex/_generated/dataModel";
+
+export type ScriptDocument = DataModel["scripts"]["document"];
 
 export const useScripts = () => {
   const uploadUrl = useMutation(api.scripts.getUploadUrl);
@@ -71,5 +46,15 @@ export const useScripts = () => {
     deleteScript({ scriptId });
   };
 
-  return { uploadScript, scripts, deleteScriptById };
+  const scriptById = (scriptId: Id<"scripts">) => {
+    const result = useQuery(api.scripts.getScript, {
+      scriptId,
+    });
+    if (result?.data && result.accessLevel === "owner") {
+      return { ...result.data, fileUrl: result.fileUrl };
+    }
+    return null;
+  };
+
+  return { uploadScript, scripts, deleteScriptById, scriptById };
 };

@@ -5,7 +5,7 @@ import { useScripts } from "@/hooks/useScripts";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileText, Eye, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-
+import Link from "next/link";
 export function ScriptsListCard() {
   const { scripts, deleteScriptById } = useScripts();
   const t = useTranslations("Scripts");
@@ -38,14 +38,16 @@ export function ScriptsListCard() {
                     </div>
                   </div>
                   <div className="flex justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-muted-foreground h-8 w-8 p-0"
-                      title={t("actions.view")}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
+                    <Link href={`/scripts/${script._id}`}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-muted-foreground h-8 w-8 p-0"
+                        title={t("actions.view")}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </Link>
                     <Button
                       variant="ghost"
                       size="sm"

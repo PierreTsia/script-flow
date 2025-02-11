@@ -34,9 +34,9 @@
    **Files:** `src/app/page.tsx`
    
 5. **PDF Core 2** (6h)
-   - [ ] script id details page
-   - [ ] PDF.js viewer integration
-   - [ ] Text selection capture
+   - [x] script id details page
+   - [x] Pdf Slick viewer integration
+   - [x] Text selection capture with page number start
    **Files:** `src/app/[scriptId]/page.tsx`
 
 6. **AI Integration** (5h)

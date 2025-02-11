@@ -1,6 +1,7 @@
 import { ScriptUploadCard } from "@/components/script-upload-card";
 import { ScriptsListCard } from "@/components/scripts-list-card";
 import { Header } from "@/components/header";
+import { Toaster } from "@/components/ui/toaster";
 export default async function Home() {
   return (
     <div className="flex flex-col min-h-screen">
@@ -11,6 +12,7 @@ export default async function Home() {
           <ScriptUploadCard />
           <ScriptsListCard />
         </div>
+        <Toaster />
       </main>
     </div>
   );

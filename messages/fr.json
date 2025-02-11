@@ -11,16 +11,22 @@
   "Scripts": {
     "recentScripts": "Scripts récents",
     "noScripts": "Aucun script téléchargé",
+    "uploadError": "Erreur lors de l'envoi du script",
+    "uploadSuccess": "Script envoyé",
+    "upload": "Envoyer un script",
     "actions": {
       "view": "Voir le script",
       "delete": "Supprimer le script"
     },
-    "upload": "Envoyer un script",
     "dropzone": {
       "confirm": "Confirmer l'envoi",
       "uploading": "Envoi en cours...",
       "dropPrompt": "Déposer le PDF ici",
       "dragPrompt": "Glisser-déposer un PDF ou cliquer pour sélectionner"
+    },
+    "notFound": {
+      "title": "Script disparu dans le néant",
+      "description": "Ce script n'a jamais existé ou a été supprimé par des gnomes interdimensionnels"
     }
   }
 }
