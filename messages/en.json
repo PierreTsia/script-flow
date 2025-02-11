@@ -11,6 +11,8 @@
   "Scripts": {
     "recentScripts": "Recent Scripts",
     "noScripts": "No scripts uploaded yet",
+    "uploadError": "Error uploading script",
+    "uploadSuccess": "Script uploaded",
     "actions": {
       "view": "View script",
       "delete": "Delete script"

@@ -1,6 +1,7 @@
 "use client";
 
 import { FileDropZone } from "@/components/file-drop-zone";
+import { toast } from "@/hooks/use-toast";
 import { useScripts } from "@/hooks/useScripts";
 import { useTranslations } from "next-intl";
 
@@ -10,7 +11,18 @@ export function ScriptUploadCard() {
 
   const handleFileAccepted = async (file: File) => {
     // TODO add try catch and a toast feedback
-    await uploadScript(file);
+    try {
+      await uploadScript(file);
+      toast({
+        title: t("uploadSuccess"),
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: t("uploadError"),
+        variant: "destructive",
+      });
+    }
   };
 
   return (

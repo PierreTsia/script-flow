@@ -11,7 +11,7 @@ A modern, dashboard-based web application built with Next.js, focusing on profes
 ### UI Components
 - **shadcn/ui**: Primary component library
 - **Tailwind CSS**: Utility-first styling
-- **PDF.js**: PDF rendering and text selection
+- **PDFSlick**: React-optimized PDF viewer with built-in text selection and Zustand integration
 
 ## 3. Dashboard Structure
 
@@ -30,18 +30,17 @@ A modern, dashboard-based web application built with Next.js, focusing on profes
 
 ### Script View Layout
 ```
+Desktop (>768px):
 +------------------+------------------+
-|     Header       | Script Name      |
+|   PDF (70%)      |  Scenes (30%)    |
 +------------------+------------------+
-|                  |                  |
-|   PDF Viewer     |   Scenes List    |
-|    (70%)         |     (30%)        |
-|                  |                  |
-| - Zoom Controls  | - Scene Items    |
-| - Text Selection | - Create New     |
-| - Page Nav       | - Quick Actions  |
-|                  |                  |
-+------------------+------------------+
+
+Mobile (≤768px):
++------------------+
+|     PDF          |
+|  (100% width)    |
++------------------+
+| [Scene Toggle]   | // Floating button
 ```
 
 ### Analysis Modal
@@ -83,9 +82,9 @@ A modern, dashboard-based web application built with Next.js, focusing on profes
 
 ## 4. Core Components
 1. **PDFViewer**
-   - Text selection capability
-   - Scene boundary visualization
-   - Zoom and navigation controls
+   - Built-in text selection and scene boundary visualization
+   - Preconfigured zoom/navigation controls
+   - Zustand store integration for PDF state
 
 2. **BreakdownSheet**
    - Dynamic element categorization
@@ -128,24 +127,24 @@ graph TD
 graph TD
     subgraph ScriptView[Script View]
         direction LR
-        subgraph MainArea[Main Area - 70%]
+        subgraph MainArea["Main Area - 70%"]
             PDF[PDF Viewer]
             Selection[Selection Tools]
             Instructions[User Instructions]
+            MobileToggle[Mobile Scene Toggle]
         end
-        subgraph Sidebar[Sidebar - 30%]
+        subgraph Sidebar["Sidebar - 30% (Mobile Sheet)"]
             ScenesList[Scenes List]
             CreateNew[New Scene Button]
         end
     end
 ```
 
-**What user sees:**
-- **Main Area (70%)**
-  - PDF displayed with zoom/scroll
-  - Clear instructions: "Select scene text to analyze"
-  - Selection highlight as they drag
-  - "Analyze Selection" button appears when text selected
+**What user sees** (Script View):
+- **Main Area**
+  - Desktop: Persistent side-by-side view
+  - Mobile: Full-width PDF with floating scene toggle
+  - New mobile behavior: Bottom sheet for scenes (40vh height)
 
 - **Sidebar (30%)**
   - List of saved scenes
@@ -343,7 +342,6 @@ src/
 │   └── use-scene.ts
 │
 └── types/                 // Direct imports, no barrel
-    ├── pdf.ts            // PDF related types
     ├── scene.ts          // Scene related types
     └── api.ts            // API types
 ```
@@ -352,11 +350,11 @@ src/
 
 ```typescript
 // components/pdf-viewer.tsx
-import type { PDFDocument, PDFSelection } from '@/types/pdf'
+import { usePDFSlick } from "@pdfslick/react"
 
 interface PDFViewerProps {
-  document: PDFDocument
-  onSelection: (selection: PDFSelection) => void
+  url: string
+  onSceneSelect: (selection: TextSelection) => void
 }
 
 // hooks/use-pdf.ts
@@ -375,4 +373,34 @@ export async function getScene(id: string): Promise<APIResponse<Scene>> {
   // ...
 }
 ``` 
+
+## 8. Implementation Considerations
+
+### PDFSlick Integration
+```typescript
+// app/scripts/[scriptId]/page.tsx
+import { PDFSlickProvider } from "@pdfslick/react"
+
+export default function ScriptPage({ params }: { params: { scriptId: string } }) {
+  return (
+    <PDFSlickProvider 
+      url={`/api/scripts/${params.scriptId}`}
+      options={{ disableTextLayer: false }}
+    >
+      <PDFViewer />
+      <SceneSidebar />
+    </PDFSlickProvider>
+  )
+}
+```
+
+**Key Decisions:**
+1. Using PDFSlick's provider pattern for cleaner state management
+2. Keeping text layer enabled for selection but style it with Tailwind
+3. PDFSlick's built-in controls match our mobile breakpoints
+
+**Tradeoffs:**
+- Adds 23kb to bundle size (gzip) vs raw PDF.js
+- Less low-level control than vanilla implementation
+- Reliant on PDFSlick's active maintenance
 
