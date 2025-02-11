@@ -7,12 +7,11 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import ScriptTopBar from "./script-top-bar";
 import { ScriptDocument } from "@/hooks/useScripts";
 import { usePDFSlick } from "@pdfslick/react";
 import "@pdfslick/react/dist/pdf_viewer.css";
-import type { PDFSlick } from "@pdfslick/core";
 import { Button } from "@/components/ui/button";
 
 interface ScriptContentProps {
@@ -23,6 +22,7 @@ interface ScriptContentProps {
 export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedText, setSelectedText] = useState("");
+  const [selectedPages, setSelectedPages] = useState<number[]>([]);
   const toggleSidebar = () => {
     setIsSheetOpen((prev) => !prev);
   };
@@ -39,27 +39,35 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
     removePageBorders: true,
   });
 
-  // Handle text selection
+  const pdfSlick = usePDFSlickStore((state) => state.pdfSlick);
+
+  const handleSelection = useCallback(() => {
+    const selection = window.getSelection();
+    if (!selection || !viewerRef.current || !pdfSlick) return;
+
+    const isInViewer = viewerRef.current.contains(selection.anchorNode);
+    const text = selection.toString().trim();
+
+    if (isInViewer && text) {
+      const currentPage = pdfSlick.store.getState().pageNumber;
+      setSelectedPages([currentPage]);
+      setSelectedText(text);
+      setIsSheetOpen(true);
+    } else {
+      setSelectedText("");
+      setSelectedPages([]);
+    }
+  }, [pdfSlick]);
+
   useEffect(() => {
-    const handleSelection = () => {
-      const selection = window.getSelection();
-      if (!selection || !viewerRef.current) return;
-
-      // Verify selection is within PDF viewer
-      const isInViewer = viewerRef.current.contains(selection.anchorNode);
-      const text = selection.toString().trim();
-
-      setSelectedText(isInViewer ? text : "");
-      setIsSheetOpen(!!text);
-    };
-
     const viewer = viewerRef.current;
-    viewer?.addEventListener("mouseup", handleSelection);
+    const selectionHandler = () => handleSelection();
 
+    viewer?.addEventListener("mouseup", selectionHandler);
     return () => {
-      viewer?.removeEventListener("mouseup", handleSelection);
+      viewer?.removeEventListener("mouseup", selectionHandler);
     };
-  }, [viewerRef]);
+  }, [viewerRef, handleSelection]);
 
   return (
     <div className="min-h-[100vh] flex flex-col">
@@ -91,13 +99,19 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
                   Manage your script scenes here
                 </SheetDescription>
                 <div className="h-full flex flex-col">
-                  <div className=" overflow-y-auto p-4">
-                    <div className="text-muted-foreground">{selectedText}</div>
-                  </div>
+                  {selectedPages.length > 0 && (
+                    <div className="text-sm mt-2 text-muted-foreground/70">
+                      Selected on page: {selectedPages[0]}
+                    </div>
+                  )}
+
                   {selectedText && (
-                    <div className="p-4 mt-12">
+                    <div className="p-4 ">
+                      <div className="text-muted-foreground bg-foreground/10 p-4 rounded-lg">
+                        {selectedText}
+                      </div>
                       <Button
-                        className=""
+                        className="mt-4"
                         onClick={() => {
                           /* TODO: Add handler */
                         }}
@@ -110,12 +124,6 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
               </SheetContent>
             </Sheet>
           </div>
-
-          {selectedText && (
-            <div className="absolute bottom-4 right-4 bg-background p-4 rounded-lg shadow-lg">
-              Selected: {selectedText}
-            </div>
-          )}
         </div>
       </div>
     </div>
