@@ -6,10 +6,8 @@ export const metadata: Metadata = {
 
 export default function ScriptLayout({
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: { scriptId: string };
 }) {
   return (
     <div className="flex h-full">
