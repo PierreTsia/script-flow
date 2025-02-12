@@ -14,7 +14,7 @@ interface ScriptContentProps {
 }
 
 export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
-  const { analyze } = useScene();
+  const { analyze, isAnalyzing } = useScene();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const {
     viewerRef,
@@ -55,6 +55,7 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
               selectedPage={selectedPages[0]}
               onOpenChange={handleOpenChange}
               onAnalyze={() => analyze(selectedText, selectedPages[0])}
+              isAnalyzing={isAnalyzing}
             />
           </div>
         </div>

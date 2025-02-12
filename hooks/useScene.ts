@@ -7,23 +7,31 @@ export const useScene = () => {
   const [error, setError] = useState<string | null>(null);
 
   const analyze = async (text: string, pageNumber: number) => {
+    console.log("Analyzing text:", text);
+    if (isAnalyzing) return; // Prevent double-submission
+
     setIsAnalyzing(true);
+    setError(null);
+    console.log("checking early return:", text);
+
     try {
       const response = await fetch(`${API_URL}/analyze-scene`, {
-        // Match your HTTP route
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, pageNumber }),
       });
 
-      if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`Analysis failed: ${response.statusText}`);
+      }
+
       return await response.json();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "API call failed");
+      setError(err instanceof Error ? err.message : "Analysis request failed");
       throw err;
     } finally {
       setIsAnalyzing(false);
+      console.log("setting isAnalyzing to false");
     }
   };
 

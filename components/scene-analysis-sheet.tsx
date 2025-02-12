@@ -18,6 +18,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 
 const SceneAnalysisSheet = ({
   isOpen,
@@ -25,12 +26,14 @@ const SceneAnalysisSheet = ({
   selectedPage,
   onOpenChange,
   onAnalyze,
+  isAnalyzing,
 }: {
   isOpen: boolean;
   selectedText: string;
   selectedPage?: number;
   onOpenChange: (open: boolean) => void;
   onAnalyze: () => void;
+  isAnalyzing: boolean;
 }) => {
   const t = useTranslations("SceneAnalysis");
 
@@ -74,8 +77,19 @@ const SceneAnalysisSheet = ({
             </CardContent>
 
             <CardFooter className="p-4 pt-0">
-              <Button className="w-full" onClick={onAnalyze}>
-                {t("analyzeButton")}
+              <Button
+                className="w-full"
+                onClick={onAnalyze}
+                disabled={isAnalyzing}
+              >
+                {isAnalyzing ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t("analyzingButton")}
+                  </div>
+                ) : (
+                  t("analyzeButton")
+                )}
               </Button>
             </CardFooter>
           </Card>

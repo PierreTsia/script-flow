@@ -37,6 +37,7 @@
     "analysisTitle": "Analyse de scène",
     "analysisDescription": "Découpage par IA du texte sélectionné",
     "emptyAnalysis": "Sélectionnez du texte et cliquez sur analyser",
-    "textSelectionTitle": "Texte Sélectionné"
+    "textSelectionTitle": "Texte Sélectionné",
+    "analyzingButton": "Analyse en cours..."
   }
 }

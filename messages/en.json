@@ -37,6 +37,6 @@
     "analysisTitle": "Scene Analysis",
     "analysisDescription": "AI-powered breakdown of selected text",
     "emptyAnalysis": "Select text and click analyze to begin",
-    "textSelectionTitle": "Selected Text"
+    "analyzingButton": "Analyzing..."
   }
 }
