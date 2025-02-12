@@ -10,15 +10,17 @@ export const analyzeScene = httpAction(async (ctx, request) => {
   const mistralKey = process.env.MISTRAL_KEY!;
   const clientOrigin = process.env.CLIENT_ORIGIN!;
   console.log("mistralKey", mistralKey);
-
+  console.log("clientOrigin", clientOrigin);
+  console.log("request", request);
   // Set in convex dashboard as "https://script-flow.vercel.app/"
 
-  const allowedOrigins = [process.env.CLIENT_ORIGIN!, "http://localhost:3000"];
+  const allowedOrigins = [clientOrigin, "http://localhost:3000"];
   const requestOrigin = request.headers.get("Origin")!;
+  console.log("requestOrigin", requestOrigin);
   const isValidOrigin = allowedOrigins.some(
     (origin) => origin.trim() === requestOrigin
   );
-
+  console.log("isValidOrigin", isValidOrigin);
   const corsHeaders = {
     "Access-Control-Allow-Origin": isValidOrigin ? requestOrigin! : "",
     "Access-Control-Allow-Methods": "POST",
