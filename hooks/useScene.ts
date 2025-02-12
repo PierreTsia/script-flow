@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "./use-toast";
 
 const API_URL = "https://animated-mole-731.convex.site";
 
@@ -7,15 +8,13 @@ export const useScene = () => {
   const [error, setError] = useState<string | null>(null);
 
   const analyze = async (text: string, pageNumber: number) => {
-    console.log("Analyzing text:", text);
     if (isAnalyzing) return; // Prevent double-submission
 
     setIsAnalyzing(true);
     setError(null);
-    console.log("checking early return:", text);
 
     try {
-      const response = await fetch(`${API_URL}/analyze-scene`, {
+      const response = await fetch(`${API_URL}/analyze-scene-hhh`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, pageNumber }),
@@ -28,10 +27,12 @@ export const useScene = () => {
       return await response.json();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Analysis request failed");
-      throw err;
+      toast({
+        title: `Analysis failed: ${err}`,
+        variant: "destructive",
+      });
     } finally {
       setIsAnalyzing(false);
-      console.log("setting isAnalyzing to false");
     }
   };
 
