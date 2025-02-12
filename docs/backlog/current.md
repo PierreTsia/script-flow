@@ -40,10 +40,12 @@
    **Files:** `src/app/[scriptId]/page.tsx`
 
 6. **AI Integration** (5h)
-   - [ ] LLM provider interface
+   - [ ] create new hook 'useScene' and convex file `scenes.ts` with analyse function
+   - [ ] this analyse function should take the selected text and the page number 
+   - [ ] and then call the LLM using an http convex request (see https://docs.convex.dev/functions/http-actions)
+   - [ ] the call is done through the LLM provider interface => see @ai-providers.md
    - [ ] Mistral API wrapper
-   - [ ] Scene analysis service
-   **Files:** `src/lib/llm-provider.ts`, `src/convex/ai.ts`
+   **Files:** `/hooks/useScene.ts`, `src/convex/scenes.ts`
 
 7. **Basic UI** (4h)
    - [ ] Upload button
