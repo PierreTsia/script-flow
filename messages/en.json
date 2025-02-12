@@ -28,5 +28,15 @@
       "title": "Script vanished into the void",
       "description": "This script either never existed or was deleted by interdimensional gnomes"
     }
+  },
+  "SceneAnalysis": {
+    "title": "Scene Management",
+    "description": "Manage your script scenes here",
+    "selectedPage": "Selected on page: {page}",
+    "analyzeButton": "🤖 Analyze Selection",
+    "analysisTitle": "Scene Analysis",
+    "analysisDescription": "AI-powered breakdown of selected text",
+    "emptyAnalysis": "Select text and click analyze to begin",
+    "textSelectionTitle": "Selected Text"
   }
 }

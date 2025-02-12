@@ -1,20 +1,12 @@
 "use client";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ScriptTopBar from "./script-top-bar";
 import { ScriptDocument } from "@/hooks/useScripts";
 
-import { Button } from "@/components/ui/button";
 import { useScene } from "@/hooks/useScene";
 import { usePdfViewer } from "@/hooks/usePdfViewer";
+import SceneAnalysisSheet from "./scene-analysis-sheet";
 
 interface ScriptContentProps {
   script: ScriptDocument;
@@ -38,12 +30,10 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
     setIsSheetOpen((prev) => !prev);
   };
 
-  useEffect(() => {
-    console.log("selectedText in content", selectedText);
-    if (selectedText && !isSheetOpen) {
-      setIsSheetOpen(true);
-    }
-  }, [selectedText, isSheetOpen]);
+  const handleOpenChange = (open: boolean) => {
+    setIsSheetOpen(open);
+    if (!open) setSelectedText("");
+  };
 
   return (
     <div className="min-h-[100vh] flex flex-col">
@@ -59,49 +49,13 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
               />
             </div>
 
-            <Sheet
-              open={isSheetOpen}
-              onOpenChange={(open) => {
-                setIsSheetOpen(open);
-                if (!open) setSelectedText("");
-              }}
-            >
-              <SheetTrigger asChild className="hidden">
-                <button className="hidden" aria-hidden="true" />
-              </SheetTrigger>
-              <SheetContent side="bottom" className="h-[60vh]">
-                <SheetHeader>
-                  <SheetTitle>Scene Management</SheetTitle>
-                  <SheetDescription>
-                    Manage your script scenes here
-                  </SheetDescription>{" "}
-                </SheetHeader>
-
-                <div className="h-full flex flex-col">
-                  {selectedPages.length > 0 && (
-                    <div className="text-sm mt-2 text-muted-foreground/70">
-                      Selected on page: {selectedPages[0]}
-                    </div>
-                  )}
-
-                  {selectedText && (
-                    <div className="p-4 ">
-                      <div className="text-muted-foreground bg-foreground/10 p-4 rounded-lg">
-                        {selectedText}
-                      </div>
-                      <Button
-                        className="mt-4"
-                        onClick={() => {
-                          analyze(selectedText, selectedPages[0]);
-                        }}
-                      >
-                        🤖 Analyze Selection
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </SheetContent>
-            </Sheet>
+            <SceneAnalysisSheet
+              isOpen={isSheetOpen}
+              selectedText={selectedText}
+              selectedPage={selectedPages[0]}
+              onOpenChange={handleOpenChange}
+              onAnalyze={() => analyze(selectedText, selectedPages[0])}
+            />
           </div>
         </div>
       </div>

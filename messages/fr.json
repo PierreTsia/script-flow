@@ -28,5 +28,15 @@
       "title": "Script disparu dans le néant",
       "description": "Ce script n'a jamais existé ou a été supprimé par des gnomes interdimensionnels"
     }
+  },
+  "SceneAnalysis": {
+    "title": "Gestion de scène",
+    "description": "Gérez les scènes de votre script ici",
+    "selectedPage": "Sélectionné sur la page : {page}",
+    "analyzeButton": "🤖 Analyser la sélection",
+    "analysisTitle": "Analyse de scène",
+    "analysisDescription": "Découpage par IA du texte sélectionné",
+    "emptyAnalysis": "Sélectionnez du texte et cliquez sur analyser",
+    "textSelectionTitle": "Texte Sélectionné"
   }
 }
