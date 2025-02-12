@@ -3,17 +3,19 @@
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
   SheetTitle,
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import ScriptTopBar from "./script-top-bar";
 import { ScriptDocument } from "@/hooks/useScripts";
-import { usePDFSlick } from "@pdfslick/react";
-import "@pdfslick/react/dist/pdf_viewer.css";
+
 import { Button } from "@/components/ui/button";
 import { useScene } from "@/hooks/useScene";
+import { usePdfViewer } from "@/hooks/usePdfViewer";
+
 interface ScriptContentProps {
   script: ScriptDocument;
   fileUrl: string;
@@ -22,61 +24,33 @@ interface ScriptContentProps {
 export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
   const { analyze } = useScene();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedText, setSelectedText] = useState("");
-  const [selectedPages, setSelectedPages] = useState<number[]>([]);
+  const {
+    viewerRef,
+    pdfSlickViewerRef,
+    usePDFSlickStore,
+    PDFSlickViewer,
+    selectedText,
+    selectedPages,
+    setSelectedText,
+  } = usePdfViewer(fileUrl);
+
   const toggleSidebar = () => {
     setIsSheetOpen((prev) => !prev);
   };
 
-  const viewerRef = useRef<HTMLDivElement>(null);
-  const {
-    viewerRef: pdfSlickViewerRef,
-    usePDFSlickStore,
-    PDFSlickViewer,
-  } = usePDFSlick(fileUrl, {
-    scaleValue: "page-fit",
-    textLayerMode: 1,
-    useOnlyCssZoom: true,
-    removePageBorders: true,
-  });
-
-  const pdfSlick = usePDFSlickStore((state) => state.pdfSlick);
-
-  const handleSelection = useCallback(() => {
-    const selection = window.getSelection();
-    if (!selection || !viewerRef.current || !pdfSlick) return;
-
-    const isInViewer = viewerRef.current.contains(selection.anchorNode);
-    const text = selection.toString().trim();
-
-    if (isInViewer && text) {
-      const currentPage = pdfSlick.store.getState().pageNumber;
-      setSelectedPages([currentPage]);
-      setSelectedText(text);
-      setIsSheetOpen(true);
-    } else {
-      setSelectedText("");
-      setSelectedPages([]);
-    }
-  }, [pdfSlick]);
-
   useEffect(() => {
-    const viewer = viewerRef.current;
-
-    viewer?.addEventListener("mouseup", handleSelection);
-    viewer?.addEventListener("touchend", handleSelection);
-
-    return () => {
-      viewer?.removeEventListener("mouseup", handleSelection);
-      viewer?.removeEventListener("touchend", handleSelection);
-    };
-  }, [viewerRef, handleSelection]);
+    console.log("selectedText in content", selectedText);
+    if (selectedText && !isSheetOpen) {
+      setIsSheetOpen(true);
+    }
+  }, [selectedText, isSheetOpen]);
 
   return (
     <div className="min-h-[100vh] flex flex-col">
+      {/* TODO later on, the topbar could store selected extracts 
+      saved in storage and open the sheet on select one */}
       <ScriptTopBar toggleSidebar={toggleSidebar} script={script} />
       <div className="flex flex-col w-full bg-background flex-1">
-        {/* Main Content Area */}
         <div className="flex flex-1 overflow-hidden">
           <div className="h-full w-full">
             <div ref={viewerRef} className="h-full w-full">
@@ -85,22 +59,24 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
               />
             </div>
 
-            {/* Sheet */}
             <Sheet
               open={isSheetOpen}
               onOpenChange={(open) => {
-                if (!open) setSelectedText(""); // Clear selection on close
                 setIsSheetOpen(open);
+                if (!open) setSelectedText("");
               }}
             >
               <SheetTrigger asChild className="hidden">
                 <button className="hidden" aria-hidden="true" />
               </SheetTrigger>
               <SheetContent side="bottom" className="h-[60vh]">
-                <SheetTitle>Scene Management</SheetTitle>
-                <SheetDescription>
-                  Manage your script scenes here
-                </SheetDescription>
+                <SheetHeader>
+                  <SheetTitle>Scene Management</SheetTitle>
+                  <SheetDescription>
+                    Manage your script scenes here
+                  </SheetDescription>{" "}
+                </SheetHeader>
+
                 <div className="h-full flex flex-col">
                   {selectedPages.length > 0 && (
                     <div className="text-sm mt-2 text-muted-foreground/70">
