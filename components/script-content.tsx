@@ -63,11 +63,6 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
   useEffect(() => {
     const viewer = viewerRef.current;
 
-    const handleSelection = () => {
-      /* existing logic */
-    };
-    const preventTouchMove = (e: TouchEvent) => e.preventDefault();
-
     viewer?.addEventListener("mouseup", handleSelection);
     viewer?.addEventListener("touchend", handleSelection);
 
