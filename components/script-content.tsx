@@ -62,11 +62,20 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
 
   useEffect(() => {
     const viewer = viewerRef.current;
-    const selectionHandler = () => handleSelection();
 
-    viewer?.addEventListener("mouseup", selectionHandler);
+    const handleSelection = () => {
+      /* existing logic */
+    };
+    const preventTouchMove = (e: TouchEvent) => e.preventDefault();
+
+    viewer?.addEventListener("mouseup", handleSelection);
+    viewer?.addEventListener("touchend", handleSelection);
+    viewer?.addEventListener("touchmove", preventTouchMove, { passive: false });
+
     return () => {
-      viewer?.removeEventListener("mouseup", selectionHandler);
+      viewer?.removeEventListener("mouseup", handleSelection);
+      viewer?.removeEventListener("touchend", handleSelection);
+      viewer?.removeEventListener("touchmove", preventTouchMove);
     };
   }, [viewerRef, handleSelection]);
 

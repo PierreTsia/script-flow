@@ -40,14 +40,21 @@
    **Files:** `src/app/[scriptId]/page.tsx`
 
 6. **AI Integration** (5h)
-   - [ ] create new hook 'useScene' and convex file `scenes.ts` with analyse function
-   - [ ] this analyse function should take the selected text and the page number 
-   - [ ] and then call the LLM using an http convex request (see https://docs.convex.dev/functions/http-actions)
-   - [ ] the call is done through the LLM provider interface => see @ai-providers.md
-   - [ ] Mistral API wrapper
+   - [x] create new hook 'useScene' and convex file `scenes.ts` with analyse function
+   - [x] this analyse function should take the selected text and the page number 
+   - [x] and then call the LLM using an http convex request (see https://docs.convex.dev/functions/http-actions)
+   - [x] the call is done through the LLM provider interface => see @ai-providers.md
+   - [x] Mistral API wrapper
    **Files:** `/hooks/useScene.ts`, `src/convex/scenes.ts`
 
-7. **Basic UI** (4h)
+7. **AI Integration 2** (5h)
+   - [ ] handle preview urls cors issue (using debug logs and allowed origins)
+   - [ ] costs monitoring using Helidome
+   - [ ] type the llm response better
+   - [ ] handle the response in the client
+   - [ ] match the entities schema
+
+8. **Basic UI** (4h)
    - [ ] Upload button
    - [ ] Script view layout
    - [ ] Analysis modal

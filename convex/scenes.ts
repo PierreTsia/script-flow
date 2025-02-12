@@ -4,15 +4,12 @@ import { MistralProvider } from "@/lib/llm/providers/mistral";
 
 export const analyzeScene = httpAction(async (ctx, request) => {
   const { text, pageNumber } = await request.json();
-  console.log("text", text);
 
-  // Env var access - will explode helpfully if missing
   const mistralKey = process.env.MISTRAL_KEY!;
   const clientOrigin = process.env.CLIENT_ORIGIN!;
-  console.log("mistralKey", mistralKey);
-  console.log("clientOrigin", clientOrigin);
-  console.log("request", request);
+
   // Set in convex dashboard as "https://script-flow.vercel.app/"
+  // TODO: deal with the preview urls
 
   const allowedOrigins = [clientOrigin, "http://localhost:3000"];
   const requestOrigin = request.headers.get("Origin")!;
@@ -28,7 +25,7 @@ export const analyzeScene = httpAction(async (ctx, request) => {
   };
 
   const provider = new MistralProvider({
-    apiKey: process.env.MISTRAL_KEY!,
+    apiKey: mistralKey,
     baseURL: "https://api.mistral.ai/v1",
   });
 
