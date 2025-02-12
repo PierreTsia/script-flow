@@ -70,12 +70,10 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
 
     viewer?.addEventListener("mouseup", handleSelection);
     viewer?.addEventListener("touchend", handleSelection);
-    viewer?.addEventListener("touchmove", preventTouchMove, { passive: false });
 
     return () => {
       viewer?.removeEventListener("mouseup", handleSelection);
       viewer?.removeEventListener("touchend", handleSelection);
-      viewer?.removeEventListener("touchmove", preventTouchMove);
     };
   }, [viewerRef, handleSelection]);
 
