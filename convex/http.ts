@@ -16,21 +16,20 @@ http.route({
   method: "OPTIONS",
   handler: httpAction(async (_, request) => {
     const headers = request.headers;
-    const allowedOrigins = process.env.CLIENT_ORIGINS?.split(",") || [];
+    const allowedOrigin = process.env.CLIENT_ORIGIN!;
     const requestOrigin = headers.get("Origin");
+
+    const isDev = requestOrigin === "http://localhost:3000";
 
     if (
       requestOrigin &&
       headers.get("Access-Control-Request-Method") &&
       headers.get("Access-Control-Request-Headers")
     ) {
-      const isValidOrigin = allowedOrigins.some(
-        (origin) => origin.trim() === requestOrigin
-      );
-
       return new Response(null, {
         headers: {
-          "Access-Control-Allow-Origin": isValidOrigin ? requestOrigin : "",
+          "Access-Control-Allow-Origin":
+            allowedOrigin === requestOrigin || isDev ? requestOrigin : "",
           "Access-Control-Allow-Methods": "POST",
           "Access-Control-Allow-Headers": "Content-Type",
           "Access-Control-Max-Age": "86400",

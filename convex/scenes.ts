@@ -1,17 +1,20 @@
 import { httpAction } from "./_generated/server";
+import { parseSceneAnalysis } from "@/lib/llm/parser";
+import { MistralProvider } from "@/lib/llm/providers/mistral";
 
 export const analyzeScene = httpAction(async (ctx, request) => {
   const { text, pageNumber } = await request.json();
+  console.log("text", text);
 
   // Env var access - will explode helpfully if missing
   const mistralKey = process.env.MISTRAL_KEY!;
   const clientOrigin = process.env.CLIENT_ORIGIN!;
   console.log("mistralKey", mistralKey);
 
-  // Set in dashboard as "http://localhost:3000"
+  // Set in convex dashboard as "https://script-flow.vercel.app/"
 
-  const allowedOrigins = process.env.CLIENT_ORIGINS?.split(",") || [];
-  const requestOrigin = request.headers.get("Origin");
+  const allowedOrigins = [process.env.CLIENT_ORIGIN!, "http://localhost:3000"];
+  const requestOrigin = request.headers.get("Origin")!;
   const isValidOrigin = allowedOrigins.some(
     (origin) => origin.trim() === requestOrigin
   );
@@ -22,36 +25,26 @@ export const analyzeScene = httpAction(async (ctx, request) => {
     "Access-Control-Allow-Headers": "Content-Type",
   };
 
-  return new Response(JSON.stringify({ analysis: mistralKey }), {
-    headers: {
-      ...corsHeaders,
-      "Content-Type": "application/json",
-    },
+  const provider = new MistralProvider({
+    apiKey: process.env.MISTRAL_KEY!,
+    baseURL: "https://api.mistral.ai/v1",
   });
 
-  /* const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${mistralKey}`
-    },
-    body: JSON.stringify({
-      model: "mistral-large-latest",
-      messages: [{
-        role: "user",
-        content: `Analyze this book passage from page ${pageNumber}: ${text}`
-      }],
-      temperature: 0.7,
-      max_tokens: 500
-    })
-  });
-
-  if (!response.ok) throw new Error(`Mistral choked: ${response.statusText}`);
-  const data = await response.json();
-  return new Response(JSON.stringify({ analysis: data.choices[0].message.content }), {
-    headers: {
-      ...corsHeaders,
-      "Content-Type": "application/json"
-    }
-  }); */
+  try {
+    const llmResponse = await provider.analyzeScene(text);
+    const analysis = parseSceneAnalysis(llmResponse);
+    console.log("analysis", analysis);
+    return new Response(JSON.stringify({ analysis, pageNumber }), {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    console.error("LLM Analysis failed:", error);
+    return new Response(JSON.stringify({ error: "Analysis failed" }), {
+      status: 500,
+      headers: corsHeaders,
+    });
+  }
 });
