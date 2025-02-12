@@ -30,13 +30,21 @@
     }
   },
   "SceneAnalysis": {
-    "title": "Scene Management",
-    "description": "Manage your script scenes here",
-    "selectedPage": "Selected on page: {page}",
-    "analyzeButton": "🤖 Analyze Selection",
+    "textSelectionTitle": "Selected Text",
+    "selectedPage": "Page {page}",
+    "analyzeButton": "Analyze Scene",
+    "draftsTitle": "Saved Drafts",
+    "draftsCount": "{count, plural, one {# analysis} other {# analyses}}",
+    "sceneNumber": "Scene {number}",
     "analysisTitle": "Scene Analysis",
-    "analysisDescription": "AI-powered breakdown of selected text",
-    "emptyAnalysis": "Select text and click analyze to begin",
-    "analyzingButton": "Analyzing..."
+    "analysisDescription": "Detailed breakdown of scene elements",
+    "noAnalysisAvailable": "No analysis available",
+    "deleteDraft": "Delete draft",
+    "saveDraft": "Save draft",
+    "saveButton": "Save Analysis",
+    "draftStatus": {
+      "savedDraft": "Saved draft locally",
+      "newAnalysis": "New analysis - not saved"
+    }
   }
 }

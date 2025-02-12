@@ -30,8 +30,6 @@ export const useScene = () => {
       }
 
       const data = await response.json();
-      console.log("data", data);
-      console.log("data.analysis", data.analysis);
       return data as SceneAnalysis;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Analysis request failed");

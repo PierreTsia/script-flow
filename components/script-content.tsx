@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState, useRef, useEffect, useMemo } from "react";
 import ScriptTopBar from "./script-top-bar";
 import { ScriptDocument } from "@/hooks/useScripts";
 import { SceneAnalysis } from "@/lib/llm/providers/index";
@@ -21,11 +21,34 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
     null
   );
 
-  const handleAnalyze = async (text: string, pageNumber: number) => {
-    const analysis = await analyze(text, pageNumber);
-    console.log("analysis", analysis);
-    setSceneAnalysis(analysis);
+  const prevAnalysis = useRef<SceneAnalysis | null>(null);
+
+  const stabilizeAnalysis = (analysis: SceneAnalysis | null) => {
+    if (!analysis) return null;
+
+    if (
+      prevAnalysis.current?.scene_number === analysis.scene_number &&
+      prevAnalysis.current?.pageNumber === analysis.pageNumber &&
+      JSON.stringify(prevAnalysis.current?.characters) ===
+        JSON.stringify(analysis.characters) &&
+      JSON.stringify(prevAnalysis.current?.locations) ===
+        JSON.stringify(analysis.locations)
+    ) {
+      return prevAnalysis.current;
+    }
+
+    prevAnalysis.current = analysis;
+    return analysis;
   };
+
+  const handleAnalyze = useCallback(
+    async (text: string, pageNumber: number) => {
+      const rawAnalysis = await analyze(text, pageNumber);
+      const stableAnalysis = stabilizeAnalysis(rawAnalysis);
+      setSceneAnalysis(stableAnalysis);
+    },
+    [analyze]
+  );
 
   const {
     viewerRef,
@@ -41,10 +64,13 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
     setIsSheetOpen((prev) => !prev);
   };
 
-  const handleOpenChange = (open: boolean) => {
-    setIsSheetOpen(open);
-    if (!open) setSelectedText("");
-  };
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      setIsSheetOpen(open);
+      if (!open) setSelectedText("");
+    },
+    [setIsSheetOpen, setSelectedText]
+  );
 
   return (
     <div className="min-h-[100vh] flex flex-col">
@@ -64,6 +90,7 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
               isOpen={isSheetOpen}
               selectedText={selectedText}
               selectedPage={selectedPages[0]}
+              scriptId={script._id}
               onOpenChange={handleOpenChange}
               onAnalyze={() => handleAnalyze(selectedText, selectedPages[0])}
               isAnalyzing={isAnalyzing}

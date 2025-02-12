@@ -38,6 +38,18 @@
     "analysisDescription": "Découpage par IA du texte sélectionné",
     "emptyAnalysis": "Sélectionnez du texte et cliquez sur analyser",
     "textSelectionTitle": "Texte Sélectionné",
-    "analyzingButton": "Analyse en cours..."
+    "analyzingButton": "Analyse en cours...",
+    "draftsTitle": "Brouillons enregistrés",
+    "draftsCount": "{count, plural, one {# brouillon} other {# brouillons}}",
+    "sceneNumber": "Scène {number}",
+    "noAnalysisAvailable": "Aucune analyse disponible",
+    "deleteDraft": "Supprimer le brouillon",
+    "saveDraft": "Enregistrer le brouillon",
+    "draftStatus": {
+      "savedDraft": "Brouillon enregistré localement",
+      "newAnalysis": "Nouvelle analyse - non enregistrée"
+    },
+    "saveButton": "Enregistrer l'analyse"
+    
   }
 }
