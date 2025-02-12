@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ScriptTopBar from "./script-top-bar";
 import { ScriptDocument } from "@/hooks/useScripts";
-
+import { SceneAnalysis } from "@/lib/llm/providers/index";
 import { useScene } from "@/hooks/useScene";
 import { usePdfViewer } from "@/hooks/usePdfViewer";
 import SceneAnalysisSheet from "./scene-analysis-sheet";
@@ -14,8 +14,19 @@ interface ScriptContentProps {
 }
 
 export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
-  const { analyze, isAnalyzing } = useScene();
+  const { analyze, isAnalyzing, error } = useScene();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const [sceneAnalysis, setSceneAnalysis] = useState<SceneAnalysis | null>(
+    null
+  );
+
+  const handleAnalyze = async (text: string, pageNumber: number) => {
+    const analysis = await analyze(text, pageNumber);
+    console.log("analysis", analysis);
+    setSceneAnalysis(analysis);
+  };
+
   const {
     viewerRef,
     pdfSlickViewerRef,
@@ -54,8 +65,9 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
               selectedText={selectedText}
               selectedPage={selectedPages[0]}
               onOpenChange={handleOpenChange}
-              onAnalyze={() => analyze(selectedText, selectedPages[0])}
+              onAnalyze={() => handleAnalyze(selectedText, selectedPages[0])}
               isAnalyzing={isAnalyzing}
+              sceneAnalysis={sceneAnalysis}
             />
           </div>
         </div>

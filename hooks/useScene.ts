@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { toast } from "./use-toast";
+import { SceneAnalysis } from "@/lib/llm/providers/index";
+import { log } from "console";
 
 const API_URL = "https://animated-mole-731.convex.site";
 
@@ -7,14 +9,17 @@ export const useScene = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const analyze = async (text: string, pageNumber: number) => {
-    if (isAnalyzing) return; // Prevent double-submission
+  const analyze = async (
+    text: string,
+    pageNumber: number
+  ): Promise<SceneAnalysis | null> => {
+    if (isAnalyzing) return null; // Prevent double-submission
 
     setIsAnalyzing(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_URL}/analyze-scene-hhh`, {
+      const response = await fetch(`${API_URL}/analyze-scene`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, pageNumber }),
@@ -24,13 +29,17 @@ export const useScene = () => {
         throw new Error(`Analysis failed: ${response.statusText}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log("data", data);
+      console.log("data.analysis", data.analysis);
+      return data as SceneAnalysis;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Analysis request failed");
       toast({
         title: `Analysis failed: ${err}`,
         variant: "destructive",
       });
+      return null;
     } finally {
       setIsAnalyzing(false);
     }

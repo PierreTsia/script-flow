@@ -1,6 +1,7 @@
 import { httpAction } from "./_generated/server";
 import { parseSceneAnalysis } from "@/lib/llm/parser";
 import { MistralProvider } from "@/lib/llm/providers/mistral";
+import { SceneAnalysis } from "@/lib/llm/providers/index";
 
 export const analyzeScene = httpAction(async (ctx, request) => {
   const { text, pageNumber } = await request.json();
@@ -30,10 +31,19 @@ export const analyzeScene = httpAction(async (ctx, request) => {
   });
 
   try {
-    const llmResponse = await provider.analyzeScene(text);
-    const analysis = parseSceneAnalysis(llmResponse);
+    const llmResponse: string = await provider.analyzeScene(text);
+    console.log("Raw LLM response:", llmResponse);
+
+    const analysis: Omit<SceneAnalysis, "pageNumber"> =
+      parseSceneAnalysis(llmResponse);
     console.log("analysis", analysis);
-    return new Response(JSON.stringify({ analysis, pageNumber }), {
+
+    const analysisWithPageNumber: SceneAnalysis = {
+      ...analysis,
+      pageNumber,
+    };
+
+    return new Response(JSON.stringify(analysisWithPageNumber), {
       headers: {
         ...corsHeaders,
         "Content-Type": "application/json",
