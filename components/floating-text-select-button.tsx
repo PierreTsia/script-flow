@@ -43,7 +43,7 @@ export function FloatingTextSelectButton({
 
   return (
     <div
-      className="fixed z-[9999] animate-in fade-in"
+      className="fixed z-[50] animate-in fade-in"
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,

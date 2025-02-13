@@ -45,11 +45,17 @@
     "noAnalysisAvailable": "Aucune analyse disponible",
     "deleteDraft": "Supprimer le brouillon",
     "saveDraft": "Enregistrer le brouillon",
+    "noAnalysisSelected": "Aucune analyse sélectionnée",
     "draftStatus": {
       "savedDraft": "Brouillon enregistré localement",
       "newAnalysis": "Nouvelle analyse - non enregistrée"
     },
-    "saveButton": "Enregistrer l'analyse"
-    
+    "saveButton": "Enregistrer l'analyse",
+    "locations": "Lieux",
+    "characters": "Personnages",
+    "props": "Objets",
+    "noLocations": "Aucun lieu trouvé",
+    "noCharacters": "Aucun personnage trouvé",
+    "noProps": "Aucun objet trouvé"
   }
 }

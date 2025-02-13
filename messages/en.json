@@ -45,6 +45,13 @@
     "draftStatus": {
       "savedDraft": "Saved draft locally",
       "newAnalysis": "New analysis - not saved"
-    }
+    },
+    "noAnalysisSelected": "No analysis selected",
+    "locations": "Locations",
+    "characters": "Characters",
+    "props": "Props",
+    "noLocations": "No locations found",
+    "noCharacters": "No characters found",
+    "noProps": "No props found"
   }
 }

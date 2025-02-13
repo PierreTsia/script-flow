@@ -24,7 +24,7 @@ const SceneAnalysisCard = ({
   const t = useTranslations("SceneAnalysis");
 
   return (
-    <Card className="flex flex-col min-h-0">
+    <Card className="flex flex-col min-h-0 border-0 shadow-none  flex-1 flex flex-col h-full">
       {(titleKey || descriptionKey) && (
         <CardHeader className="pb-2">
           {titleKey && <CardTitle className="text-lg">{t(titleKey)}</CardTitle>}

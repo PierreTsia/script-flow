@@ -124,10 +124,12 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
           </div>
         </div>
 
-        {selectedText && selectionRect && (
+        {selectedText && selectionRect && !isDialogOpen && !isSheetOpen && (
           <FloatingTextSelectButton
             selectionRect={selectionRect}
-            onClick={() => setIsDialogOpen(true)}
+            onClick={() => {
+              setIsDialogOpen(true);
+            }}
           />
         )}
       </div>

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-} from "lucide-react";
+import { ChevronsUpDown, LogOut } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import LocaleSwitcher from "@/components/locale-switcher";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
