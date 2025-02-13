@@ -28,5 +28,30 @@
       "title": "Script vanished into the void",
       "description": "This script either never existed or was deleted by interdimensional gnomes"
     }
+  },
+  "SceneAnalysis": {
+    "textSelectionTitle": "Selected Text",
+    "selectedPage": "Page {page}",
+    "analyzeButton": "Analyze Scene",
+    "draftsTitle": "Saved Drafts",
+    "draftsCount": "{count, plural, one {# analysis} other {# analyses}}",
+    "sceneNumber": "Scene {number}",
+    "analysisTitle": "Scene Analysis",
+    "analysisDescription": "Detailed breakdown of scene elements",
+    "noAnalysisAvailable": "No analysis available",
+    "deleteDraft": "Delete draft",
+    "saveDraft": "Save draft",
+    "saveButton": "Save Analysis",
+    "draftStatus": {
+      "savedDraft": "Saved draft locally",
+      "newAnalysis": "New analysis - not saved"
+    },
+    "noAnalysisSelected": "No analysis selected",
+    "locations": "Locations",
+    "characters": "Characters",
+    "props": "Props",
+    "noLocations": "No locations found",
+    "noCharacters": "No characters found",
+    "noProps": "No props found"
   }
 }

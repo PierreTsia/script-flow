@@ -20,9 +20,6 @@ http.route({
     const requestOrigin = headers.get("Origin");
 
     const isDev = requestOrigin === "http://localhost:3000";
-    console.log("requestOrigin", requestOrigin);
-    console.log("allowedOrigin", allowedOrigin);
-    console.log("isDev", isDev);
 
     if (
       requestOrigin &&

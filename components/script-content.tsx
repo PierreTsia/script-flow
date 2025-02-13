@@ -1,80 +1,98 @@
 "use client";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetDescription,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
 import ScriptTopBar from "./script-top-bar";
 import { ScriptDocument } from "@/hooks/useScripts";
-import { usePDFSlick } from "@pdfslick/react";
-import "@pdfslick/react/dist/pdf_viewer.css";
-import { Button } from "@/components/ui/button";
 import { useScene } from "@/hooks/useScene";
+import { usePdfViewer } from "@/hooks/usePdfViewer";
+import SceneAnalysisSheet from "./scene-analysis-sheet";
+
+import SelectedTextDialog from "./selected-text-dialog";
+import { FloatingTextSelectButton } from "./floating-text-select-button";
+
 interface ScriptContentProps {
   script: ScriptDocument;
   fileUrl: string;
 }
 
 export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
-  const { analyze } = useScene();
+  const { isAnalyzing, analyseAndSaveDraft } = useScene(script._id);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedText, setSelectedText] = useState("");
-  const [selectedPages, setSelectedPages] = useState<number[]>([]);
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectionRect, setSelectionRect] = useState<DOMRect | null>(null);
+
+  const {
+    viewerRef,
+    pdfSlickViewerRef,
+    usePDFSlickStore,
+    PDFSlickViewer,
+    selectedText,
+    selectedPages,
+    setSelectedText,
+  } = usePdfViewer(fileUrl);
+
   const toggleSidebar = () => {
     setIsSheetOpen((prev) => !prev);
   };
 
-  const viewerRef = useRef<HTMLDivElement>(null);
-  const {
-    viewerRef: pdfSlickViewerRef,
-    usePDFSlickStore,
-    PDFSlickViewer,
-  } = usePDFSlick(fileUrl, {
-    scaleValue: "page-fit",
-    textLayerMode: 1,
-    useOnlyCssZoom: true,
-    removePageBorders: true,
-  });
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      setIsSheetOpen(open);
+      if (!open) setSelectedText("");
+    },
+    [setIsSheetOpen, setSelectedText]
+  );
 
-  const pdfSlick = usePDFSlickStore((state) => state.pdfSlick);
+  const handleOpenDialogChange = useCallback(
+    (open: boolean) => {
+      setIsDialogOpen(open);
+      if (!open) setSelectedText("");
+    },
+    [setIsDialogOpen, setSelectedText]
+  );
 
-  const handleSelection = useCallback(() => {
-    const selection = window.getSelection();
-    if (!selection || !viewerRef.current || !pdfSlick) return;
-
-    const isInViewer = viewerRef.current.contains(selection.anchorNode);
-    const text = selection.toString().trim();
-
-    if (isInViewer && text) {
-      const currentPage = pdfSlick.store.getState().pageNumber;
-      setSelectedPages([currentPage]);
+  const handleAnalyze = useCallback(
+    async (text: string, pageNumber: number) => {
+      await analyseAndSaveDraft(text, pageNumber);
       setSelectedText(text);
-      setIsSheetOpen(true);
-    } else {
-      setSelectedText("");
-      setSelectedPages([]);
+      setIsDialogOpen(false);
+    },
+    [analyseAndSaveDraft, setSelectedText]
+  );
+
+  const updateSelectionPosition = useCallback(() => {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(selection.rangeCount - 1);
+      const rect = range.getBoundingClientRect();
+
+      console.log("Selection detected:", {
+        rect,
+        hasSelection: !!selection,
+        selectedText,
+      });
+
+      // Only update if we have valid dimensions
+      if (rect.width > 0 && rect.height > 0) {
+        setSelectionRect(rect);
+      }
     }
-  }, [pdfSlick]);
+  }, [selectedText]);
 
+  // Add effect to update position when text is selected
   useEffect(() => {
-    const viewer = viewerRef.current;
-    const selectionHandler = () => handleSelection();
-
-    viewer?.addEventListener("mouseup", selectionHandler);
-    return () => {
-      viewer?.removeEventListener("mouseup", selectionHandler);
-    };
-  }, [viewerRef, handleSelection]);
+    if (selectedText) {
+      updateSelectionPosition();
+    }
+  }, [selectedText, updateSelectionPosition]);
 
   return (
     <div className="min-h-[100vh] flex flex-col">
+      {/* TODO later on, the topbar could store selected extracts 
+      saved in storage and open the sheet on select one */}
       <ScriptTopBar toggleSidebar={toggleSidebar} script={script} />
       <div className="flex flex-col w-full bg-background flex-1">
-        {/* Main Content Area */}
         <div className="flex flex-1 overflow-hidden">
           <div className="h-full w-full">
             <div ref={viewerRef} className="h-full w-full">
@@ -83,49 +101,37 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
               />
             </div>
 
-            {/* Sheet */}
-            <Sheet
-              open={isSheetOpen}
-              onOpenChange={(open) => {
-                if (!open) setSelectedText(""); // Clear selection on close
-                setIsSheetOpen(open);
-              }}
-            >
-              <SheetTrigger asChild className="hidden">
-                <button className="hidden" aria-hidden="true" />
-              </SheetTrigger>
-              <SheetContent side="bottom" className="h-[60vh]">
-                <SheetTitle>Scene Management</SheetTitle>
-                <SheetDescription>
-                  Manage your script scenes here
-                </SheetDescription>
-                <div className="h-full flex flex-col">
-                  {selectedPages.length > 0 && (
-                    <div className="text-sm mt-2 text-muted-foreground/70">
-                      Selected on page: {selectedPages[0]}
-                    </div>
-                  )}
+            <SelectedTextDialog
+              isDialogOpen={isDialogOpen}
+              onOpenChange={handleOpenDialogChange}
+              selectedText={selectedText}
+              selectedPage={selectedPages[0]}
+              isAnalyzing={isAnalyzing}
+              onConfirmClick={() =>
+                handleAnalyze(selectedText, selectedPages[0])
+              }
+            />
 
-                  {selectedText && (
-                    <div className="p-4 ">
-                      <div className="text-muted-foreground bg-foreground/10 p-4 rounded-lg">
-                        {selectedText}
-                      </div>
-                      <Button
-                        className="mt-4"
-                        onClick={() => {
-                          analyze(selectedText, selectedPages[0]);
-                        }}
-                      >
-                        🤖 Analyze Selection
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </SheetContent>
-            </Sheet>
+            <SceneAnalysisSheet
+              isOpen={isSheetOpen}
+              selectedText={selectedText}
+              selectedPage={selectedPages[0]}
+              scriptId={script._id}
+              onOpenChange={handleOpenChange}
+              onAnalyze={() => handleAnalyze(selectedText, selectedPages[0])}
+              isAnalyzing={isAnalyzing}
+            />
           </div>
         </div>
+
+        {selectedText && selectionRect && !isDialogOpen && !isSheetOpen && (
+          <FloatingTextSelectButton
+            selectionRect={selectionRect}
+            onClick={() => {
+              setIsDialogOpen(true);
+            }}
+          />
+        )}
       </div>
     </div>
   );

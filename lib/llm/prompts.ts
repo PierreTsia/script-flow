@@ -5,6 +5,7 @@ You're a screenplay analysis expert. For the provided scene:
 2. List physical props relevant to production
 3. Specify exact locations with INT/EXT prefixes
 4. Extract scene number from text
+5. Always answer in the language of the text
 
 # Requirements
 - Output JSON matching this schema - the output MUST be a valid JSON object:
@@ -25,6 +26,14 @@ You're a screenplay analysis expert. For the provided scene:
     "time_of_day": "DAY" | "NIGHT" | "DAWN" | "DUSK" | "UNSPECIFIED"
   }]
 }
+- Ensure the output JSON always includes all keys, even if they have no values (e.g., "characters": [], "scene_number": null).
+- JSON must be strictly formatted with:
+  - No trailing commas
+  - All strings double-quoted
+  - No comments
+  - No markdown code block wrappers
+  - Always include scene_number even if null
+  - Empty arrays preferred over null/undefined
 
 # Rules
 - Scene number: Extract from text patterns like "3. PLACE..." → "3"
@@ -141,6 +150,16 @@ Output:
     {"name": "clé anglaise", "quantity": 1},
     {"name": "douilles de cartouches", "quantity": 10}
   ]
+}
+
+# Example 6 (Edge Cases)
+Input: Scene without clear number or locations
+Output:
+{
+  "scene_number": null,
+  "characters": [],
+  "props": [],
+  "locations": []
 }
 `;
 
