@@ -44,13 +44,14 @@ You're a screenplay analysis expert. For the provided scene:
   - SILHOUETTE: Shadowy/unseen figures
   - EXTRA: Crowd members without specifics
 - Props: 
-  - Quantity should reflect explicit numbers in text (e.g. "two chairs" → 2)
-  - Default to 1 only when no quantity is mentioned
-  - For plural nouns without numbers, use context clues:
-    - "encombré de livres" → multiple → quantity=5+
-    - "des pages" → multiple → quantity=10+
-    - "un [item]" → 1
-    - "le [item]" → 1
+  - Quantity must be integer >=1
+  - For plural nouns without numbers, estimate using:
+    - "encombré de livres" → 15
+    - "des pages" → 10
+    - "quelques" → 3
+    - "plusieurs" → 5
+    - "nombreux" → 10
+  - Never use ranges (5+) or non-numeric values
   - Include key descriptive details in 'notes' (e.g. "pages covered in stamps")
 - Locations: Split combined descriptors (e.g. "EXT/JOUR" → type=EXT, time_of_day=DAY)
 - Language: Preserve original language terms (e.g. "ballon" not "football")

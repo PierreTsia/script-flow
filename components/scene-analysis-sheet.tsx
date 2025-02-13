@@ -16,7 +16,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-
+import MobileDraftsSceneSelect from "./mobile-drafts-scene-select";
 import SceneAnalysisCard from "./scene-analysis-card";
 import {
   DraftSceneAnalysis,
@@ -61,14 +61,27 @@ const SceneAnalysisSheet = ({
           <SheetDescription>{t("description")}</SheetDescription>
         </SheetHeader>
 
+        {/* Mobile Select - Outside grid */}
+        <div className="lg:hidden mb-4">
+          <MobileDraftsSceneSelect
+            drafts={drafts}
+            selectedDraft={selectedDraftAnalysis}
+            onSelect={(draftId: string | null) => {
+              if (draftId) {
+                setselectedDraftAnalysis(
+                  drafts.find((draft) => draft._id === draftId) || null
+                );
+              } else {
+                setselectedDraftAnalysis(null);
+              }
+            }}
+          />
+        </div>
+
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6 overflow-hidden">
           {/* Left Panel - Draft List */}
-          <div className="h-[30vh] lg:h-auto overflow-y-auto lg:overflow-y-auto border-b lg:border-r">
-            <SceneAnalysisCard
-              titleKey="draftsTitle"
-              descriptionKey="draftsCount"
-              descriptionValues={{ count: drafts.length }}
-            >
+          <div className="hidden lg:block h-[30vh] lg:h-auto overflow-y-auto lg:overflow-y-auto border-b lg:border-r">
+            <SceneAnalysisCard>
               <div className="space-y-1">
                 {drafts.map((draft) => (
                   <div
@@ -113,8 +126,6 @@ const SceneAnalysisSheet = ({
           {/* Right Panel - Draft Details */}
           <div className="flex flex-col overflow-hidden lg:overflow-hidden">
             <SceneAnalysisCard
-              titleKey="analysisTitle"
-              descriptionKey="analysisDescription"
               footer={
                 <div className="w-full flex items-center justify-between mt-4 pt-4 border-t">
                   <div className="text-sm text-muted-foreground">

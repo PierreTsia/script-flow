@@ -50,20 +50,18 @@
 7. **AI Integration 2** (5h)
    - [ ] handle preview urls cors issue (using debug logs and allowed origins)
    - [x] costs monitoring using Helidome
-   - [ ] manage a `analysedScenes` state in the client to avoid re-fetching the same scene over and over again
-      - [ ] create the state 
-      - [ ] add a list of nalyzed scenes in the UI (figure out how to do this)
-   - [ ] persist the analysed scenes in the client local storage
+   - [x] persist the analysed scenes draft scenes in the database
    - [x] type the llm response better
    - [x] handle the response in the client
+   - [ ] fix sheet layout in mobile : select element for draft selection
    - [ ] display the response as a prefilled form in the analysis block
    - [-] match the entities schema
    - [ ] save the verified analysis in the database
 
 8. **Basic UI** (4h)
-   - [ ] Upload button
-   - [ ] Script view layout
-   - [ ] Analysis modal
+   - [x] Upload button
+   - [x] Script view layout
+   - [x] Analysis modal
    **Files:** `src/app/page.tsx`, `src/components/upload.tsx`
 
 ## Error Handling (3h)
