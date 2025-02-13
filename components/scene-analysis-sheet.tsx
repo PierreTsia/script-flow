@@ -85,21 +85,18 @@ const SceneAnalysisSheet = ({
                         </div>
                       </div>
 
-                      <div
-                        className="flex gap-2 ml-4"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteDraft(draft._id);
-                          setselectedDraftAnalysis(null);
-                        }}
-                      >
+                      <div className="flex gap-2 ml-4">
                         <Button
                           variant="ghost"
                           size="sm"
                           aria-label={t("deleteDraft")}
-                          className="h-8 w-8 p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="h-8 w-8 p-2 opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
+                          onClick={() => {
+                            handleDeleteDraft(draft._id);
+                            setselectedDraftAnalysis(null);
+                          }}
                         >
-                          <Trash2 className="h-4 w-4 text-destructive" />
+                          <Trash2 className="h-4 w-4 " />
                         </Button>
                       </div>
                     </div>
