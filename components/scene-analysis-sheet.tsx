@@ -18,7 +18,13 @@ import {
 } from "@/components/ui/collapsible";
 
 import SceneAnalysisCard from "./scene-analysis-card";
-import { DraftSceneAnalysis, useScene } from "@/hooks/useScene";
+import {
+  DraftSceneAnalysis,
+  SceneCharacter,
+  SceneLocation,
+  SceneProp,
+  useScene,
+} from "@/hooks/useScene";
 import { Id } from "@/convex/_generated/dataModel";
 
 const SceneAnalysisSheet = ({
@@ -144,21 +150,23 @@ const SceneAnalysisSheet = ({
                     <SectionCollapsible
                       type="locations"
                       title={`Locations (${selectedDraftAnalysis.locations.length})`}
-                      items={selectedDraftAnalysis.locations}
+                      items={selectedDraftAnalysis.locations as SceneLocation[]}
                     />
 
                     {/* Characters Section */}
                     <SectionCollapsible
                       type="characters"
                       title={`Characters (${selectedDraftAnalysis.characters.length})`}
-                      items={selectedDraftAnalysis.characters}
+                      items={
+                        selectedDraftAnalysis.characters as SceneCharacter[]
+                      }
                     />
 
                     {/* Props Section */}
                     <SectionCollapsible
                       type="props"
                       title={`Props (${selectedDraftAnalysis.props.length})`}
-                      items={selectedDraftAnalysis.props}
+                      items={selectedDraftAnalysis.props as SceneProp[]}
                     />
                   </div>
                 </div>
@@ -184,7 +192,7 @@ const SectionCollapsible = ({
 }: {
   title: string;
   type: "locations" | "characters" | "props";
-  items: any[];
+  items: SceneLocation[] | SceneCharacter[] | SceneProp[];
   maxHeight?: string;
 }) => {
   // Determine icon and color based on section type
@@ -229,11 +237,13 @@ const SectionCollapsible = ({
                     <span className="font-medium">
                       {item.name || "Unnamed Item"}
                     </span>
-                    <span className="text-muted-foreground text-xs">
-                      {item.type || "No type specified"}
-                    </span>
+                    {"type" in item && (
+                      <span className="text-muted-foreground text-xs">
+                        {item?.type || "No type specified"}
+                      </span>
+                    )}
                   </div>
-                  {item.notes && (
+                  {"notes" in item && (
                     <p className="text-muted-foreground text-xs mt-1">
                       {item.notes}
                     </p>
