@@ -1,14 +1,14 @@
 "use client";
 
 import { SidebarIcon } from "lucide-react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React from "react";
+import Link from "next/link";
 
 import { SearchForm } from "@/components/search-form";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -51,7 +51,7 @@ export function SiteHeader() {
           <BreadcrumbList>
             {/* Home is always first */}
             <BreadcrumbItem>
-              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+              <Link href="/">Home</Link>
             </BreadcrumbItem>
 
             {/* Map through the rest of the breadcrumbs */}
@@ -65,9 +65,7 @@ export function SiteHeader() {
                     <BreadcrumbPage>{crumb.text}</BreadcrumbPage>
                   ) : (
                     // Other items are links
-                    <BreadcrumbLink href={crumb.href}>
-                      {crumb.text}
-                    </BreadcrumbLink>
+                    <Link href={crumb.href}>{crumb.text}</Link>
                   )}
                 </BreadcrumbItem>
               </React.Fragment>

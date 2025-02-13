@@ -1,4 +1,3 @@
-import { ScriptUploadCard } from "@/components/script-upload-card";
 import { ScriptsListCard } from "@/components/scripts-list-card";
 export default function Page() {
   return (
