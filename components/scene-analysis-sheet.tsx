@@ -63,7 +63,7 @@ const SceneAnalysisSheet = ({
 
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6 overflow-hidden">
           {/* Left Panel - Draft List */}
-          <div className="flex flex-col overflow-y-auto border-r">
+          <div className="h-[30vh] lg:h-auto overflow-y-auto lg:overflow-y-auto border-b lg:border-r">
             <SceneAnalysisCard
               titleKey="draftsTitle"
               descriptionKey="draftsCount"
@@ -111,7 +111,7 @@ const SceneAnalysisSheet = ({
           </div>
 
           {/* Right Panel - Draft Details */}
-          <div className="flex flex-col overflow-hidden">
+          <div className="flex flex-col overflow-hidden lg:overflow-hidden">
             <SceneAnalysisCard
               titleKey="analysisTitle"
               descriptionKey="analysisDescription"
