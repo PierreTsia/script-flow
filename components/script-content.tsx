@@ -1,54 +1,25 @@
 "use client";
 
-import { useCallback, useState, useRef, useEffect, useMemo } from "react";
+import { useCallback, useState } from "react";
 import ScriptTopBar from "./script-top-bar";
 import { ScriptDocument } from "@/hooks/useScripts";
-import { SceneAnalysis } from "@/lib/llm/providers/index";
 import { useScene } from "@/hooks/useScene";
 import { usePdfViewer } from "@/hooks/usePdfViewer";
 import SceneAnalysisSheet from "./scene-analysis-sheet";
 
+import { Button } from "./ui/button";
+import { Wand2 } from "lucide-react";
+import SelectedTextDialog from "./selected-text-dialog";
 interface ScriptContentProps {
   script: ScriptDocument;
   fileUrl: string;
 }
 
 export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
-  const { analyze, isAnalyzing, error } = useScene();
+  const { isAnalyzing, analyseAndSaveDraft } = useScene(script._id);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const [sceneAnalysis, setSceneAnalysis] = useState<SceneAnalysis | null>(
-    null
-  );
-
-  const prevAnalysis = useRef<SceneAnalysis | null>(null);
-
-  const stabilizeAnalysis = (analysis: SceneAnalysis | null) => {
-    if (!analysis) return null;
-
-    if (
-      prevAnalysis.current?.scene_number === analysis.scene_number &&
-      prevAnalysis.current?.pageNumber === analysis.pageNumber &&
-      JSON.stringify(prevAnalysis.current?.characters) ===
-        JSON.stringify(analysis.characters) &&
-      JSON.stringify(prevAnalysis.current?.locations) ===
-        JSON.stringify(analysis.locations)
-    ) {
-      return prevAnalysis.current;
-    }
-
-    prevAnalysis.current = analysis;
-    return analysis;
-  };
-
-  const handleAnalyze = useCallback(
-    async (text: string, pageNumber: number) => {
-      const rawAnalysis = await analyze(text, pageNumber);
-      const stableAnalysis = stabilizeAnalysis(rawAnalysis);
-      setSceneAnalysis(stableAnalysis);
-    },
-    [analyze]
-  );
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const {
     viewerRef,
@@ -72,6 +43,23 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
     [setIsSheetOpen, setSelectedText]
   );
 
+  const handleOpenDialogChange = useCallback(
+    (open: boolean) => {
+      setIsDialogOpen(open);
+      if (!open) setSelectedText("");
+    },
+    [setIsDialogOpen, setSelectedText]
+  );
+
+  const handleAnalyze = useCallback(
+    async (text: string, pageNumber: number) => {
+      await analyseAndSaveDraft(text, pageNumber);
+      setSelectedText(text);
+      setIsDialogOpen(false);
+    },
+    [analyseAndSaveDraft, setSelectedText]
+  );
+
   return (
     <div className="min-h-[100vh] flex flex-col">
       {/* TODO later on, the topbar could store selected extracts 
@@ -86,6 +74,17 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
               />
             </div>
 
+            <SelectedTextDialog
+              isDialogOpen={isDialogOpen}
+              onOpenChange={handleOpenDialogChange}
+              selectedText={selectedText}
+              selectedPage={selectedPages[0]}
+              isAnalyzing={isAnalyzing}
+              onConfirmClick={() =>
+                handleAnalyze(selectedText, selectedPages[0])
+              }
+            />
+
             <SceneAnalysisSheet
               isOpen={isSheetOpen}
               selectedText={selectedText}
@@ -94,10 +93,21 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
               onOpenChange={handleOpenChange}
               onAnalyze={() => handleAnalyze(selectedText, selectedPages[0])}
               isAnalyzing={isAnalyzing}
-              sceneAnalysis={sceneAnalysis}
             />
           </div>
         </div>
+
+        {selectedText && (
+          <div className="fixed bottom-4 left-4 z-50 animate-in fade-in slide-in-from-bottom-2">
+            <Button
+              onClick={() => setIsDialogOpen(true)}
+              className="rounded-full shadow-lg px-6 py-6 gap-2"
+            >
+              <Wand2 className="h-5 w-5" />
+              <span>Analyze Scene</span>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

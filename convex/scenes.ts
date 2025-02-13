@@ -1,7 +1,9 @@
-import { httpAction } from "./_generated/server";
+import { httpAction, mutation, query } from "./_generated/server";
 import { parseSceneAnalysis } from "@/lib/llm/parser";
 import { MistralProvider } from "@/lib/llm/providers/mistral";
 import { SceneAnalysis } from "@/lib/llm/providers/index";
+
+import { v } from "convex/values";
 
 export const analyzeScene = httpAction(async (ctx, request) => {
   const { text, pageNumber } = await request.json();
@@ -56,4 +58,48 @@ export const analyzeScene = httpAction(async (ctx, request) => {
       headers: corsHeaders,
     });
   }
+});
+
+export const saveDraft = mutation({
+  args: {
+    scriptId: v.id("scripts"),
+    sceneNumber: v.union(v.string(), v.null()),
+    analysis: v.string(),
+    text: v.string(),
+    pageNumber: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const analysis: SceneAnalysis = JSON.parse(args.analysis);
+
+    await ctx.db.insert("draftScenesAnalysis", {
+      script_id: args.scriptId,
+      scene_number: args.sceneNumber,
+      locations: analysis.locations,
+      characters: analysis.characters,
+      props: analysis.props,
+      text: args.text,
+      page_number: args.pageNumber,
+    });
+  },
+});
+
+export const getDrafts = query({
+  args: {
+    scriptId: v.id("scripts"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("draftScenesAnalysis")
+      .filter((q) => q.eq(q.field("script_id"), args.scriptId))
+      .collect();
+  },
+});
+
+export const deleteDraft = mutation({
+  args: {
+    draftId: v.id("draftScenesAnalysis"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.draftId);
+  },
 });

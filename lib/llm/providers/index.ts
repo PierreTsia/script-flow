@@ -9,7 +9,7 @@ export interface LLMProvider {
 
 // In a new file, e.g., lib/llm/types.ts
 export interface SceneAnalysis {
-  scene_number: string;
+  scene_number: string | null;
   characters: { name: string; type: CharacterType }[];
   props: { name: string; quantity: number; notes?: string }[];
   locations: Location[];
@@ -18,10 +18,15 @@ export interface SceneAnalysis {
 
 // You'll also need to define the CharacterType and Location types.
 // You can do this in the same file or in separate files.
-export type CharacterType = "main" | "supporting" | "background";
+export type CharacterType =
+  | "PRINCIPAL"
+  | "SECONDARY"
+  | "FIGURANT"
+  | "SILHOUETTE"
+  | "EXTRA";
 export type LocationType = "INT" | "EXT";
 
-export type TimeOfDay = "DAY" | "NIGHT";
+export type TimeOfDay = "DAY" | "NIGHT" | "DAWN" | "DUSK" | "UNSPECIFIED";
 export type Location = {
   name: string;
   type: LocationType;
