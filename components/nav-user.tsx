@@ -25,7 +25,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 export function NavUser({
   user,
 }: {
@@ -33,9 +34,20 @@ export function NavUser({
     name: string;
     email: string;
     avatar: string;
-  };
+  } | null;
 }) {
   const { isMobile } = useSidebar();
+  const { signOut } = useAuth();
+  const router = useRouter();
+  const handleSignOut = () => {
+    console.log("signing out");
+    signOut();
+    router.push("/");
+  };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <SidebarMenu>
@@ -67,7 +79,9 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {user.name.charAt(0)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user.name}</span>
@@ -98,7 +112,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSignOut}>
               <LogOut />
               Log out
             </DropdownMenuItem>

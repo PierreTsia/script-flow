@@ -11,11 +11,11 @@ export function ScriptsListCard() {
   const t = useTranslations("Scripts");
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 rounded-lg p-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">{t("recentScripts")}</h3>
       </div>
-      <div className="h-96 bg-muted/50 rounded-lg border p-4 overflow-y-auto">
+      <div className="rounded-lg border p-4 overflow-y-auto">
         {!scripts?.length ? (
           <div className="flex h-full items-center justify-center">
             <p className="text-muted-foreground">{t("noScripts")}</p>
@@ -25,7 +25,7 @@ export function ScriptsListCard() {
             {scripts?.map((script) => (
               <Card
                 key={script._id}
-                className="hover:bg-accent/50 transition-colors"
+                className="hover:bg-accent/50 transition-colors border-none"
               >
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-4">

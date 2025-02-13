@@ -11,7 +11,7 @@ import { ConvexClientProvider } from "@/components/providers/convex-client-provi
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-
+import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -55,7 +55,10 @@ export default async function RootLayout({
                     <SiteHeader />
                     <div className="flex flex-1">
                       <AppSidebar />
-                      <SidebarInset>{children}</SidebarInset>
+                      <SidebarInset>
+                        {children}
+                        <Toaster />
+                      </SidebarInset>
                     </div>
                   </SidebarProvider>
                 </div>
