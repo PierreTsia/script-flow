@@ -34,11 +34,12 @@ export const getAll = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     const userId = identity?.subject;
-    const scripts = await ctx.db
-      .query("scripts")
-      .filter((q) => q.eq(q.field("userId"), userId))
-      .collect();
-    return scripts;
+    return userId
+      ? await ctx.db
+          .query("scripts")
+          .withIndex("by_user", (q) => q.eq("userId", userId))
+          .collect()
+      : [];
   },
 });
 

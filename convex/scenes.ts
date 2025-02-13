@@ -90,7 +90,7 @@ export const getDrafts = query({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("draftScenesAnalysis")
-      .filter((q) => q.eq(q.field("script_id"), args.scriptId))
+      .withIndex("by_script", (q) => q.eq("script_id", args.scriptId))
       .collect();
   },
 });
