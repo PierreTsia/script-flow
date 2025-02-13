@@ -28,5 +28,28 @@
       "title": "Script disparu dans le néant",
       "description": "Ce script n'a jamais existé ou a été supprimé par des gnomes interdimensionnels"
     }
+  },
+  "SceneAnalysis": {
+    "title": "Gestion de scène",
+    "description": "Gérez les scènes de votre script ici",
+    "selectedPage": "Sélectionné sur la page : {page}",
+    "analyzeButton": "🤖 Analyser la sélection",
+    "analysisTitle": "Analyse de scène",
+    "analysisDescription": "Découpage par IA du texte sélectionné",
+    "emptyAnalysis": "Sélectionnez du texte et cliquez sur analyser",
+    "textSelectionTitle": "Texte Sélectionné",
+    "analyzingButton": "Analyse en cours...",
+    "draftsTitle": "Brouillons enregistrés",
+    "draftsCount": "{count, plural, one {# brouillon} other {# brouillons}}",
+    "sceneNumber": "Scène {number}",
+    "noAnalysisAvailable": "Aucune analyse disponible",
+    "deleteDraft": "Supprimer le brouillon",
+    "saveDraft": "Enregistrer le brouillon",
+    "draftStatus": {
+      "savedDraft": "Brouillon enregistré localement",
+      "newAnalysis": "Nouvelle analyse - non enregistrée"
+    },
+    "saveButton": "Enregistrer l'analyse"
+    
   }
 }

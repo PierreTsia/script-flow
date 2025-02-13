@@ -22,7 +22,6 @@ export const backfillScriptStatus = internalMutation({
       })
     }
     
-    console.log(`Updated ${scripts.length} scripts`)
   }
 })
 ```

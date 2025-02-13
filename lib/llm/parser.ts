@@ -1,40 +1,32 @@
-export function parseSceneAnalysis(raw: string): SceneAnalysis {
-  // Strip potential markdown code blocks
-  const jsonString = raw
-    .replace(/```json/g, "")
-    .replace(/```/g, "")
-    .trim();
+import { SceneAnalysis } from "./providers";
+
+export function parseSceneAnalysis(
+  raw: string
+): Omit<SceneAnalysis, "pageNumber"> {
+  const jsonString = raw.replace(/```(json)?/g, "").trim();
+
+  // Add pre-validation
+  const requiredKeys = ["scene_number", "characters", "props", "locations"];
+  if (!requiredKeys.every((k) => jsonString.includes(`"${k}"`))) {
+    throw new Error("Missing required JSON keys");
+  }
 
   try {
-    const parsed = JSON.parse(jsonString) as SceneAnalysis;
+    const parsed = JSON.parse(jsonString) as Omit<SceneAnalysis, "pageNumber">;
 
-    // Basic validation
-    if (!parsed.scene_number || !Array.isArray(parsed.characters)) {
-      throw new Error("Invalid analysis format");
+    // Add post-validation
+    if (
+      typeof parsed.scene_number !== "string" &&
+      parsed.scene_number !== null
+    ) {
+      throw new Error("scene_number must be string or null");
     }
+    if (!Array.isArray(parsed.characters))
+      throw new Error("characters must be array");
 
     return parsed;
   } catch (e) {
-    console.error("Failed to parse LLM output:", e);
-    throw new Error(`AI response parsing failed: ${(e as Error).message}`);
+    console.error("Failed JSON:", jsonString); // Log the problematic JSON
+    throw e;
   }
 }
-
-// Add this type near your prompt definitions
-export type SceneAnalysis = {
-  scene_number: string;
-  characters: Array<{
-    name: string;
-    type: "PRINCIPAL" | "SECONDARY" | "FIGURANT" | "SILHOUETTE" | "EXTRA";
-  }>;
-  props: Array<{
-    name: string;
-    quantity: number;
-    notes?: string;
-  }>;
-  locations: Array<{
-    name: string;
-    type: "INT" | "EXT";
-    time_of_day: "DAY" | "NIGHT" | "DAWN" | "DUSK" | "UNSPECIFIED";
-  }>;
-};
