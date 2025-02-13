@@ -8,6 +8,9 @@ import { getLocale } from "next-intl/server";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -47,7 +50,15 @@ export default async function RootLayout({
                 enableSystem
                 disableTransitionOnChange
               >
-                {children}
+                <div className="[--header-height:calc(theme(spacing.14))]">
+                  <SidebarProvider className="flex flex-col">
+                    <SiteHeader />
+                    <div className="flex flex-1">
+                      <AppSidebar />
+                      <SidebarInset>{children}</SidebarInset>
+                    </div>
+                  </SidebarProvider>
+                </div>
               </ThemeProvider>
             </IntlProvider>
           </ConvexClientProvider>
