@@ -35,7 +35,7 @@ const SceneAnalysisCard = ({
           )}
         </CardHeader>
       )}
-      <CardContent className="flex-1 p-4 pt-0 min-h-0">{children}</CardContent>
+      <CardContent className="flex-1 p-6 pt-0 min-h-0">{children}</CardContent>
       {footer && <CardFooter className="p-4 pt-0">{footer}</CardFooter>}
     </Card>
   );

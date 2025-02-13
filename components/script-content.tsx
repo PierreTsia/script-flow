@@ -1,15 +1,15 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import ScriptTopBar from "./script-top-bar";
 import { ScriptDocument } from "@/hooks/useScripts";
 import { useScene } from "@/hooks/useScene";
 import { usePdfViewer } from "@/hooks/usePdfViewer";
 import SceneAnalysisSheet from "./scene-analysis-sheet";
 
-import { Button } from "./ui/button";
-import { Wand2 } from "lucide-react";
 import SelectedTextDialog from "./selected-text-dialog";
+import { FloatingTextSelectButton } from "./floating-text-select-button";
+
 interface ScriptContentProps {
   script: ScriptDocument;
   fileUrl: string;
@@ -20,6 +20,7 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectionRect, setSelectionRect] = useState<DOMRect | null>(null);
 
   const {
     viewerRef,
@@ -60,6 +61,32 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
     [analyseAndSaveDraft, setSelectedText]
   );
 
+  const updateSelectionPosition = useCallback(() => {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(selection.rangeCount - 1);
+      const rect = range.getBoundingClientRect();
+
+      console.log("Selection detected:", {
+        rect,
+        hasSelection: !!selection,
+        selectedText,
+      });
+
+      // Only update if we have valid dimensions
+      if (rect.width > 0 && rect.height > 0) {
+        setSelectionRect(rect);
+      }
+    }
+  }, [selectedText]);
+
+  // Add effect to update position when text is selected
+  useEffect(() => {
+    if (selectedText) {
+      updateSelectionPosition();
+    }
+  }, [selectedText, updateSelectionPosition]);
+
   return (
     <div className="min-h-[100vh] flex flex-col">
       {/* TODO later on, the topbar could store selected extracts 
@@ -97,16 +124,11 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
           </div>
         </div>
 
-        {selectedText && (
-          <div className="fixed bottom-4 left-4 z-50 animate-in fade-in slide-in-from-bottom-2">
-            <Button
-              onClick={() => setIsDialogOpen(true)}
-              className="rounded-full shadow-lg px-6 py-6 gap-2"
-            >
-              <Wand2 className="h-5 w-5" />
-              <span>Analyze Scene</span>
-            </Button>
-          </div>
+        {selectedText && selectionRect && (
+          <FloatingTextSelectButton
+            selectionRect={selectionRect}
+            onClick={() => setIsDialogOpen(true)}
+          />
         )}
       </div>
     </div>

@@ -3,14 +3,14 @@
 import { setUserLocale } from "@/services/locale";
 import { Locale } from "@/components/providers/intl-provider";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Globe } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type LocaleSwitcherSelectProps = {
   defaultValue: string;
@@ -24,31 +24,26 @@ export function LocaleSwitcherSelect({
   label,
 }: LocaleSwitcherSelectProps) {
   const router = useRouter();
-  const onChange = (value: string) => {
+
+  const onValueChange = (value: string) => {
     const locale = value as Locale;
     setUserLocale(locale);
     router.refresh();
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Globe className="h-[1.2rem] w-[1.2rem]" />
-          <span className="sr-only">{label}</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+    <Select defaultValue={defaultValue} onValueChange={onValueChange}>
+      <SelectTrigger className="min-w-[140px] w-full">
+        <Globe className="mr-2 h-[1.2rem] w-[1.2rem]" />
+        <SelectValue placeholder={label} />
+      </SelectTrigger>
+      <SelectContent>
         {items.map((locale) => (
-          <DropdownMenuItem
-            key={locale.value}
-            onClick={() => onChange(locale.value)}
-            className={defaultValue === locale.value ? "bg-accent" : ""}
-          >
+          <SelectItem key={locale.value} value={locale.value}>
             {locale.label.toUpperCase()}
-          </DropdownMenuItem>
+          </SelectItem>
         ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </SelectContent>
+    </Select>
   );
 }
