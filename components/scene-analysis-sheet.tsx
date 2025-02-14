@@ -18,13 +18,9 @@ import {
 } from "@/components/ui/collapsible";
 import MobileDraftsSceneSelect from "./mobile-drafts-scene-select";
 import SceneAnalysisCard from "./scene-analysis-card";
-import {
-  DraftSceneAnalysis,
-  SceneCharacter,
-  SceneLocation,
-  SceneProp,
-  useScene,
-} from "@/hooks/useScene";
+import { DraftSceneAnalysis, useScene } from "@/hooks/useScene";
+
+import { DraftLocations, DraftCharacters, DraftProps } from "@/convex/helpers";
 import { Id } from "@/convex/_generated/dataModel";
 
 const SceneAnalysisSheet = ({
@@ -161,23 +157,21 @@ const SceneAnalysisSheet = ({
                     <SectionCollapsible
                       type="locations"
                       title={`Locations (${selectedDraftAnalysis.locations.length})`}
-                      items={selectedDraftAnalysis.locations as SceneLocation[]}
+                      items={selectedDraftAnalysis.locations}
                     />
 
                     {/* Characters Section */}
                     <SectionCollapsible
                       type="characters"
                       title={`Characters (${selectedDraftAnalysis.characters.length})`}
-                      items={
-                        selectedDraftAnalysis.characters as SceneCharacter[]
-                      }
+                      items={selectedDraftAnalysis.characters}
                     />
 
                     {/* Props Section */}
                     <SectionCollapsible
                       type="props"
                       title={`Props (${selectedDraftAnalysis.props.length})`}
-                      items={selectedDraftAnalysis.props as SceneProp[]}
+                      items={selectedDraftAnalysis.props}
                     />
                   </div>
                 </div>
@@ -203,7 +197,7 @@ const SectionCollapsible = ({
 }: {
   title: string;
   type: "locations" | "characters" | "props";
-  items: SceneLocation[] | SceneCharacter[] | SceneProp[];
+  items: DraftLocations | DraftCharacters | DraftProps;
   maxHeight?: string;
 }) => {
   // Determine icon and color based on section type

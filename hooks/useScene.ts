@@ -9,24 +9,6 @@ const API_URL = "https://animated-mole-731.convex.site";
 
 export type DraftSceneAnalysis = Doc<"draftScenesAnalysis">;
 
-export type SceneLocation = {
-  name: string;
-  type: "INT" | "EXT";
-  time_of_day: "DAY" | "NIGHT" | "DAWN" | "DUSK" | "UNSPECIFIED";
-};
-
-export type SceneCharacter = {
-  name: string;
-  type: "PRINCIPAL" | "SECONDARY" | "FIGURANT" | "SILHOUETTE" | "EXTRA";
-  description: string | undefined;
-};
-
-export type SceneProp = {
-  name: string;
-  quantity: number;
-  notes: string | undefined;
-};
-
 export const useScene = (scriptId: Id<"scripts">) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -53,7 +53,7 @@ export const analyzeScene = httpAction(async (ctx, request) => {
     });
   } catch (error) {
     console.error("LLM Analysis failed:", error);
-    return new Response(JSON.stringify({ error: "Analysis failed" }), {
+    return new Response(JSON.stringify({ error }), {
       status: 500,
       headers: corsHeaders,
     });
