@@ -6,6 +6,8 @@ import {
   draftLocationsValidator,
   draftPropsValidator,
   characterTypeValidator,
+  timeOfDayValidator,
+  locationTypeValidator,
 } from "./helpers";
 export default defineSchema({
   tasks: defineTable({
@@ -62,7 +64,24 @@ export default defineSchema({
     character_id: v.id("characters"),
     scene_id: v.id("scenes"),
   })
+    .index("by_character_scene", ["character_id", "scene_id"])
     .index("by_character", ["character_id"])
+    .index("by_scene", ["scene_id"]),
+
+  locations: defineTable({
+    script_id: v.id("scripts"),
+    name: v.string(),
+    type: locationTypeValidator,
+    time_of_day: timeOfDayValidator,
+  })
+    .index("by_script", ["script_id"])
+    .index("by_type", ["type"])
+    .index("by_time_of_day", ["time_of_day"]),
+  location_scenes: defineTable({
+    location_id: v.id("locations"),
+    scene_id: v.id("scenes"),
+  })
+    .index("by_location", ["location_id"])
     .index("by_scene", ["scene_id"]),
 
   /* 

@@ -43,7 +43,6 @@ export const createCharacter = mutation({
 export const createCharacterWithScene = mutation({
   args: createCharacterWithSceneValidator,
   handler: async (ctx, args) => {
-    console.log("args", args);
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Unauthorized");
@@ -61,11 +60,8 @@ export const createCharacterWithScene = mutation({
       )
       .unique();
 
-    console.log("existingCharacter", existingCharacter);
-
     if (existingCharacter) {
       characterId = existingCharacter._id;
-      console.log("characterId", characterId);
     } else {
       // Insert new character
       characterId = await ctx.db.insert("characters", {
@@ -78,14 +74,23 @@ export const createCharacterWithScene = mutation({
           [args.name, ...(args.aliases || [])].join(" ").toLowerCase() +
           ` ${args.type}`,
       });
-      console.log("new characterId", characterId);
     }
 
-    // Link character to the scene
-    await ctx.db.insert("character_scenes", {
-      character_id: characterId,
-      scene_id: args.scene_id,
-    });
+    // Check if the character is already linked to the scene
+    const existingLink = await ctx.db
+      .query("character_scenes")
+      .withIndex("by_character_scene", (q) =>
+        q.eq("character_id", characterId).eq("scene_id", args.scene_id)
+      )
+      .first();
+
+    if (!existingLink) {
+      // Link character to the scene if not already linked
+      await ctx.db.insert("character_scenes", {
+        character_id: characterId,
+        scene_id: args.scene_id,
+      });
+    }
 
     return characterId;
   },
