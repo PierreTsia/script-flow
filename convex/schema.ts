@@ -46,7 +46,6 @@ export default defineSchema({
     .index("by_script", ["script_id"]),
   characters: defineTable({
     script_id: v.id("scripts"),
-    scene_id: v.id("scenes"),
     name: v.string(),
     type: characterTypeValidator,
     notes: v.optional(v.string()),
@@ -54,11 +53,17 @@ export default defineSchema({
     searchText: v.string(),
   })
     .index("by_script", ["script_id"])
-    .index("by_scene", ["scene_id"])
+    .index("unique_character_per_script", ["script_id", "name", "type"])
     .searchIndex("search_characters", {
       searchField: "searchText",
       filterFields: ["script_id", "type"],
     }),
+  character_scenes: defineTable({
+    character_id: v.id("characters"),
+    scene_id: v.id("scenes"),
+  })
+    .index("by_character", ["character_id"])
+    .index("by_scene", ["scene_id"]),
 
   /* 
   use like so: 

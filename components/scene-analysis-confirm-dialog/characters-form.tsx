@@ -28,29 +28,33 @@ import { Trash2Icon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 import { TabType } from "./entities-tabs";
-
+import { AlertDialogFooter } from "@/components/ui/alert-dialog";
 const EMPTY_CHARACTER = {
   name: "",
   type: "PRINCIPAL",
   notes: "",
 } as const;
 
+interface CharactersFormProps {
+  scriptId: Id<"scripts">;
+  sceneId: Id<"scenes"> | null;
+  selectedDraftAnalysis: DraftSceneAnalysis | null;
+  setCurrentTab: (tab: TabType) => void;
+  children: React.ReactNode;
+}
+
 const CharactersForm = ({
   scriptId,
   sceneId,
   selectedDraftAnalysis,
   setCurrentTab,
-}: {
-  scriptId: Id<"scripts">;
-  sceneId: Id<"scenes"> | null;
-  selectedDraftAnalysis: DraftSceneAnalysis | null;
-  setCurrentTab: (tab: TabType) => void;
-}) => {
+  children,
+}: CharactersFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const t = useTranslations("SceneAnalysis");
 
-  const { createCharacter } = useSceneEntities(scriptId);
+  const { createCharacter } = useSceneEntities();
 
   const characterFormSchema = z.object({
     name: z.string().min(2).max(50),
@@ -87,19 +91,26 @@ const CharactersForm = ({
       if (!sceneId) {
         throw new Error("Scene ID is required");
       }
-      await Promise.all(
-        data.characters.map((char) =>
-          createCharacter(
+      const characterIds = await Promise.all(
+        data.characters.map((char) => {
+          const characterId = createCharacter({
+            scriptId,
             sceneId,
-            char.name,
-            char.type,
-            char.aliases,
-            char.notes
-          )
-        )
+            name: char.name,
+            type: char.type,
+            aliases: char.aliases,
+            notes: char.notes,
+          });
+          console.log("characterId", characterId);
+          return characterId;
+        })
       );
-      toast({ title: `${data.characters.length} characters saved` });
-      setCurrentTab("locations");
+
+      const allSuccessful = characterIds.every(Boolean);
+
+      if (allSuccessful) {
+        setCurrentTab("locations");
+      }
     } catch (error) {
       console.error("Submission failed:", error);
       toast({
@@ -194,9 +205,20 @@ const CharactersForm = ({
         </form>
       </Form>
 
-      <Button type="button" onClick={() => append(EMPTY_CHARACTER)}>
+      <Button
+        type="button"
+        variant="ghost"
+        onClick={() => append(EMPTY_CHARACTER)}
+      >
         {t("addCharacter")}
       </Button>
+
+      <AlertDialogFooter>
+        <Button type="submit" form="character-form">
+          {t("confirmSaveButton")}
+        </Button>
+        {children}
+      </AlertDialogFooter>
 
       {!selectedDraftAnalysis?.characters?.length && (
         <div className="text-center text-muted-foreground py-8">

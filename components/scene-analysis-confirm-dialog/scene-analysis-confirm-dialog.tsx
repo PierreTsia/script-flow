@@ -3,7 +3,6 @@ import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
@@ -99,7 +98,9 @@ export const SceneAnalysisConfirmDialog = ({
                 scriptId={scriptId}
                 selectedDraftAnalysis={selectedDraftAnalysis}
                 onCreateScene={onCreateScene}
-              />
+              >
+                <CancelButton setIsOpen={setIsOpen} />
+              </SceneInfoForm>
             </TabsContent>
 
             {/* Locations Tab */}
@@ -126,7 +127,9 @@ export const SceneAnalysisConfirmDialog = ({
                 sceneId={savedSceneId}
                 selectedDraftAnalysis={selectedDraftAnalysis}
                 setCurrentTab={setCurrentTab}
-              />
+              >
+                <CancelButton setIsOpen={setIsOpen} />
+              </CharactersForm>
             </TabsContent>
 
             {/* Props Tab */}
@@ -147,18 +150,27 @@ export const SceneAnalysisConfirmDialog = ({
             </TabsContent>
           </EntitiesTabs>
         </ScrollArea>
-
-        <AlertDialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
-            {t("cancelButton")}
-          </Button>
-          <Button type="submit" form="character-form">
-            {t("confirmSaveButton")}
-          </Button>
-        </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
 };
 
+const CancelButton = ({
+  setIsOpen,
+}: {
+  setIsOpen: (isOpen: boolean) => void;
+}) => {
+  const t = useTranslations("SceneAnalysis");
+  return (
+    <Button
+      variant="outline"
+      onClick={(e) => {
+        e.preventDefault();
+        setIsOpen(false);
+      }}
+    >
+      {t("cancelButton")}
+    </Button>
+  );
+};
 export default SceneAnalysisConfirmDialog;

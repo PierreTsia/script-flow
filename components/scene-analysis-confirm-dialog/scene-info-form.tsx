@@ -7,25 +7,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
+import { AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState, useEffect } from "react";
 import { Id } from "@/convex/_generated/dataModel";
-import { DraftSceneAnalysis, useScene } from "@/hooks/useScene";
-import { useToast } from "@/hooks/use-toast";
-import { useTranslations } from "next-intl";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { DraftSceneAnalysis } from "@/hooks/useScene";
 
-const SceneInfoForm = ({
-  scriptId,
-  selectedDraftAnalysis,
-  onCreateScene,
-}: {
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+
+interface SceneInfoFormProps {
   scriptId: Id<"scripts">;
   selectedDraftAnalysis: DraftSceneAnalysis | null;
+  children: React.ReactNode;
   onCreateScene: ({
     script_id,
     scene_number,
@@ -39,7 +36,14 @@ const SceneInfoForm = ({
     text: string;
     summary: string;
   }) => Promise<void>;
-}) => {
+}
+
+const SceneInfoForm = ({
+  scriptId,
+  selectedDraftAnalysis,
+  onCreateScene,
+  children,
+}: SceneInfoFormProps) => {
   const t = useTranslations("SceneAnalysis");
 
   const sceneInfoFormSchema = z.object({
@@ -68,7 +72,7 @@ const SceneInfoForm = ({
         summary: "",
       });
     }
-  }, [selectedDraftAnalysis]);
+  }, [selectedDraftAnalysis, form.reset]);
 
   const onSubmit = async ({
     scene_number,
@@ -87,7 +91,7 @@ const SceneInfoForm = ({
   return (
     <div className="space-y-6 px-6">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} id="character-form">
+        <form onSubmit={form.handleSubmit(onSubmit)} id="scene-info-form">
           <div className="space-y-4">
             <FormField
               control={form.control}
@@ -150,6 +154,12 @@ const SceneInfoForm = ({
               )}
             />
           </div>
+          <AlertDialogFooter>
+            <Button type="submit" form="scene-info-form">
+              {t("confirmSaveButton")}
+            </Button>
+            {children}
+          </AlertDialogFooter>
         </form>
       </Form>
     </div>
