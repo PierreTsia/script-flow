@@ -63,16 +63,18 @@ const SceneInfoForm = ({
     },
   });
 
+  const { reset } = form;
+
   useEffect(() => {
     if (selectedDraftAnalysis) {
-      form.reset({
+      reset({
         scene_number: selectedDraftAnalysis.scene_number || "",
         page_number: selectedDraftAnalysis.page_number,
         text: selectedDraftAnalysis.text,
         summary: "",
       });
     }
-  }, [selectedDraftAnalysis, form.reset]);
+  }, [selectedDraftAnalysis, reset]);
 
   const onSubmit = async ({
     scene_number,

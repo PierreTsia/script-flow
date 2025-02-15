@@ -72,7 +72,7 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
         setSelectionRect(rect);
       }
     }
-  }, [selectedText]);
+  }, []);
 
   // Add effect to update position when text is selected
   useEffect(() => {

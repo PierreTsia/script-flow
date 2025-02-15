@@ -29,6 +29,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 import { TabType } from "./entities-tabs";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
+
 const EMPTY_CHARACTER = {
   name: "",
   type: "PRINCIPAL",
@@ -72,6 +73,8 @@ const CharactersForm = ({
     },
   });
 
+  const { reset } = form;
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "characters",
@@ -79,9 +82,9 @@ const CharactersForm = ({
 
   useEffect(() => {
     if (selectedDraftAnalysis?.characters) {
-      form.reset({ characters: selectedDraftAnalysis.characters });
+      reset({ characters: selectedDraftAnalysis.characters });
     }
-  }, [selectedDraftAnalysis]);
+  }, [selectedDraftAnalysis, reset]);
 
   const onSubmit = async (data: {
     characters: z.infer<typeof characterFormSchema>[];
@@ -214,7 +217,7 @@ const CharactersForm = ({
       </Button>
 
       <AlertDialogFooter>
-        <Button type="submit" form="character-form">
+        <Button type="submit" form="character-form" disabled={isLoading}>
           {t("confirmSaveButton")}
         </Button>
         {children}

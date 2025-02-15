@@ -19,7 +19,6 @@ import CharactersForm from "./characters-form";
 import SceneInfoForm from "./scene-info-form";
 import { useScene } from "@/hooks/useScene";
 import { useState, useEffect } from "react";
-import { log } from "console";
 
 type TabType = "scene_info" | "locations" | "characters" | "props";
 

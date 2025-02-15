@@ -1,5 +1,4 @@
 import { Card, CardContent, CardFooter } from "./ui/card";
-import { useTranslations } from "next-intl";
 
 const SceneAnalysisCard = ({
   children,
@@ -8,8 +7,6 @@ const SceneAnalysisCard = ({
   children: React.ReactNode;
   footer?: React.ReactNode;
 }) => {
-  const t = useTranslations("SceneAnalysis");
-
   return (
     <Card className="flex flex-col min-h-0 border-0 shadow-none  flex-1 flex flex-col h-full ">
       <CardContent className="flex-1 p-4 pt-0 min-h-0">{children}</CardContent>

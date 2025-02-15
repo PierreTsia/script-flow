@@ -24,14 +24,6 @@ const useSceneEntities = () => {
     sceneId: Id<"scenes">;
     scriptId: Id<"scripts">;
   }) => {
-    console.log("createCharacter", {
-      name,
-      type,
-      aliases,
-      notes,
-      sceneId,
-      scriptId,
-    });
     try {
       const characterId = await create({
         name,
