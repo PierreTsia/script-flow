@@ -76,6 +76,12 @@
     },
     "characters": "Characters",
     "props": "Props",
+    "removeProp": "Remove",
+    "prop": {
+      "name": "Name",
+      "quantity": "Quantity",
+      "notes": "Notes"
+    },
     "noLocations": "No locations found",
     "noCharacters": "No characters found",
     "noProps": "No props found",
@@ -99,8 +105,7 @@
       "type": "Type",
       "notes": "Notes"
     },
-    "prop": {
-      "name": "Name"
-    }
+    "addProp": "Add Prop"
+    
   }
 }

@@ -87,6 +87,23 @@ export default defineSchema({
     .index("by_location", ["location_id"])
     .index("by_scene", ["scene_id"]),
 
+  props: defineTable({
+    script_id: v.id("scripts"),
+    name: v.string(),
+    quantity: v.number(),
+    notes: v.optional(v.string()),
+  })
+    .index("by_script", ["script_id"])
+    .index("by_name", ["name"])
+    .index("unique_prop_per_script", ["script_id", "name"]),
+  prop_scenes: defineTable({
+    prop_id: v.id("props"),
+    scene_id: v.id("scenes"),
+  })
+    .index("by_prop_scene", ["prop_id", "scene_id"])
+    .index("by_prop", ["prop_id"])
+    .index("by_scene", ["scene_id"]),
+
   /* 
   use like so: 
 

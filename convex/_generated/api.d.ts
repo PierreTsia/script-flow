@@ -17,6 +17,7 @@ import type * as characters from "../characters.js";
 import type * as helpers from "../helpers.js";
 import type * as http from "../http.js";
 import type * as locations from "../locations.js";
+import type * as props from "../props.js";
 import type * as scenes from "../scenes.js";
 import type * as scripts from "../scripts.js";
 import type * as tasks from "../tasks.js";
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   helpers: typeof helpers;
   http: typeof http;
   locations: typeof locations;
+  props: typeof props;
   scenes: typeof scenes;
   scripts: typeof scripts;
   tasks: typeof tasks;

@@ -12,6 +12,9 @@ const useSceneEntities = () => {
   const saveLocationInScene = useMutation(
     api.locations.createLocationWithScene
   );
+
+  const savePropInScene = useMutation(api.props.createPropWithScene);
+
   const { toast } = useToast();
 
   const createCharacter = async ({
@@ -86,7 +89,39 @@ const useSceneEntities = () => {
     }
   };
 
-  return { createCharacter, createLocation };
+  const createProp = async ({
+    name,
+    quantity,
+    sceneId,
+    scriptId,
+    notes,
+  }: {
+    name: string;
+    quantity: number;
+    sceneId: Id<"scenes">;
+    scriptId: Id<"scripts">;
+    notes?: string;
+  }) => {
+    try {
+      const propId = await savePropInScene({
+        name,
+        quantity,
+        script_id: scriptId,
+        scene_id: sceneId,
+        notes,
+      });
+      return propId;
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+      return null;
+    }
+  };
+  return { createCharacter, createLocation, createProp };
 };
 
 export default useSceneEntities;

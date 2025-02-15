@@ -17,6 +17,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { EntitiesTabs } from "./entities-tabs";
 import CharactersForm from "./characters-form";
 import SceneInfoForm from "./scene-info-form";
+import PropsForm from "./props-form";
 import { useScene } from "@/hooks/useScene";
 import { useState, useEffect } from "react";
 import LocationsForm from "./locations-form";
@@ -129,19 +130,14 @@ export const SceneAnalysisConfirmDialog = ({
 
             {/* Props Tab */}
             <TabsContent value="props">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium">
-                    {t("prop.name")}
-                  </label>
-                  <input
-                    type="text"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    placeholder="Orange Sofa"
-                  />
-                </div>
-                {/* Add more prop fields */}
-              </div>
+              <PropsForm
+                scriptId={scriptId}
+                sceneId={savedSceneId}
+                selectedDraftAnalysis={selectedDraftAnalysis}
+                setCurrentTab={setCurrentTab}
+              >
+                <CancelButton setIsOpen={setIsOpen} />
+              </PropsForm>
             </TabsContent>
           </EntitiesTabs>
         </ScrollArea>

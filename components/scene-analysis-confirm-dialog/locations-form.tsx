@@ -33,7 +33,7 @@ import { AlertDialogFooter } from "@/components/ui/alert-dialog";
 const EMPTY_LOCATION = {
   name: "",
   type: "INT",
-  timeOfDay: "DAY",
+  time_of_day: "DAY",
   notes: "",
 } as const;
 
