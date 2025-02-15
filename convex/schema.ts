@@ -41,10 +41,12 @@ export default defineSchema({
     page_number: v.number(),
     text: v.string(),
     summary: v.optional(v.string()),
-  }).index("by_script", ["script_id"]),
+  })
+    .index("unique_scene_constraint", ["script_id", "scene_number"])
+    .index("by_script", ["script_id"]),
   characters: defineTable({
     script_id: v.id("scripts"),
-    scene_id: v.optional(v.id("scenes")),
+    scene_id: v.id("scenes"),
     name: v.string(),
     type: characterTypeValidator,
     notes: v.optional(v.string()),

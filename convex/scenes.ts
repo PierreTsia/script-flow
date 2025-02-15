@@ -3,7 +3,7 @@ import { parseSceneAnalysis } from "@/lib/llm/parser";
 import { MistralProvider } from "@/lib/llm/providers/mistral";
 import { SceneAnalysis } from "@/lib/llm/providers/index";
 
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
 export const analyzeScene = httpAction(async (ctx, request) => {
   const { text, pageNumber } = await request.json();
@@ -38,7 +38,6 @@ export const analyzeScene = httpAction(async (ctx, request) => {
 
     const analysis: Omit<SceneAnalysis, "pageNumber"> =
       parseSceneAnalysis(llmResponse);
-    console.log("analysis", analysis);
 
     const analysisWithPageNumber: SceneAnalysis = {
       ...analysis,
@@ -123,6 +122,20 @@ export const saveScene = mutation({
       throw new Error("Script not found");
     }
 
+    const existing = await ctx.db
+      .query("scenes")
+      .withIndex("unique_scene_constraint", (q) =>
+        q.eq("script_id", args.script_id).eq("scene_number", args.scene_number)
+      )
+      .unique();
+
+    if (existing !== null) {
+      throw new ConvexError({
+        message: `A scene with script_id "${args.script_id}" and scene_number "${args.scene_number}" already exists.`,
+        code: "DUPLICATE_SCENE",
+      });
+    }
+
     const sceneId = await ctx.db.insert("scenes", {
       script_id: args.script_id,
       scene_number: args.scene_number,
@@ -132,5 +145,20 @@ export const saveScene = mutation({
     });
 
     return sceneId;
+  },
+});
+
+export const getSceneByNumber = query({
+  args: {
+    scriptId: v.id("scripts"),
+    sceneNumber: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("scenes")
+      .withIndex("unique_scene_constraint", (q) =>
+        q.eq("script_id", args.scriptId).eq("scene_number", args.sceneNumber)
+      )
+      .unique();
   },
 });

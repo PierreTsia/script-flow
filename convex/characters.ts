@@ -8,6 +8,7 @@ const createCharacterValidator = v.object({
   type: characterTypeValidator,
   aliases: v.optional(v.array(v.string())),
   notes: v.optional(v.string()),
+  scene_id: v.id("scenes"),
 });
 
 export const create = mutation({

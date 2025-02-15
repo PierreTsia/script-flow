@@ -6,6 +6,7 @@ const useSceneEntities = (scriptId: Id<"scripts">) => {
   const insertCharacter = useMutation(api.characters.create);
 
   const createCharacter = async (
+    sceneId: Id<"scenes">,
     name: string,
     type: CharacterType,
     aliases?: string[],
@@ -13,6 +14,7 @@ const useSceneEntities = (scriptId: Id<"scripts">) => {
   ) => {
     const characterId = await insertCharacter({
       script_id: scriptId,
+      scene_id: sceneId,
       name,
       type,
       aliases,

@@ -4,13 +4,20 @@ import { SceneAnalysis } from "@/lib/llm/providers/index";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
-
+import { ConvexError } from "convex/values";
 const API_URL = "https://animated-mole-731.convex.site";
 
 export type DraftSceneAnalysis = Doc<"draftScenesAnalysis">;
 
 export const useScene = (scriptId: Id<"scripts">) => {
   const insertScene = useMutation(api.scenes.saveScene);
+  const getSceneByNumber = (sceneNumber?: string | null) => {
+    if (!sceneNumber) return null;
+    return useQuery(api.scenes.getSceneByNumber, {
+      scriptId,
+      sceneNumber,
+    });
+  };
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -114,11 +121,17 @@ export const useScene = (scriptId: Id<"scripts">) => {
       });
       return sceneId;
     } catch (error) {
-      console.error(error);
-      toast({
-        title: "Scene creation failed",
-        variant: "destructive",
-      });
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: `Scene creation failed: ${error}`,
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -132,5 +145,6 @@ export const useScene = (scriptId: Id<"scripts">) => {
     analyseAndSaveDraft,
     drafts,
     handleDeleteDraft,
+    getSceneByNumber,
   };
 };

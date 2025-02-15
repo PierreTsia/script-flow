@@ -19,7 +19,8 @@ import { EntitiesTabs } from "./entities-tabs";
 import CharactersForm from "./characters-form";
 import SceneInfoForm from "./scene-info-form";
 import { useScene } from "@/hooks/useScene";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { log } from "console";
 
 type TabType = "scene_info" | "locations" | "characters" | "props";
 
@@ -41,7 +42,17 @@ export const SceneAnalysisConfirmDialog = ({
 
   const [savedSceneId, setSavedSceneId] = useState<Id<"scenes"> | null>(null);
   const [currentTab, setCurrentTab] = useState<TabType>("scene_info");
-  const { createScene } = useScene(scriptId);
+  const { createScene, getSceneByNumber } = useScene(scriptId);
+  const scene = getSceneByNumber(selectedDraftAnalysis?.scene_number);
+
+  useEffect(() => {
+    if (scene) {
+      setSavedSceneId(scene._id);
+    } else {
+      setSavedSceneId(null);
+      setCurrentTab("scene_info");
+    }
+  }, [scene, setSavedSceneId]);
 
   const onCreateScene = async (scene: {
     scene_number: string;
@@ -54,7 +65,6 @@ export const SceneAnalysisConfirmDialog = ({
       script_id: scriptId,
     });
     if (sceneId) {
-      setSavedSceneId(sceneId);
       setCurrentTab("locations");
     }
   };
@@ -78,6 +88,7 @@ export const SceneAnalysisConfirmDialog = ({
 
         <ScrollArea className="pr-4 h-[calc(80vh-180px)]">
           <EntitiesTabs
+            key={savedSceneId ?? "new-scene"}
             sceneId={savedSceneId}
             currentTab={currentTab}
             setCurrentTab={setCurrentTab}
@@ -112,6 +123,7 @@ export const SceneAnalysisConfirmDialog = ({
             <TabsContent value="characters">
               <CharactersForm
                 scriptId={scriptId}
+                sceneId={savedSceneId}
                 selectedDraftAnalysis={selectedDraftAnalysis}
                 setCurrentTab={setCurrentTab}
               />

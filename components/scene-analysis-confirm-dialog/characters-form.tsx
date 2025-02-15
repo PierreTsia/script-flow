@@ -37,10 +37,12 @@ const EMPTY_CHARACTER = {
 
 const CharactersForm = ({
   scriptId,
+  sceneId,
   selectedDraftAnalysis,
   setCurrentTab,
 }: {
   scriptId: Id<"scripts">;
+  sceneId: Id<"scenes"> | null;
   selectedDraftAnalysis: DraftSceneAnalysis | null;
   setCurrentTab: (tab: TabType) => void;
 }) => {
@@ -82,9 +84,18 @@ const CharactersForm = ({
   }) => {
     try {
       setIsLoading(true);
+      if (!sceneId) {
+        throw new Error("Scene ID is required");
+      }
       await Promise.all(
         data.characters.map((char) =>
-          createCharacter(char.name, char.type, char.aliases, char.notes)
+          createCharacter(
+            sceneId,
+            char.name,
+            char.type,
+            char.aliases,
+            char.notes
+          )
         )
       );
       toast({ title: `${data.characters.length} characters saved` });
