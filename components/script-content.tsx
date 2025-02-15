@@ -67,12 +67,6 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
       const range = selection.getRangeAt(selection.rangeCount - 1);
       const rect = range.getBoundingClientRect();
 
-      console.log("Selection detected:", {
-        rect,
-        hasSelection: !!selection,
-        selectedText,
-      });
-
       // Only update if we have valid dimensions
       if (rect.width > 0 && rect.height > 0) {
         setSelectionRect(rect);

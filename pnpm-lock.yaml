@@ -11,6 +11,9 @@ dependencies:
   '@helicone/helpers':
     specifier: ^1.0.0
     version: 1.0.0
+  '@hookform/resolvers':
+    specifier: ^4.0.0
+    version: 4.0.0(react-hook-form@7.54.2)
   '@pdfslick/core':
     specifier: ^2.1.0
     version: 2.1.0(@types/node@20.17.17)(@types/react@19.0.8)(react@19.0.0)
@@ -51,6 +54,9 @@ dependencies:
     specifier: ^1.1.2
     version: 1.1.2(@types/react@19.0.8)(react@19.0.0)
   '@radix-ui/react-switch':
+    specifier: ^1.1.3
+    version: 1.1.3(@types/react-dom@19.0.3)(@types/react@19.0.8)(react-dom@19.0.0)(react@19.0.0)
+  '@radix-ui/react-tabs':
     specifier: ^1.1.3
     version: 1.1.3(@types/react-dom@19.0.3)(@types/react@19.0.8)(react-dom@19.0.0)(react@19.0.0)
   '@radix-ui/react-toast':
@@ -98,6 +104,9 @@ dependencies:
   react-hook-form:
     specifier: ^7.54.2
     version: 7.54.2(react@19.0.0)
+  react-use-form:
+    specifier: ^0.1.0
+    version: 0.1.0(react-dom@19.0.0)
   recharts:
     specifier: ^2.15.1
     version: 2.15.1(react-dom@19.0.0)(react@19.0.0)
@@ -107,6 +116,9 @@ dependencies:
   tailwindcss-animate:
     specifier: ^1.0.7
     version: 1.0.7(tailwindcss@3.4.17)
+  zod:
+    specifier: ^3.24.2
+    version: 3.24.2
 
 devDependencies:
   '@eslint/eslintrc':
@@ -806,6 +818,14 @@ packages:
 
   /@helicone/helpers@1.0.0:
     resolution: {integrity: sha512-YZDGIsOe19+tADpM4ggOPsS3RmapjM8BHfaFBcpfOsNtedU/YGUmqK03wtVHjPZu0PHE9QHR/bXhiVlmTPCtvQ==, tarball: https://registry.npmjs.org/@helicone/helpers/-/helpers-1.0.0.tgz}
+    dev: false
+
+  /@hookform/resolvers@4.0.0(react-hook-form@7.54.2):
+    resolution: {integrity: sha512-93ZueVlTaeMF0pRbrLbcnzrxeb2mGA/xyO3RgfrsKs5OCtcfjoWcdjBJm+N7096Jfg/JYlGPjuyQCgqVEodSTg==, tarball: https://registry.npmjs.org/@hookform/resolvers/-/resolvers-4.0.0.tgz}
+    peerDependencies:
+      react-hook-form: ^7.0.0
+    dependencies:
+      react-hook-form: 7.54.2(react@19.0.0)
     dev: false
 
   /@humanfs/core@0.19.1:
@@ -1950,6 +1970,33 @@ packages:
       '@radix-ui/react-use-controllable-state': 1.1.0(@types/react@19.0.8)(react@19.0.0)
       '@radix-ui/react-use-previous': 1.1.0(@types/react@19.0.8)(react@19.0.0)
       '@radix-ui/react-use-size': 1.1.0(@types/react@19.0.8)(react@19.0.0)
+      '@types/react': 19.0.8
+      '@types/react-dom': 19.0.3(@types/react@19.0.8)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    dev: false
+
+  /@radix-ui/react-tabs@1.1.3(@types/react-dom@19.0.3)(@types/react@19.0.8)(react-dom@19.0.0)(react@19.0.0):
+    resolution: {integrity: sha512-9mFyI30cuRDImbmFF6O2KUJdgEOsGh9Vmx9x/Dh9tOhL7BngmQPQfwW4aejKm5OHpfWIdmeV6ySyuxoOGjtNng==, tarball: https://registry.npmjs.org/@radix-ui/react-tabs/-/react-tabs-1.1.3.tgz}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@radix-ui/primitive': 1.1.1
+      '@radix-ui/react-context': 1.1.1(@types/react@19.0.8)(react@19.0.0)
+      '@radix-ui/react-direction': 1.1.0(@types/react@19.0.8)(react@19.0.0)
+      '@radix-ui/react-id': 1.1.0(@types/react@19.0.8)(react@19.0.0)
+      '@radix-ui/react-presence': 1.1.2(@types/react-dom@19.0.3)(@types/react@19.0.8)(react-dom@19.0.0)(react@19.0.0)
+      '@radix-ui/react-primitive': 2.0.2(@types/react-dom@19.0.3)(@types/react@19.0.8)(react-dom@19.0.0)(react@19.0.0)
+      '@radix-ui/react-roving-focus': 1.1.2(@types/react-dom@19.0.3)(@types/react@19.0.8)(react-dom@19.0.0)(react@19.0.0)
+      '@radix-ui/react-use-controllable-state': 1.1.0(@types/react@19.0.8)(react@19.0.0)
       '@types/react': 19.0.8
       '@types/react-dom': 19.0.3(@types/react@19.0.8)
       react: 19.0.0
@@ -4917,6 +4964,15 @@ packages:
       tslib: 2.8.1
     dev: false
 
+  /react-use-form@0.1.0(react-dom@19.0.0):
+    resolution: {integrity: sha512-Is95GBTp/dtWpLUWluTMr48tTrld6CoVW6I4Nlxgt16mQmhJINGZBX41xyLiDazAqw6rcDk4M8ym1yyeqAn4kQ==, tarball: https://registry.npmjs.org/react-use-form/-/react-use-form-0.1.0.tgz}
+    peerDependencies:
+      react-dom: ^16.7.0-alpha.0
+    dependencies:
+      react: 16.14.0
+      react-dom: 19.0.0(react@19.0.0)
+    dev: false
+
   /react-use@17.6.0(react-dom@19.0.0)(react@19.0.0):
     resolution: {integrity: sha512-OmedEScUMKFfzn1Ir8dBxiLLSOzhKe/dPZwVxcujweSj45aNM7BEGPb9BEVIgVEqEXx6f3/TsXzwIktNgUR02g==, tarball: https://registry.npmjs.org/react-use/-/react-use-17.6.0.tgz}
     peerDependencies:
@@ -4939,6 +4995,15 @@ packages:
       throttle-debounce: 3.0.1
       ts-easing: 0.2.0
       tslib: 2.8.1
+    dev: false
+
+  /react@16.14.0:
+    resolution: {integrity: sha512-0X2CImDkJGApiAlcf0ODKIneSwBPhqJawOa5wCtKbu7ZECrmS26NvtSILynQ66cgkT/RJ4LidJOc3bUESwmU8g==, tarball: https://registry.npmjs.org/react/-/react-16.14.0.tgz}
+    engines: {node: '>=0.10.0'}
+    dependencies:
+      loose-envify: 1.4.0
+      object-assign: 4.1.1
+      prop-types: 15.8.1
     dev: false
 
   /react@19.0.0:
@@ -5886,6 +5951,10 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==, tarball: https://registry.npmjs.org/yocto-queue/-/yocto-queue-0.1.0.tgz}
     engines: {node: '>=10'}
     dev: true
+
+  /zod@3.24.2:
+    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==, tarball: https://registry.npmjs.org/zod/-/zod-3.24.2.tgz}
+    dev: false
 
   /zustand@5.0.3(@types/react@19.0.8)(react@19.0.0):
     resolution: {integrity: sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==, tarball: https://registry.npmjs.org/zustand/-/zustand-5.0.3.tgz}

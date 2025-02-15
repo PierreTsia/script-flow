@@ -52,6 +52,27 @@
     "props": "Props",
     "noLocations": "No locations found",
     "noCharacters": "No characters found",
-    "noProps": "No props found"
+    "noProps": "No props found",
+    "saveConfirmationTitle": "Scene Analysis",
+    "saveConfirmationDescription": "For scene {sceneNumber} with {locationsCount} locations and {charactersCount} characters.",
+    "cancelButton": "Cancel",
+    "confirmSaveButton": "Confirm Save",
+    "saveConfirmationSuccess": "Analysis saved",
+    "saveConfirmationError": "Error saving analysis",
+    "characterType": {
+      "PRINCIPAL": "Principal",
+      "SECONDARY": "Secondary",
+      "FIGURANT": "Figurant",
+      "SILHOUETTE": "Silhouette",
+      "EXTRA": "Extra"
+    },
+    "character": {
+      "name": "Name",
+      "type": "Type",
+      "notes": "Notes"
+    },
+    "prop": {
+      "name": "Name"
+    }
   }
 }

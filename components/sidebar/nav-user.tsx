@@ -1,8 +1,8 @@
 "use client";
 
 import { ChevronsUpDown, LogOut } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
-import LocaleSwitcher from "@/components/locale-switcher";
+import { ThemeToggle } from "@/components/sidebar/theme-toggle";
+import LocaleSwitcher from "@/components/sidebar/locale-switcher";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
