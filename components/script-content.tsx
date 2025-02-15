@@ -16,7 +16,7 @@ interface ScriptContentProps {
 }
 
 export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
-  const { isAnalyzing, analyseAndSaveDraft } = useScene(script._id);
+  const { isLoading, analyseAndSaveDraft } = useScene(script._id);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -100,7 +100,7 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
               onOpenChange={handleOpenDialogChange}
               selectedText={selectedText}
               selectedPage={selectedPages[0]}
-              isAnalyzing={isAnalyzing}
+              isAnalyzing={isLoading}
               onConfirmClick={() =>
                 handleAnalyze(selectedText, selectedPages[0])
               }
@@ -113,7 +113,7 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
               scriptId={script._id}
               onOpenChange={handleOpenChange}
               onAnalyze={() => handleAnalyze(selectedText, selectedPages[0])}
-              isAnalyzing={isAnalyzing}
+              isAnalyzing={isLoading}
             />
           </div>
         </div>

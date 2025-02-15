@@ -42,12 +42,17 @@
     "deleteDraft": "Delete draft",
     "saveDraft": "Save draft",
     "saveButton": "Save Analysis",
+    "scene_number": "Scene",
+    "page_number": "Page",
+    "summary": "Summary",
+    "text": "Text",
     "draftStatus": {
       "savedDraft": "Saved draft locally",
       "newAnalysis": "New analysis - not saved"
     },
     "noAnalysisSelected": "No analysis selected",
     "locations": "Locations",
+    "scene_info": "Scene Info",
     "location": {
       "name": "Name"
     },

@@ -35,8 +35,16 @@ export default defineSchema({
     characters: draftCharactersValidator,
     props: draftPropsValidator,
   }).index("by_script", ["script_id"]),
+  scenes: defineTable({
+    script_id: v.id("scripts"),
+    scene_number: v.string(),
+    page_number: v.number(),
+    text: v.string(),
+    summary: v.optional(v.string()),
+  }).index("by_script", ["script_id"]),
   characters: defineTable({
     script_id: v.id("scripts"),
+    scene_id: v.optional(v.id("scenes")),
     name: v.string(),
     type: characterTypeValidator,
     notes: v.optional(v.string()),
@@ -44,6 +52,7 @@ export default defineSchema({
     searchText: v.string(),
   })
     .index("by_script", ["script_id"])
+    .index("by_scene", ["scene_id"])
     .searchIndex("search_characters", {
       searchField: "searchText",
       filterFields: ["script_id", "type"],

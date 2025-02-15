@@ -10,14 +10,17 @@ const API_URL = "https://animated-mole-731.convex.site";
 export type DraftSceneAnalysis = Doc<"draftScenesAnalysis">;
 
 export const useScene = (scriptId: Id<"scripts">) => {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const insertScene = useMutation(api.scenes.saveScene);
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
 
   const analyze = async (
     text: string,
     pageNumber: number
   ): Promise<SceneAnalysis | null> => {
-    if (isAnalyzing) return null; // Prevent double-submission
+    if (isLoading) return null; // Prevent double-submission
 
     try {
       const response = await fetch(`${API_URL}/analyze-scene`, {
@@ -45,7 +48,7 @@ export const useScene = (scriptId: Id<"scripts">) => {
   const saveDraft = useMutation(api.scenes.saveDraft);
 
   const analyseAndSaveDraft = async (text: string, pageNumber: number) => {
-    setIsAnalyzing(true);
+    setIsLoading(true);
     setError(null);
     try {
       const analysis = await analyze(text, pageNumber);
@@ -67,7 +70,7 @@ export const useScene = (scriptId: Id<"scripts">) => {
       });
       return null;
     } finally {
-      setIsAnalyzing(false);
+      setIsLoading(false);
       setError(null);
     }
   };
@@ -84,8 +87,46 @@ export const useScene = (scriptId: Id<"scripts">) => {
     });
   };
 
+  const createScene = async ({
+    scene_number,
+    page_number,
+    script_id,
+    text,
+    summary,
+  }: {
+    script_id: Id<"scripts">;
+    scene_number: string;
+    page_number: number;
+    text: string;
+    summary?: string;
+  }) => {
+    setIsLoading(true);
+    try {
+      const sceneId = await insertScene({
+        script_id,
+        scene_number,
+        page_number,
+        text,
+        summary,
+      });
+      toast({
+        title: "Scene created",
+      });
+      return sceneId;
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Scene creation failed",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
-    isAnalyzing,
+    isLoading,
+    createScene,
     error,
     saveDraft,
     analyseAndSaveDraft,

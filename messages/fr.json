@@ -68,6 +68,11 @@
     "saveConfirmationError": "Erreur lors de l'enregistrement de l'analyse",
     "addCharacter": "Ajouter un personnage",
     "removeCharacter": "Supprimer",
+    "scene_info": "Informations de la scène",
+    "scene_number": "Scène",
+    "page_number": "Page",
+    "summary": "Résumé",
+    "text": "Texte",
     "characterType": {
       "PRINCIPAL": "Principal",
       "SECONDARY": "Secondaire",

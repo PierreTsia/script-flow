@@ -4,6 +4,7 @@ import { CharacterType } from "@/convex/helpers";
 import { useMutation } from "convex/react";
 const useSceneEntities = (scriptId: Id<"scripts">) => {
   const insertCharacter = useMutation(api.characters.create);
+
   const createCharacter = async (
     name: string,
     type: CharacterType,

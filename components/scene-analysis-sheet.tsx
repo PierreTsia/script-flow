@@ -19,7 +19,7 @@ import { DraftSceneAnalysis, useScene } from "@/hooks/useScene";
 import { Id } from "@/convex/_generated/dataModel";
 
 import SectionCollapsible from "./section-collapsible";
-import SceneAnalysisConfirmDialog from "./scene-analysis-confirm-dialog";
+import SceneAnalysisConfirmDialog from "./scene-analysis-confirm-dialog/scene-analysis-confirm-dialog";
 
 const SceneAnalysisSheet = ({
   isOpen,

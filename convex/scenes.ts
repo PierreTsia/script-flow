@@ -103,3 +103,34 @@ export const deleteDraft = mutation({
     await ctx.db.delete(args.draftId);
   },
 });
+
+export const saveScene = mutation({
+  args: {
+    script_id: v.id("scripts"),
+    scene_number: v.string(),
+    page_number: v.number(),
+    text: v.string(),
+    summary: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    const script = await ctx.db.get(args.script_id);
+    if (!script) {
+      throw new Error("Script not found");
+    }
+
+    const sceneId = await ctx.db.insert("scenes", {
+      script_id: args.script_id,
+      scene_number: args.scene_number,
+      page_number: args.page_number,
+      text: args.text,
+      summary: args.summary,
+    });
+
+    return sceneId;
+  },
+});
