@@ -51,6 +51,9 @@
     },
     "noAnalysisSelected": "Aucune analyse sélectionnée",
     "locations": "Lieux",
+    "location": {
+      "name": "Nom"
+    },
     "characters": "Personnages",
     "props": "Accessoires",
     "noLocations": "Aucun lieu trouvé",
@@ -63,6 +66,8 @@
     "confirmSaveButton": "Enregistrer l'analyse",
     "saveConfirmationSuccess": "Analyse enregistrée",
     "saveConfirmationError": "Erreur lors de l'enregistrement de l'analyse",
+    "addCharacter": "Ajouter un personnage",
+    "removeCharacter": "Supprimer",
     "characterType": {
       "PRINCIPAL": "Principal",
       "SECONDARY": "Secondaire",

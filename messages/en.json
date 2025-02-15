@@ -48,6 +48,9 @@
     },
     "noAnalysisSelected": "No analysis selected",
     "locations": "Locations",
+    "location": {
+      "name": "Name"
+    },
     "characters": "Characters",
     "props": "Props",
     "noLocations": "No locations found",
@@ -59,6 +62,8 @@
     "confirmSaveButton": "Confirm Save",
     "saveConfirmationSuccess": "Analysis saved",
     "saveConfirmationError": "Error saving analysis",
+    "addCharacter": "Add Character",
+    "removeCharacter": "Remove",
     "characterType": {
       "PRINCIPAL": "Principal",
       "SECONDARY": "Secondary",

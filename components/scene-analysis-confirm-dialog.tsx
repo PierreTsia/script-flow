@@ -32,11 +32,17 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import useSceneEntities from "@/hooks/useSceneEntities";
 import { useParams } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
 import { useToast } from "@/hooks/use-toast";
+import { Trash2Icon } from "lucide-react";
+const EMPTY_CHARACTER = {
+  name: "",
+  type: "PRINCIPAL",
+  notes: "",
+} as const;
 
 export const SceneAnalysisConfirmDialog = ({
   selectedDraftAnalysis,
@@ -70,42 +76,37 @@ export const SceneAnalysisConfirmDialog = ({
     aliases: z.array(z.string()).optional(),
   });
 
-  const form = useForm<z.infer<typeof characterFormSchema>>({
-    resolver: zodResolver(characterFormSchema),
+  const form = useForm<{ characters: z.infer<typeof characterFormSchema>[] }>({
+    resolver: zodResolver(
+      z.object({ characters: z.array(characterFormSchema) })
+    ),
     defaultValues: {
-      name: "",
-      type: "PRINCIPAL",
-      notes: "",
-      aliases: [],
+      characters: [],
     },
   });
 
-  useEffect(() => {
-    if (selectedDraftAnalysis) {
-      if (selectedDraftAnalysis.characters?.length) {
-        form.reset({
-          name: selectedDraftAnalysis.characters[0].name,
-          type: selectedDraftAnalysis.characters[0].type,
-          notes: selectedDraftAnalysis.characters[0].notes,
-        });
-      }
-    }
-  }, [selectedDraftAnalysis, form.reset]);
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "characters",
+  });
 
-  const onSubmit = async ({
-    name,
-    type,
-    notes,
-    aliases,
-  }: z.infer<typeof characterFormSchema>) => {
+  useEffect(() => {
+    if (selectedDraftAnalysis?.characters) {
+      form.reset({ characters: selectedDraftAnalysis.characters });
+    }
+  }, [selectedDraftAnalysis]);
+
+  const onSubmit = async (data: {
+    characters: z.infer<typeof characterFormSchema>[];
+  }) => {
     try {
       setIsLoading(true);
-      await createCharacter(name, type, aliases, notes);
-      setIsLoading(false);
-      toast({
-        title: "Character created",
-        description: `The character ${name} - ${type} has been saved`,
-      });
+      await Promise.all(
+        data.characters.map((char) =>
+          createCharacter(char.name, char.type, char.aliases, char.notes)
+        )
+      );
+      toast({ title: `${data.characters.length} characters saved` });
     } catch (error) {
       console.error("Submission failed:", error);
       toast({
@@ -154,7 +155,7 @@ export const SceneAnalysisConfirmDialog = ({
               <div className="space-y-4">
                 <div className="space-y-2">
                   <label className="block text-sm font-medium">
-                    Location Name
+                    {t("location.name")}
                   </label>
                   <input
                     type="text"
@@ -175,74 +176,90 @@ export const SceneAnalysisConfirmDialog = ({
                     id="character-form"
                   >
                     <div className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t("character.name")}</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage>
-                              {form.formState.errors.name?.message}
-                            </FormMessage>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="type"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t("character.type")}</FormLabel>
-                            <FormControl>
-                              <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue
-                                    placeholder={t("character.type")}
+                      {fields.map((field, index) => (
+                        <div
+                          key={field.id}
+                          className="space-y-4 border p-4 rounded-lg mb-4"
+                        >
+                          <FormField
+                            control={form.control}
+                            name={`characters.${index}.name`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t("character.name")}</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name={`characters.${index}.type`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t("character.type")}</FormLabel>
+                                <FormControl>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue
+                                        placeholder={t("character.type")}
+                                      />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {[
+                                        "PRINCIPAL",
+                                        "SECONDARY",
+                                        "FIGURANT",
+                                        "SILHOUETTE",
+                                        "EXTRA",
+                                      ].map((type) => (
+                                        <SelectItem key={type} value={type}>
+                                          {t(`characterType.${type}`)}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name={`characters.${index}.notes`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t("character.notes")}</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    {...field}
+                                    placeholder={t("character.notes")}
                                   />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {[
-                                    "PRINCIPAL",
-                                    "SECONDARY",
-                                    "FIGURANT",
-                                    "SILHOUETTE",
-                                    "EXTRA",
-                                  ].map((type) => (
-                                    <SelectItem key={type} value={type}>
-                                      {t(`characterType.${type}`)}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="notes"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t("character.notes")}</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                {...field}
-                                placeholder={t("character.notes")}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={() => remove(index)}
+                          >
+                            <Trash2Icon className="w-4 h-4" />
+                            {t("removeCharacter")}
+                          </Button>
+                        </div>
+                      ))}
                     </div>
                   </form>
                 </Form>
+
+                <Button type="button" onClick={() => append(EMPTY_CHARACTER)}>
+                  {t("addCharacter")}
+                </Button>
 
                 {!selectedDraftAnalysis?.characters?.length && (
                   <div className="text-center text-muted-foreground py-8">
