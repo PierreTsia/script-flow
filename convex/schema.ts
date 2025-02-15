@@ -73,7 +73,9 @@ export default defineSchema({
     name: v.string(),
     type: locationTypeValidator,
     time_of_day: timeOfDayValidator,
+    notes: v.optional(v.string()),
   })
+    .index("unique_location_per_script", ["script_id", "name", "type"])
     .index("by_script", ["script_id"])
     .index("by_type", ["type"])
     .index("by_time_of_day", ["time_of_day"]),
@@ -81,6 +83,7 @@ export default defineSchema({
     location_id: v.id("locations"),
     scene_id: v.id("scenes"),
   })
+    .index("by_location_scene", ["location_id", "scene_id"])
     .index("by_location", ["location_id"])
     .index("by_scene", ["scene_id"]),
 

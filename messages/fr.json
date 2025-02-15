@@ -51,8 +51,24 @@
     },
     "noAnalysisSelected": "Aucune analyse sélectionnée",
     "locations": "Lieux",
+    "addLocation": "Ajouter un lieu",
+    "timeOfDay": {
+      "DAY": "Jour",
+      "NIGHT": "Nuit",
+      "DAWN": "Aube",
+      "DUSK": "Crépuscule",
+      "UNSPECIFIED": "Non spécifié"
+    },
+    "removeLocation": "Supprimer",
+    "locationType": {
+      "INT": "Intérieur",
+      "EXT": "Extérieur"
+    },
     "location": {
-      "name": "Nom"
+      "name": "Nom",
+      "type": "Type",
+      "timeOfDay": "Temps de la journée",
+      "notes": "Notes"
     },
     "characters": "Personnages",
     "props": "Accessoires",

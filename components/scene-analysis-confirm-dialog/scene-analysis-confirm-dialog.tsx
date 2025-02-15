@@ -19,6 +19,7 @@ import CharactersForm from "./characters-form";
 import SceneInfoForm from "./scene-info-form";
 import { useScene } from "@/hooks/useScene";
 import { useState, useEffect } from "react";
+import LocationsForm from "./locations-form";
 
 type TabType = "scene_info" | "locations" | "characters" | "props";
 
@@ -104,19 +105,14 @@ export const SceneAnalysisConfirmDialog = ({
 
             {/* Locations Tab */}
             <TabsContent value="locations">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium">
-                    {t("location.name")}
-                  </label>
-                  <input
-                    type="text"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    placeholder="Central Perk Cafe"
-                  />
-                </div>
-                {/* Add more location fields */}
-              </div>
+              <LocationsForm
+                scriptId={scriptId}
+                sceneId={savedSceneId}
+                selectedDraftAnalysis={selectedDraftAnalysis}
+                setCurrentTab={setCurrentTab}
+              >
+                <CancelButton setIsOpen={setIsOpen} />
+              </LocationsForm>
             </TabsContent>
 
             {/* Characters Tab */}

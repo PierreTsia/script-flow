@@ -4,9 +4,14 @@ import { CharacterType } from "@/convex/helpers";
 import { useMutation } from "convex/react";
 import { useToast } from "@/hooks/use-toast";
 import { ConvexError } from "convex/values";
-
+import { LocationType, TimeOfDay } from "@/convex/helpers";
 const useSceneEntities = () => {
-  const create = useMutation(api.characters.createCharacterWithScene);
+  const saveCharacterInScene = useMutation(
+    api.characters.createCharacterWithScene
+  );
+  const saveLocationInScene = useMutation(
+    api.locations.createLocationWithScene
+  );
   const { toast } = useToast();
 
   const createCharacter = async ({
@@ -25,7 +30,7 @@ const useSceneEntities = () => {
     scriptId: Id<"scripts">;
   }) => {
     try {
-      const characterId = await create({
+      const characterId = await saveCharacterInScene({
         name,
         type,
         script_id: scriptId,
@@ -45,7 +50,43 @@ const useSceneEntities = () => {
     }
   };
 
-  return { createCharacter };
+  const createLocation = async ({
+    name,
+    type,
+    time_of_day,
+    sceneId,
+    scriptId,
+    notes,
+  }: {
+    name: string;
+    type: LocationType;
+    time_of_day: TimeOfDay;
+    sceneId: Id<"scenes">;
+    scriptId: Id<"scripts">;
+    notes?: string;
+  }) => {
+    try {
+      const locationId = await saveLocationInScene({
+        name,
+        type,
+        time_of_day,
+        script_id: scriptId,
+        scene_id: sceneId,
+        notes,
+      });
+      return locationId;
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+      return null;
+    }
+  };
+
+  return { createCharacter, createLocation };
 };
 
 export default useSceneEntities;

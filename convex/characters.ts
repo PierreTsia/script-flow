@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+import { mutation } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { characterTypeValidator } from "./helpers";
 
@@ -45,7 +45,7 @@ export const createCharacterWithScene = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      throw new Error("Unauthorized");
+      throw new ConvexError("Unauthorized");
     }
 
     // Check if the character already exists

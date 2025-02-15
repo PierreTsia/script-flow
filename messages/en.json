@@ -46,15 +46,33 @@
     "page_number": "Page",
     "summary": "Summary",
     "text": "Text",
+    "title": "Scene Analysis",
+    "description": "Manage your script scenes here",
     "draftStatus": {
       "savedDraft": "Saved draft locally",
       "newAnalysis": "New analysis - not saved"
     },
     "noAnalysisSelected": "No analysis selected",
     "locations": "Locations",
+    "addLocation": "Add Location",
+    "timeOfDay": {
+      "DAY": "Day",
+      "NIGHT": "Night",
+      "DAWN": "Dawn",
+      "DUSK": "Dusk",
+      "UNSPECIFIED": "Unspecified"
+    },
+    "removeLocation": "Remove",
+    "locationType": {
+      "INT": "Interior",
+      "EXT": "Exterior"
+    },
     "scene_info": "Scene Info",
     "location": {
-      "name": "Name"
+      "name": "Name",
+      "type": "Type",
+      "timeOfDay": "Time of Day",
+      "notes": "Notes"
     },
     "characters": "Characters",
     "props": "Props",
