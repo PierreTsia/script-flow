@@ -1,9 +1,14 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { characterTypeValidator } from "./helpers";
 import { Doc } from "./_generated/dataModel";
-
+import { FunctionReturnType } from "convex/server";
+import { api } from "./_generated/api";
 export type CharacterDocument = Doc<"characters">;
+
+export type CharacterWithScenes = FunctionReturnType<
+  typeof api.characters.getCharactersByScriptId
+>;
 
 const createCharacterWithSceneValidator = v.object({
   script_id: v.id("scripts"),
@@ -96,5 +101,48 @@ export const createCharacterWithScene = mutation({
     }
 
     return characterId;
+  },
+});
+
+export const getCharactersByScriptId = query({
+  args: {
+    script_id: v.id("scripts"),
+  },
+  handler: async (ctx, args) => {
+    // Get all characters for this script
+    const characters = await ctx.db
+      .query("characters")
+      .withIndex("by_script", (q) => q.eq("script_id", args.script_id))
+      .collect();
+
+    // Get all character_scenes relationships for these characters
+    const characterScenes = await Promise.all(
+      characters.map(async (character) => {
+        const scenes = await ctx.db
+          .query("character_scenes")
+          .withIndex("by_character", (q) => q.eq("character_id", character._id))
+          .collect();
+
+        // For each character_scene, get the actual scene data
+        const sceneDetails = await Promise.all(
+          scenes.map(async (cs) => {
+            const scene = await ctx.db.get(cs.scene_id);
+            return {
+              id: cs.scene_id,
+              scene_number: scene?.scene_number,
+              // Add any other scene fields you need
+              ...scene,
+            };
+          })
+        );
+
+        return {
+          ...character,
+          scenes: sceneDetails,
+        };
+      })
+    );
+
+    return characterScenes;
   },
 });

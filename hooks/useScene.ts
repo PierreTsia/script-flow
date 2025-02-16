@@ -5,23 +5,37 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { ConvexError } from "convex/values";
+import { FunctionReturnType } from "convex/server";
 const API_URL = "https://animated-mole-731.convex.site";
 
 export type DraftSceneAnalysis = Doc<"draftScenesAnalysis">;
 
 export const useScene = (scriptId: Id<"scripts">) => {
   const insertScene = useMutation(api.scenes.saveScene);
-  const getSceneByNumber = (sceneNumber?: string | null) => {
-    if (!sceneNumber) return null;
-    return useQuery(api.scenes.getSceneByNumber, {
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const drafts = useQuery(api.scenes.getDrafts, { scriptId }) || [];
+  const deleteDraft = useMutation(api.scenes.deleteDraft);
+
+  const sceneByNumberQuery = (sceneNumber: string) =>
+    useQuery(api.scenes.getSceneAndEntitiesByNumber, {
       scriptId,
       sceneNumber,
     });
+
+  const getSceneAndEntitiesByNumber = (sceneNumber?: string | null) => {
+    if (!sceneNumber) return null;
+    return sceneByNumberQuery(sceneNumber);
   };
 
-  const [isLoading, setIsLoading] = useState(false);
+  const charactersByScriptIdQuery = (scriptId: Id<"scripts">) =>
+    useQuery(api.characters.getCharactersByScriptId, { script_id: scriptId });
 
-  const [error, setError] = useState<string | null>(null);
+  const getCharactersByScriptId = (scriptId: Id<"scripts">) => {
+    if (!scriptId) return null;
+    return charactersByScriptIdQuery(scriptId);
+  };
 
   const analyze = async (
     text: string,
@@ -82,11 +96,6 @@ export const useScene = (scriptId: Id<"scripts">) => {
     }
   };
 
-  const drafts: DraftSceneAnalysis[] =
-    useQuery(api.scenes.getDrafts, { scriptId }) || [];
-
-  const deleteDraft = useMutation(api.scenes.deleteDraft);
-
   const handleDeleteDraft = async (draftId: Id<"draftScenesAnalysis">) => {
     await deleteDraft({ draftId });
     toast({
@@ -145,6 +154,7 @@ export const useScene = (scriptId: Id<"scripts">) => {
     analyseAndSaveDraft,
     drafts,
     handleDeleteDraft,
-    getSceneByNumber,
+    getSceneAndEntitiesByNumber,
+    getCharactersByScriptId,
   };
 };

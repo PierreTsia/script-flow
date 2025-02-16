@@ -50,11 +50,18 @@ export const SceneAnalysisConfirmDialog = ({
 
   const [savedSceneId, setSavedSceneId] = useState<Id<"scenes"> | null>(null);
   const [currentTab, setCurrentTab] = useState<TabType>("scene_info");
-  const { createScene, getSceneByNumber } = useScene(scriptId);
-  const scene = getSceneByNumber(selectedDraftAnalysis?.scene_number);
+
+  const { createScene, getSceneAndEntitiesByNumber } = useScene(scriptId);
+  const scene = getSceneAndEntitiesByNumber(
+    selectedDraftAnalysis?.scene_number
+  );
+  //const sceneEntities = getSceneEntities(scene?._id);
+
+  console.log("scene", scene);
+  //console.log("sceneEntities", sceneEntities);
 
   useEffect(() => {
-    if (scene) {
+    if (scene?._id) {
       setSavedSceneId(scene._id);
     } else {
       setSavedSceneId(null);
@@ -96,7 +103,6 @@ export const SceneAnalysisConfirmDialog = ({
 
         <ScrollArea className="pr-4 h-[calc(80vh-180px)]">
           <EntitiesTabs
-            key={savedSceneId ?? "new-scene"}
             sceneId={savedSceneId}
             currentTab={currentTab}
             setCurrentTab={setCurrentTab}

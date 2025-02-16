@@ -1,10 +1,13 @@
 import { useScripts } from "@/hooks/useScripts";
 import { Id } from "@/convex/_generated/dataModel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import SceneSummaryCard from "./scene-summary-card";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import { TabsPageMenu } from "./tabs-page-menu";
+import SceneSummaryCard from "./scene-summary-card";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { useState } from "react";
+import ScenesTabContent from "./scenes-tab-content";
+import CharactersTabContent from "./characters-tab-content";
 const ScriptSceneEntitiesScreen = ({
   scriptId,
 }: {
@@ -12,6 +15,10 @@ const ScriptSceneEntitiesScreen = ({
 }) => {
   const { getScriptEntities } = useScripts();
   const entities = getScriptEntities(scriptId);
+
+  const [currentTab, setCurrentTab] = useState<
+    "scenes" | "characters" | "locations" | "props"
+  >("scenes");
 
   if (!entities) {
     return <EntityScreenSkeleton />;
@@ -22,27 +29,30 @@ const ScriptSceneEntitiesScreen = ({
       {/* Script Header */}
 
       {/* Main Content */}
-      <Tabs defaultValue="scenes" className="flex-1">
-        <TabsList>
-          <TabsTrigger value="scenes">Scenes Overview</TabsTrigger>
-          <TabsTrigger value="characters">Characters</TabsTrigger>
-          <TabsTrigger value="locations">Locations</TabsTrigger>
-          <TabsTrigger value="props">Props</TabsTrigger>
-        </TabsList>
-
+      <TabsPageMenu currentTab={currentTab} setCurrentTab={setCurrentTab}>
         {/* Scenes Tab */}
         <TabsContent value="scenes" className="flex-1">
+          <ScenesTabContent scriptId={scriptId} />
+        </TabsContent>
+        {/* Other tabs would be implemented similarly */}
+        <TabsContent value="characters" className="flex-1">
+          <CharactersTabContent scriptId={scriptId} />
+        </TabsContent>
+        <TabsContent value="locations" className="flex-1">
           <ScrollArea className="h-[calc(100vh-220px)]">
             <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-              {entities.scenes.map((scene) => (
-                <SceneSummaryCard key={scene._id} scene={scene} />
-              ))}
+              Locations
             </div>
           </ScrollArea>
         </TabsContent>
-
-        {/* Other tabs would be implemented similarly */}
-      </Tabs>
+        <TabsContent value="props" className="flex-1">
+          <ScrollArea className="h-[calc(100vh-220px)]">
+            <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+              Props
+            </div>
+          </ScrollArea>
+        </TabsContent>
+      </TabsPageMenu>
     </div>
   );
 };
