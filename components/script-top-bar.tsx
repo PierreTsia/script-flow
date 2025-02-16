@@ -1,19 +1,6 @@
 "use client";
 
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Eye, Database, Brain } from "lucide-react";
+import { Eye, Database } from "lucide-react";
 import { ScriptDocument } from "@/hooks/useScripts";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 export default function ScriptTopBar({
