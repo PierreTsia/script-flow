@@ -77,6 +77,7 @@ export const saveDraft = mutation({
       characters: analysis.characters,
       props: analysis.props,
       text: args.text,
+      summary: analysis.summary || "",
       page_number: args.pageNumber,
     });
   },

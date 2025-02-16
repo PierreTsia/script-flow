@@ -71,7 +71,7 @@ const SceneInfoForm = ({
         scene_number: selectedDraftAnalysis.scene_number || "",
         page_number: selectedDraftAnalysis.page_number,
         text: selectedDraftAnalysis.text,
-        summary: "",
+        summary: selectedDraftAnalysis.summary || "",
       });
     }
   }, [selectedDraftAnalysis, reset]);

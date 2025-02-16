@@ -33,6 +33,7 @@ export default defineSchema({
     scene_number: v.union(v.string(), v.null()),
     page_number: v.number(),
     text: v.string(),
+    summary: v.optional(v.string()),
     locations: draftLocationsValidator,
     characters: draftCharactersValidator,
     props: draftPropsValidator,

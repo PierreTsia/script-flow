@@ -2,15 +2,22 @@
 
 import { NavigationMenu } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
-import { MenuIcon } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Eye, Database } from "lucide-react";
 import { ScriptDocument } from "@/hooks/useScripts";
 
 export default function ScriptTopBar({
-  toggleSidebar,
+  toggleViewerScreen,
   script,
+  toggleEntitiesScreen,
 }: {
-  toggleSidebar: () => void;
+  toggleViewerScreen: () => void;
   script: ScriptDocument;
+  toggleEntitiesScreen: () => void;
 }) {
   return (
     <NavigationMenu className="sticky top-0 z-50 max-h-[4rem] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 min-w-full">
@@ -19,14 +26,35 @@ export default function ScriptTopBar({
           <h1 className="text-lg font-semibold text-left">
             {script.name || "Untitled Script"}
           </h1>
-          <p className="text-sm text-muted-foreground  text-left">
+          <p className="text-sm text-muted-foreground text-left">
             Uploaded: {new Date(script._creationTime).toLocaleString()}
           </p>
         </div>
 
-        <Button onClick={toggleSidebar}>
-          <MenuIcon className="w-4 h-4" />
-        </Button>
+        <div className="flex space-x-4">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" onClick={toggleEntitiesScreen}>
+                <Database className="w-4 h-4" />
+                <span className="ml-2">Entities</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <span>Open Saved Entities</span>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={toggleViewerScreen}>
+                <Eye className="w-4 h-4" />
+                <span className="ml-2">Viewer</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <span>Open Analysis Sheet</span>
+            </TooltipContent>
+          </Tooltip>
+        </div>
       </ul>
     </NavigationMenu>
   );

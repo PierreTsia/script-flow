@@ -10,6 +10,7 @@ export interface LLMProvider {
 // In a new file, e.g., lib/llm/types.ts
 export interface SceneAnalysis {
   scene_number: string | null;
+  summary: string | null;
   characters: { name: string; type: CharacterType }[];
   props: { name: string; quantity: number; notes?: string }[];
   locations: Location[];
