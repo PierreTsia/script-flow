@@ -45,17 +45,64 @@
     "noAnalysisAvailable": "Aucune analyse disponible",
     "deleteDraft": "Supprimer le brouillon",
     "saveDraft": "Enregistrer le brouillon",
-    "noAnalysisSelected": "Aucune analyse sélectionnée",
     "draftStatus": {
       "savedDraft": "Brouillon enregistré localement",
       "newAnalysis": "Nouvelle analyse - non enregistrée"
     },
-    "saveButton": "Enregistrer l'analyse",
+    "noAnalysisSelected": "Aucune analyse sélectionnée",
     "locations": "Lieux",
+    "addLocation": "Ajouter un lieu",
+    "timeOfDay": {
+      "DAY": "Jour",
+      "NIGHT": "Nuit",
+      "DAWN": "Aube",
+      "DUSK": "Crépuscule",
+      "UNSPECIFIED": "Non spécifié"
+    },
+    "removeLocation": "Supprimer",
+    "locationType": {
+      "INT": "Intérieur",
+      "EXT": "Extérieur"
+    },
+    "location": {
+      "name": "Nom",
+      "type": "Type",
+      "timeOfDay": "Temps de la journée",
+      "notes": "Notes"
+    },
     "characters": "Personnages",
-    "props": "Objets",
+    "props": "Accessoires",
     "noLocations": "Aucun lieu trouvé",
     "noCharacters": "Aucun personnage trouvé",
-    "noProps": "Aucun objet trouvé"
+    "noProps": "Aucun accessoire trouvé",
+    "saveButton": "Enregistrer l'analyse",
+    "saveConfirmationTitle": "Analyse de scène",
+    "saveConfirmationDescription": "Pour la scène {sceneNumber} avec {locationsCount} lieux et {charactersCount} personnages.",
+    "cancelButton": "Annuler",
+    "confirmSaveButton": "Enregistrer l'analyse",
+    "saveConfirmationSuccess": "Analyse enregistrée",
+    "saveConfirmationError": "Erreur lors de l'enregistrement de l'analyse",
+    "addCharacter": "Ajouter un personnage",
+    "removeCharacter": "Supprimer",
+    "scene_info": "Informations de la scène",
+    "scene_number": "Scène",
+    "page_number": "Page",
+    "summary": "Résumé",
+    "text": "Texte",
+    "characterType": {
+      "PRINCIPAL": "Principal",
+      "SECONDARY": "Secondaire",
+      "FIGURANT": "Figurant",
+      "SILHOUETTE": "Silhouette",
+      "EXTRA": "Extra"
+    },
+    "character": {
+      "name": "Nom",
+      "type": "Type",
+      "notes": "Notes"
+    },
+    "prop": {
+      "name": "Nom"
+    }
   }
 }

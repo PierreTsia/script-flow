@@ -6,7 +6,13 @@ export function parseSceneAnalysis(
   const jsonString = raw.replace(/```(json)?/g, "").trim();
 
   // Add pre-validation
-  const requiredKeys = ["scene_number", "characters", "props", "locations"];
+  const requiredKeys = [
+    "scene_number",
+    "characters",
+    "props",
+    "locations",
+    "summary",
+  ];
   if (!requiredKeys.every((k) => jsonString.includes(`"${k}"`))) {
     throw new Error("Missing required JSON keys");
   }

@@ -4,38 +4,30 @@ import { SceneAnalysis } from "@/lib/llm/providers/index";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
-
+import { ConvexError } from "convex/values";
 const API_URL = "https://animated-mole-731.convex.site";
 
 export type DraftSceneAnalysis = Doc<"draftScenesAnalysis">;
 
-export type SceneLocation = {
-  name: string;
-  type: "INT" | "EXT";
-  time_of_day: "DAY" | "NIGHT" | "DAWN" | "DUSK" | "UNSPECIFIED";
-};
-
-export type SceneCharacter = {
-  name: string;
-  type: "PRINCIPAL" | "SECONDARY" | "FIGURANT" | "SILHOUETTE" | "EXTRA";
-  description: string | undefined;
-};
-
-export type SceneProp = {
-  name: string;
-  quantity: number;
-  notes: string | undefined;
-};
-
 export const useScene = (scriptId: Id<"scripts">) => {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const insertScene = useMutation(api.scenes.saveScene);
+  const getSceneByNumber = (sceneNumber?: string | null) => {
+    if (!sceneNumber) return null;
+    return useQuery(api.scenes.getSceneByNumber, {
+      scriptId,
+      sceneNumber,
+    });
+  };
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
 
   const analyze = async (
     text: string,
     pageNumber: number
   ): Promise<SceneAnalysis | null> => {
-    if (isAnalyzing) return null; // Prevent double-submission
+    if (isLoading) return null; // Prevent double-submission
 
     try {
       const response = await fetch(`${API_URL}/analyze-scene`, {
@@ -63,7 +55,7 @@ export const useScene = (scriptId: Id<"scripts">) => {
   const saveDraft = useMutation(api.scenes.saveDraft);
 
   const analyseAndSaveDraft = async (text: string, pageNumber: number) => {
-    setIsAnalyzing(true);
+    setIsLoading(true);
     setError(null);
     try {
       const analysis = await analyze(text, pageNumber);
@@ -85,7 +77,7 @@ export const useScene = (scriptId: Id<"scripts">) => {
       });
       return null;
     } finally {
-      setIsAnalyzing(false);
+      setIsLoading(false);
       setError(null);
     }
   };
@@ -102,12 +94,57 @@ export const useScene = (scriptId: Id<"scripts">) => {
     });
   };
 
+  const createScene = async ({
+    scene_number,
+    page_number,
+    script_id,
+    text,
+    summary,
+  }: {
+    script_id: Id<"scripts">;
+    scene_number: string;
+    page_number: number;
+    text: string;
+    summary?: string;
+  }) => {
+    setIsLoading(true);
+    try {
+      const sceneId = await insertScene({
+        script_id,
+        scene_number,
+        page_number,
+        text,
+        summary,
+      });
+      toast({
+        title: "Scene created",
+      });
+      return sceneId;
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: `Scene creation failed: ${error}`,
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
-    isAnalyzing,
+    isLoading,
+    createScene,
     error,
     saveDraft,
     analyseAndSaveDraft,
     drafts,
     handleDeleteDraft,
+    getSceneByNumber,
   };
 };

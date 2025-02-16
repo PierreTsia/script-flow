@@ -1,33 +1,44 @@
 "use client";
 
-import { NavigationMenu } from "@/components/ui/navigation-menu";
-import { Button } from "@/components/ui/button";
-import { MenuIcon } from "lucide-react";
+import { Eye, Database } from "lucide-react";
 import { ScriptDocument } from "@/hooks/useScripts";
-
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 export default function ScriptTopBar({
-  toggleSidebar,
+  toggleEntitiesScreen,
+  toggleViewerScreen,
   script,
 }: {
-  toggleSidebar: () => void;
+  toggleEntitiesScreen: () => void;
+  toggleViewerScreen: () => void;
   script: ScriptDocument;
 }) {
   return (
-    <NavigationMenu className="sticky top-0 z-50 max-h-[4rem] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 min-w-full">
+    <ToggleGroup
+      type="single"
+      className="sticky top-0 z-50 max-h-[4rem] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 min-w-full"
+    >
       <ul className="h-14 px-4 md:px-6 flex items-center justify-between min-w-full">
         <div className="flex flex-col">
           <h1 className="text-lg font-semibold text-left">
             {script.name || "Untitled Script"}
           </h1>
-          <p className="text-sm text-muted-foreground  text-left">
+          <p className="text-sm text-muted-foreground text-left">
             Uploaded: {new Date(script._creationTime).toLocaleString()}
           </p>
         </div>
 
-        <Button onClick={toggleSidebar}>
-          <MenuIcon className="w-4 h-4" />
-        </Button>
+        <div className="flex items-center gap-2 w-[200px]">
+          <ToggleGroupItem value="entities" onClick={toggleEntitiesScreen}>
+            <Database className="w-4 h-4" />
+            <span className="ml-2">Entities</span>
+          </ToggleGroupItem>
+
+          <ToggleGroupItem value="viewer" onClick={toggleViewerScreen}>
+            <Eye className="w-4 h-4" />
+            <span className="ml-2">Viewer</span>
+          </ToggleGroupItem>
+        </div>
       </ul>
-    </NavigationMenu>
+    </ToggleGroup>
   );
 }

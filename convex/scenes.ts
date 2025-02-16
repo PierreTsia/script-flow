@@ -3,7 +3,7 @@ import { parseSceneAnalysis } from "@/lib/llm/parser";
 import { MistralProvider } from "@/lib/llm/providers/mistral";
 import { SceneAnalysis } from "@/lib/llm/providers/index";
 
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
 export const analyzeScene = httpAction(async (ctx, request) => {
   const { text, pageNumber } = await request.json();
@@ -38,7 +38,6 @@ export const analyzeScene = httpAction(async (ctx, request) => {
 
     const analysis: Omit<SceneAnalysis, "pageNumber"> =
       parseSceneAnalysis(llmResponse);
-    console.log("analysis", analysis);
 
     const analysisWithPageNumber: SceneAnalysis = {
       ...analysis,
@@ -53,7 +52,7 @@ export const analyzeScene = httpAction(async (ctx, request) => {
     });
   } catch (error) {
     console.error("LLM Analysis failed:", error);
-    return new Response(JSON.stringify({ error: "Analysis failed" }), {
+    return new Response(JSON.stringify({ error }), {
       status: 500,
       headers: corsHeaders,
     });
@@ -78,6 +77,7 @@ export const saveDraft = mutation({
       characters: analysis.characters,
       props: analysis.props,
       text: args.text,
+      summary: analysis.summary || "",
       page_number: args.pageNumber,
     });
   },
@@ -90,7 +90,7 @@ export const getDrafts = query({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("draftScenesAnalysis")
-      .filter((q) => q.eq(q.field("script_id"), args.scriptId))
+      .withIndex("by_script", (q) => q.eq("script_id", args.scriptId))
       .collect();
   },
 });
@@ -101,5 +101,65 @@ export const deleteDraft = mutation({
   },
   handler: async (ctx, args) => {
     await ctx.db.delete(args.draftId);
+  },
+});
+
+export const saveScene = mutation({
+  args: {
+    script_id: v.id("scripts"),
+    scene_number: v.string(),
+    page_number: v.number(),
+    text: v.string(),
+    summary: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    const script = await ctx.db.get(args.script_id);
+    if (!script) {
+      throw new Error("Script not found");
+    }
+
+    const existing = await ctx.db
+      .query("scenes")
+      .withIndex("unique_scene_constraint", (q) =>
+        q.eq("script_id", args.script_id).eq("scene_number", args.scene_number)
+      )
+      .unique();
+
+    if (existing !== null) {
+      throw new ConvexError({
+        message: `A scene with script_id "${args.script_id}" and scene_number "${args.scene_number}" already exists.`,
+        code: "DUPLICATE_SCENE",
+      });
+    }
+
+    const sceneId = await ctx.db.insert("scenes", {
+      script_id: args.script_id,
+      scene_number: args.scene_number,
+      page_number: args.page_number,
+      text: args.text,
+      summary: args.summary,
+    });
+
+    return sceneId;
+  },
+});
+
+export const getSceneByNumber = query({
+  args: {
+    scriptId: v.id("scripts"),
+    sceneNumber: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("scenes")
+      .withIndex("unique_scene_constraint", (q) =>
+        q.eq("script_id", args.scriptId).eq("scene_number", args.sceneNumber)
+      )
+      .unique();
   },
 });

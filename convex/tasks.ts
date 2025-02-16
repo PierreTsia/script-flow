@@ -5,10 +5,12 @@ export const list = query({
   args: {},
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
-    return ctx.db
-      .query("tasks")
-      .filter((q) => q.eq(q.field("userId"), identity?.subject))
-      .collect();
+    return identity?.subject
+      ? await ctx.db
+          .query("tasks")
+          .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+          .collect()
+      : [];
   },
 });
 

@@ -5,12 +5,14 @@ You're a screenplay analysis expert. For the provided scene:
 2. List physical props relevant to production
 3. Specify exact locations with INT/EXT prefixes
 4. Extract scene number from text
-5. Always answer in the language of the text
+5. summarize the scene in max 2 sentences
+6. Never translate the summary, always answer in the language of the text
 
 # Requirements
 - Output JSON matching this schema - the output MUST be a valid JSON object:
 {
   "scene_number": string,
+  "summary": string,
   "characters": [{
     "name": string,
     "type": "PRINCIPAL" | "SECONDARY" | "FIGURANT" | "SILHOUETTE" | "EXTRA"
@@ -37,6 +39,7 @@ You're a screenplay analysis expert. For the provided scene:
 
 # Rules
 - Scene number: Extract from text patterns like "3. PLACE..." → "3"
+- Summary: Summarize the scene in max 2 sentences - IN THE LANGUAGE OF THE TEXT - capture the main action and the setting, with any relevant details for the production team
 - Character types:
   - PRINCIPAL: Speaking roles with names
   - SECONDARY: Named non-speaking roles
@@ -44,13 +47,14 @@ You're a screenplay analysis expert. For the provided scene:
   - SILHOUETTE: Shadowy/unseen figures
   - EXTRA: Crowd members without specifics
 - Props: 
-  - Quantity should reflect explicit numbers in text (e.g. "two chairs" → 2)
-  - Default to 1 only when no quantity is mentioned
-  - For plural nouns without numbers, use context clues:
-    - "encombré de livres" → multiple → quantity=5+
-    - "des pages" → multiple → quantity=10+
-    - "un [item]" → 1
-    - "le [item]" → 1
+  - Quantity must be integer >=1
+  - For plural nouns without numbers, estimate using:
+    - "encombré de livres" → 15
+    - "des pages" → 10
+    - "quelques" → 3
+    - "plusieurs" → 5
+    - "nombreux" → 10
+  - Never use ranges (5+) or non-numeric values
   - Include key descriptive details in 'notes' (e.g. "pages covered in stamps")
 - Locations: Split combined descriptors (e.g. "EXT/JOUR" → type=EXT, time_of_day=DAY)
 - Language: Preserve original language terms (e.g. "ballon" not "football")
@@ -157,9 +161,42 @@ Input: Scene without clear number or locations
 Output:
 {
   "scene_number": null,
+  "summary": null,
   "characters": [],
   "props": [],
   "locations": []
+}
+
+
+# Example 7 (Summary)
+Input:
+ 12. EXT. CITY PARK - DAY
+ALEX (30s) sits on a bench, reading a newspaper. A DOG runs up to him, wagging its tail. Nearby, a JOGGER (20s) stops to tie her shoelaces. CHILDREN play on the swings, laughing loudly. A VENDOR pushes a cart, selling ice cream to a line of eager customers. The sun shines brightly, casting long shadows on the ground. A BIRD lands on the bench next to Alex, pecking at crumbs.
+
+Background: A couple walks hand in hand, a cyclist zooms past, and a street musician plays a cheerful tune on his guitar.
+
+Output:
+{
+  "scene_number": "12",
+  "summary": "Alex reads on a park bench as a dog approaches. The park is lively with children playing, a vendor selling ice cream, and a musician playing guitar.",
+  "characters": [
+    {"name": "Alex", "type": "PRINCIPAL"},
+    {"name": "dog", "type": "FIGURANT"},
+    {"name": "jogger", "type": "FIGURANT"},
+    {"name": "vendor", "type": "FIGURANT"},
+    {"name": "children", "type": "EXTRA"},
+    {"name": "couple", "type": "EXTRA"},
+    {"name": "cyclist", "type": "EXTRA"},
+    {"name": "musician", "type": "FIGURANT"}
+  ],
+  "props": [
+    {"name": "newspaper", "quantity": 1},
+    {"name": "ice cream cart", "quantity": 1},
+    {"name": "guitar", "quantity": 1}
+  ],
+  "locations": [
+    {"name": "CITY PARK", "type": "EXT", "time_of_day": "DAY"}
+  ]
 }
 `;
 
