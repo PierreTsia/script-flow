@@ -4,9 +4,10 @@ import { characterTypeValidator } from "./helpers";
 import { Doc } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { api } from "./_generated/api";
+
 export type CharacterDocument = Doc<"characters">;
 
-export type CharacterWithScenes = FunctionReturnType<
+export type CharactersWithScenes = FunctionReturnType<
   typeof api.characters.getCharactersByScriptId
 >;
 
@@ -144,5 +145,86 @@ export const getCharactersByScriptId = query({
     );
 
     return characterScenes;
+  },
+});
+
+export const deduplicateCharacter = mutation({
+  args: {
+    duplicated_character_id: v.id("characters"),
+    target_character_id: v.id("characters"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("Unauthorized");
+    }
+
+    // Check if the characters exist
+    const duplicatedCharacter = await ctx.db.get(args.duplicated_character_id);
+    const targetCharacter = await ctx.db.get(args.target_character_id);
+
+    if (!duplicatedCharacter || !targetCharacter) {
+      throw new ConvexError("Character not found");
+    }
+
+    // Update target character with merged data
+    await ctx.db.patch(args.target_character_id, {
+      aliases: [
+        ...(targetCharacter.aliases || []),
+        duplicatedCharacter.name,
+        ...(duplicatedCharacter.aliases || []),
+      ],
+      searchText:
+        [
+          targetCharacter.name,
+          ...(targetCharacter.aliases || []),
+          duplicatedCharacter.name,
+          ...(duplicatedCharacter.aliases || []),
+        ]
+          .join(" ")
+          .toLowerCase() + ` ${targetCharacter.type}`,
+    });
+
+    // create new links between character and scenes
+    const duplicatedCharacterScenes = await ctx.db
+      .query("character_scenes")
+      .withIndex("by_character", (q) =>
+        q.eq("character_id", duplicatedCharacter._id)
+      )
+      .collect();
+
+    // Get existing scene relationships for target character
+    const existingSceneRelations = await ctx.db
+      .query("character_scenes")
+      .withIndex("by_character", (q) =>
+        q.eq("character_id", args.target_character_id)
+      )
+      .collect();
+
+    const existingSceneIds = new Set(
+      existingSceneRelations.map((r) => r.scene_id)
+    );
+
+    // Only create new relationships for scenes that don't already exist
+    await Promise.all(
+      duplicatedCharacterScenes
+        .filter((cs) => !existingSceneIds.has(cs.scene_id))
+        .map(async (cs) => {
+          await ctx.db.insert("character_scenes", {
+            character_id: args.target_character_id,
+            scene_id: cs.scene_id,
+          });
+        })
+    );
+
+    // delete all characters scenes from duplicated character
+    await Promise.all(
+      duplicatedCharacterScenes.map(async (cs) => {
+        await ctx.db.delete(cs._id);
+      })
+    );
+
+    // delete character
+    await ctx.db.delete(args.duplicated_character_id);
   },
 });

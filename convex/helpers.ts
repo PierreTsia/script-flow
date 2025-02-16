@@ -22,6 +22,7 @@ export const draftLocationsValidator = v.array(
     name: v.string(),
     type: locationTypeValidator,
     time_of_day: timeOfDayValidator,
+    notes: v.optional(v.string()),
   })
 );
 

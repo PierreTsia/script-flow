@@ -1,6 +1,5 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslations } from "next-intl";
-import { Id } from "@/convex/_generated/dataModel";
 
 const tabs = ["scenes", "characters", "locations", "props"] as const;
 export type TabType = (typeof tabs)[number];

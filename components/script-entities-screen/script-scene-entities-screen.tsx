@@ -1,9 +1,8 @@
 import { useScripts } from "@/hooks/useScripts";
 import { Id } from "@/convex/_generated/dataModel";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TabsPageMenu } from "./tabs-page-menu";
-import SceneSummaryCard from "./scene-summary-card";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { useState } from "react";
 import ScenesTabContent from "./scenes-tab-content";

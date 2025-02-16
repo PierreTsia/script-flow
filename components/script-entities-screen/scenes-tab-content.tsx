@@ -1,6 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import SceneSummaryCard from "./scene-summary-card";
-import { ScriptEntitiesResult } from "@/hooks/useScripts";
 import { Id } from "@/convex/_generated/dataModel";
 import { useScripts } from "@/hooks/useScripts";
 import EntityScreenSkeleton from "./entity-screen-skeleton";
