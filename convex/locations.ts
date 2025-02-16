@@ -35,8 +35,8 @@ export const createLocationWithScene = mutation({
       locationId = existingLocation._id;
     } else {
       // Insert new location
-      const { scene_id, ...location } = args;
-      locationId = await ctx.db.insert("locations", location);
+      const { scene_id, notes, ...locationData } = args;
+      locationId = await ctx.db.insert("locations", locationData);
     }
 
     // Check if the location is already linked to the scene
@@ -52,6 +52,7 @@ export const createLocationWithScene = mutation({
       await ctx.db.insert("location_scenes", {
         location_id: locationId,
         scene_id: args.scene_id,
+        notes: args.notes,
       });
     }
 

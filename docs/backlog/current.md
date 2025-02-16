@@ -66,6 +66,12 @@
    - [ ] Create auth helpers:
      - [ ] Move common auth checks to `convex/model/auth.ts`
      - [ ] Implement `requireAuth` utility function
+   - [ ] Schema improvements for scene-specific notes:
+     - [ ] Remove notes field from characters, locations, and props tables
+     - [ ] Add notes field to all junction tables (character_scenes, location_scenes, prop_scenes)
+     - [ ] Update mutations to handle scene-specific notes
+     - [ ] Update queries to fetch scene-specific notes
+     - [ ] Update AI response handling to store notes in junction tables
    - [ ] Optimize query patterns:
      - [ ] Reduce sequential queries in script entities fetching
      - [ ] Batch character-scene relationship queries

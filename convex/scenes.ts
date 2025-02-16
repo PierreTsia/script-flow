@@ -163,11 +163,11 @@ export const getSceneAndEntitiesByNumber = query({
     scriptId: v.id("scripts"),
     sceneNumber: v.string(),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, { scriptId, sceneNumber }) => {
     const scene = await ctx.db
       .query("scenes")
       .withIndex("unique_scene_constraint", (q) =>
-        q.eq("script_id", args.scriptId).eq("scene_number", args.sceneNumber)
+        q.eq("script_id", scriptId).eq("scene_number", sceneNumber)
       )
       .unique();
 
@@ -175,13 +175,21 @@ export const getSceneAndEntitiesByNumber = query({
       return null;
     }
 
-    const locations = await ctx.db
-      .query("location_scenes")
+    // Fetch characters with their scene-specific notes
+    const characterScenes = await ctx.db
+      .query("character_scenes")
       .withIndex("by_scene", (q) => q.eq("scene_id", scene._id))
       .collect();
 
-    const characters = await ctx.db
-      .query("character_scenes")
+    const characters = await Promise.all(
+      characterScenes.map(async (cs) => ({
+        character: await ctx.db.get(cs.character_id),
+        notes: cs.notes, // Include notes from junction
+      }))
+    );
+
+    const locations = await ctx.db
+      .query("location_scenes")
       .withIndex("by_scene", (q) => q.eq("scene_id", scene._id))
       .collect();
 
@@ -192,8 +200,8 @@ export const getSceneAndEntitiesByNumber = query({
 
     return {
       ...scene,
-      locations,
       characters,
+      locations,
       props,
     };
   },

@@ -44,7 +44,6 @@ export const createProp = mutation({
       script_id: args.script_id,
       name: args.name,
       quantity,
-      notes: args.notes,
     });
 
     return propId;
@@ -73,25 +72,16 @@ export const createPropWithScene = mutation({
     } else {
       // Insert new prop
       const quantity = args.quantity ?? 1; // Default quantity to 1 if not provided
-      const { scene_id, ...prop } = args;
-      propId = await ctx.db.insert("props", { ...prop, quantity });
+      const { scene_id, notes, ...propData } = args; // Extract notes
+      propId = await ctx.db.insert("props", { ...propData, quantity });
     }
 
-    // Check if the prop is already linked to the scene
-    const existingLink = await ctx.db
-      .query("prop_scenes")
-      .withIndex("by_prop_scene", (q) =>
-        q.eq("prop_id", propId).eq("scene_id", args.scene_id)
-      )
-      .first();
-
-    if (!existingLink) {
-      // Link prop to the scene if not already linked
-      await ctx.db.insert("prop_scenes", {
-        prop_id: propId,
-        scene_id: args.scene_id,
-      });
-    }
+    // Create the junction with notes
+    await ctx.db.insert("prop_scenes", {
+      prop_id: propId,
+      scene_id: args.scene_id,
+      notes: args.notes, // Put notes here
+    });
 
     return propId;
   },

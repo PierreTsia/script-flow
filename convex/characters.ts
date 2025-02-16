@@ -39,7 +39,6 @@ export const createCharacter = mutation({
       name: args.name,
       type: args.type,
       aliases: args.aliases,
-      notes: args.notes,
       searchText:
         [args.name, ...(args.aliases || [])].join(" ").toLowerCase() +
         ` ${args.type}`,
@@ -73,33 +72,24 @@ export const createCharacterWithScene = mutation({
       characterId = existingCharacter._id;
     } else {
       // Insert new character
+      const { scene_id, notes, ...characterData } = args;
+      const searchText =
+        [characterData.name, ...(characterData.aliases || [])]
+          .join(" ")
+          .toLowerCase() + ` ${characterData.type}`;
+
       characterId = await ctx.db.insert("characters", {
-        script_id: args.script_id,
-        name: args.name,
-        type: args.type,
-        aliases: args.aliases,
-        notes: args.notes,
-        searchText:
-          [args.name, ...(args.aliases || [])].join(" ").toLowerCase() +
-          ` ${args.type}`,
+        ...characterData,
+        searchText,
       });
     }
 
-    // Check if the character is already linked to the scene
-    const existingLink = await ctx.db
-      .query("character_scenes")
-      .withIndex("by_character_scene", (q) =>
-        q.eq("character_id", characterId).eq("scene_id", args.scene_id)
-      )
-      .first();
-
-    if (!existingLink) {
-      // Link character to the scene if not already linked
-      await ctx.db.insert("character_scenes", {
-        character_id: characterId,
-        scene_id: args.scene_id,
-      });
-    }
+    // Create the junction with notes
+    await ctx.db.insert("character_scenes", {
+      character_id: characterId,
+      scene_id: args.scene_id,
+      notes: args.notes,
+    });
 
     return characterId;
   },
@@ -109,14 +99,13 @@ export const getCharactersByScriptId = query({
   args: {
     script_id: v.id("scripts"),
   },
-  handler: async (ctx, args) => {
-    // Get all characters for this script
+  handler: async (ctx, { script_id }) => {
     const characters = await ctx.db
       .query("characters")
-      .withIndex("by_script", (q) => q.eq("script_id", args.script_id))
+      .withIndex("by_script", (q) => q.eq("script_id", script_id))
       .collect();
 
-    // Get all character_scenes relationships for these characters
+    // Fetch character-scene relationships with notes
     const characterScenes = await Promise.all(
       characters.map(async (character) => {
         const scenes = await ctx.db
@@ -124,22 +113,17 @@ export const getCharactersByScriptId = query({
           .withIndex("by_character", (q) => q.eq("character_id", character._id))
           .collect();
 
-        // For each character_scene, get the actual scene data
-        const sceneDetails = await Promise.all(
-          scenes.map(async (cs) => {
-            const scene = await ctx.db.get(cs.scene_id);
-            return {
-              id: cs.scene_id,
-              scene_number: scene?.scene_number,
-              // Add any other scene fields you need
-              ...scene,
-            };
-          })
-        );
-
         return {
           ...character,
-          scenes: sceneDetails,
+          scenes: await Promise.all(
+            scenes.map(async (cs) => {
+              const scene = await ctx.db.get(cs.scene_id);
+              return {
+                ...scene,
+                notes: cs.notes, // Include notes from junction table
+              };
+            })
+          ),
         };
       })
     );
@@ -213,6 +197,7 @@ export const deduplicateCharacter = mutation({
           await ctx.db.insert("character_scenes", {
             character_id: args.target_character_id,
             scene_id: cs.scene_id,
+            notes: cs.notes, // Preserve the notes from the duplicated character
           });
         })
     );

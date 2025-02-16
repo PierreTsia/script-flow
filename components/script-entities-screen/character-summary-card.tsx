@@ -59,11 +59,12 @@ const CharacterSummaryCard = ({
         <div className="text-sm text-muted-foreground">
           <p className="mb-2">{character.scenes.length} scenes</p>
           <div className="flex flex-wrap gap-1">
-            {character.scenes.slice(0, 3).map((scene) => (
-              <Badge key={scene._id} variant="outline">
-                Scene {scene.scene_number}
-              </Badge>
-            ))}
+            {character.scenes.length &&
+              character.scenes.slice(0, 3).map((scene) => (
+                <Badge key={scene?._id} variant="outline">
+                  Scene {scene.scene_number}
+                </Badge>
+              ))}
             {character.scenes.length > 3 && (
               <Badge variant="outline">
                 +{character.scenes.length - 3} more
@@ -142,7 +143,7 @@ const DeduplicateCharacterButton = ({
         </SelectTrigger>
         <SelectContent>
           {allCharacters.map((targetChar) => (
-            <SelectItem key={targetChar._id} value={targetChar._id}>
+            <SelectItem key={`${targetChar._id}`} value={targetChar._id}>
               Merge into {targetChar.name}
             </SelectItem>
           ))}
