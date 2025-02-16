@@ -1,6 +1,9 @@
 import { mutation } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { characterTypeValidator } from "./helpers";
+import { Doc } from "./_generated/dataModel";
+
+export type CharacterDocument = Doc<"characters">;
 
 const createCharacterWithSceneValidator = v.object({
   script_id: v.id("scripts"),

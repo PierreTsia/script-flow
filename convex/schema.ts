@@ -47,6 +47,7 @@ export default defineSchema({
   })
     .index("unique_scene_constraint", ["script_id", "scene_number"])
     .index("by_script", ["script_id"]),
+
   characters: defineTable({
     script_id: v.id("scripts"),
     name: v.string(),

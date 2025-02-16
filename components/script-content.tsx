@@ -6,7 +6,14 @@ import { ScriptDocument } from "@/hooks/useScripts";
 import ScriptViewerScreen from "./script-viewer-screen";
 import { Button } from "./ui/button";
 import { Brain } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
+import ScriptSceneEntitiesScreen from "./script-scene-entities-screen";
 interface ScriptContentProps {
   script: ScriptDocument;
   fileUrl: string;
@@ -37,14 +44,23 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
           isSheetOpen={isSheetOpen}
           setIsSheetOpen={setIsSheetOpen}
         >
-          <Button
-            onClick={toggleSheet}
-            className="absolute w-[80vw] left-1/2 -translate-x-1/2 top-[91vh]"
-          >
-            <Brain className="w-4 h-4" />
-            <span className="ml-2">Open Analysis Panel</span>
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={toggleSheet}
+                  className="absolute w-[80px] h-[80px] left-1/2 -translate-x-1/2 top-[80vh] lg:top-[90vh] rounded-full flex items-center justify-center flex-col opacity-50 hover:opacity-100 transition-opacity duration-300"
+                >
+                  <Brain className="!w-[2rem] !h-[2rem]" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Open Analysis Panel</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </ScriptViewerScreen>
+      )}
+      {activeScreen === "entities" && (
+        <ScriptSceneEntitiesScreen scriptId={script._id} />
       )}
     </div>
   );

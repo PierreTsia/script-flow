@@ -107,7 +107,6 @@ const LocationsForm = ({
             time_of_day: location.time_of_day,
             notes: location.notes,
           });
-          console.log("locationId", locationId);
           return locationId;
         })
       );
