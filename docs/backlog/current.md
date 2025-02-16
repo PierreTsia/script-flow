@@ -23,7 +23,7 @@
 
 3. **Database Setup** (3h)
    - [x] Convex project initialization with mock getTasks
-   - [ ] Script/Scene schema definition
+   - [x] Script/Scene schema definition
    - [x] Basic CRUD operations
    - [x] clerck/convex provider
    **Files:** `convex/`, `.env`, `src/convex/`
@@ -53,16 +53,50 @@
    - [x] persist the analysed scenes draft scenes in the database
    - [x] type the llm response better
    - [x] handle the response in the client
-   - [ ] fix sheet layout in mobile : select element for draft selection
-   - [ ] display the response as a prefilled form in the analysis block
-   - [-] match the entities schema
-   - [ ] save the verified analysis in the database
+   - [x] fix sheet layout in mobile : select element for draft selection
+   - [x] display the response as a prefilled form in the analysis block
+   - [x] match the entities schema
+   - [x] save the verified analysis in the database
+
+8. **Convex improvements** (4h)
+   - [ ] Add pagination to large result sets:
+     - [ ] Scenes listing
+     - [ ] Characters listing
+     - [ ] Character-scene relationships
+   - [ ] Create auth helpers:
+     - [ ] Move common auth checks to `convex/model/auth.ts`
+     - [ ] Implement `requireAuth` utility function
+   - [x] Schema improvements for scene-specific notes:
+     - [x] Remove notes field from characters, locations, and props tables
+     - [x] Add notes field to all junction tables (character_scenes, location_scenes, prop_scenes)
+     - [x] Update mutations to handle scene-specific notes
+     - [x] Update queries to fetch scene-specific notes
+   - [ ] Optimize query patterns:
+     - [ ] Reduce sequential queries in script entities fetching
+     - [ ] Batch character-scene relationship queries
+   - [ ] Improve internal functions organization:
+     - [ ] Move scene analysis logic to internal actions
+     - [ ] Create dedicated internal functions for common operations
+   - [ ] Add size limits to `.collect()` operations:
+     - [ ] Add default limits where pagination isn't implemented
+     - [ ] Add warning comments for potentially large queries
+   - [ ] Error handling improvements:
+     - [ ] Standardize error messages
+     - [ ] Implement proper ConvexError usage
 
 8. **Basic UI** (4h)
    - [x] Upload button
    - [x] Script view layout
    - [x] Analysis modal
    **Files:** `src/app/page.tsx`, `src/components/upload.tsx`
+
+9. **Script Entities Screen** (4h)
+   - [x] Script entities screen
+   - [x] Script entities screen layout
+   - [x] Script entities screen layout
+   - [x] Script entities screen layout
+   - [x] Script entities screen layout
+   **Files:** `src/app/[scriptId]/page.tsx`
 
 ## Error Handling (3h)
 - [ ] Global error boundaries

@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { ConvexError } from "convex/values";
 
@@ -44,7 +44,6 @@ export const createProp = mutation({
       script_id: args.script_id,
       name: args.name,
       quantity,
-      notes: args.notes,
     });
 
     return propId;
@@ -73,26 +72,53 @@ export const createPropWithScene = mutation({
     } else {
       // Insert new prop
       const quantity = args.quantity ?? 1; // Default quantity to 1 if not provided
-      const { scene_id, ...prop } = args;
-      propId = await ctx.db.insert("props", { ...prop, quantity });
+      const { scene_id, notes, ...propData } = args; // Extract notes
+      propId = await ctx.db.insert("props", { ...propData, quantity });
     }
 
-    // Check if the prop is already linked to the scene
-    const existingLink = await ctx.db
-      .query("prop_scenes")
-      .withIndex("by_prop_scene", (q) =>
-        q.eq("prop_id", propId).eq("scene_id", args.scene_id)
-      )
-      .first();
-
-    if (!existingLink) {
-      // Link prop to the scene if not already linked
-      await ctx.db.insert("prop_scenes", {
-        prop_id: propId,
-        scene_id: args.scene_id,
-      });
-    }
+    // Create the junction with notes
+    await ctx.db.insert("prop_scenes", {
+      prop_id: propId,
+      scene_id: args.scene_id,
+      notes: args.notes, // Put notes here
+    });
 
     return propId;
+  },
+});
+
+export const getPropsByScriptId = query({
+  args: { script_id: v.id("scripts") },
+  handler: async (ctx, { script_id }) => {
+    // Get all props for this script
+    const props = await ctx.db
+      .query("props")
+      .withIndex("by_script", (q) => q.eq("script_id", script_id))
+      .collect();
+
+    // Fetch scenes for each prop
+    return await Promise.all(
+      props.map(async (prop) => {
+        const propScenes = await ctx.db
+          .query("prop_scenes")
+          .withIndex("by_prop", (q) => q.eq("prop_id", prop._id))
+          .collect();
+
+        const scenes = await Promise.all(
+          propScenes.map(async (ps) => {
+            const scene = await ctx.db.get(ps.scene_id);
+            return {
+              ...scene!,
+              notes: ps.notes,
+            };
+          })
+        );
+
+        return {
+          ...prop,
+          scenes,
+        };
+      })
+    );
   },
 });

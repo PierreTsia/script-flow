@@ -20,37 +20,26 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import useSceneEntities from "@/hooks/useSceneEntities";
 import { useState, useEffect } from "react";
-import { Id } from "@/convex/_generated/dataModel";
 import { useFieldArray } from "react-hook-form";
-import { DraftSceneAnalysis } from "@/hooks/useScene";
 import { Button } from "@/components/ui/button";
 import { Trash2Icon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
-import { TabType } from "./entities-tabs";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
-
+import { EntitiesFormProps } from "./scene-analysis-confirm-dialog";
 const EMPTY_CHARACTER = {
   name: "",
   type: "PRINCIPAL",
   notes: "",
 } as const;
 
-interface CharactersFormProps {
-  scriptId: Id<"scripts">;
-  sceneId: Id<"scenes"> | null;
-  selectedDraftAnalysis: DraftSceneAnalysis | null;
-  setCurrentTab: (tab: TabType) => void;
-  children: React.ReactNode;
-}
-
 const CharactersForm = ({
   scriptId,
   sceneId,
   selectedDraftAnalysis,
-  setCurrentTab,
+  onNextTab,
   children,
-}: CharactersFormProps) => {
+}: EntitiesFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const t = useTranslations("SceneAnalysis");
@@ -104,7 +93,6 @@ const CharactersForm = ({
             aliases: char.aliases,
             notes: char.notes,
           });
-          console.log("characterId", characterId);
           return characterId;
         })
       );
@@ -112,7 +100,12 @@ const CharactersForm = ({
       const allSuccessful = characterIds.every(Boolean);
 
       if (allSuccessful) {
-        setCurrentTab("locations");
+        toast({
+          title: "Characters saved",
+          description: "Characters saved successfully",
+        });
+        console.log("setting props tab");
+        onNextTab();
       }
     } catch (error) {
       console.error("Submission failed:", error);

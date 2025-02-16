@@ -1,8 +1,12 @@
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { Id, DataModel } from "@/convex/_generated/dataModel";
+import { FunctionReturnType } from "convex/server";
 
 export type ScriptDocument = DataModel["scripts"]["document"];
+export type ScriptEntitiesResult = FunctionReturnType<
+  typeof api.scripts.getScriptEntities
+>;
 
 export const useScripts = () => {
   const uploadUrl = useMutation(api.scripts.getUploadUrl);
@@ -10,6 +14,9 @@ export const useScripts = () => {
   const createNewScriptFromStorageId = useMutation(
     api.scripts.createNewScriptFromStorageId
   );
+
+  const getScriptEntities = (scriptId: Id<"scripts">) =>
+    useQuery(api.scripts.getScriptEntities, { scriptId });
 
   const uploadFile = async (file: File, url: string) => {
     const result = await fetch(url, {
@@ -56,5 +63,11 @@ export const useScripts = () => {
     return null;
   };
 
-  return { uploadScript, scripts, deleteScriptById, scriptById };
+  return {
+    uploadScript,
+    scripts,
+    deleteScriptById,
+    scriptById,
+    getScriptEntities,
+  };
 };

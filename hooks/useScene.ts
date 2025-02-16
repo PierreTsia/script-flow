@@ -11,17 +11,46 @@ export type DraftSceneAnalysis = Doc<"draftScenesAnalysis">;
 
 export const useScene = (scriptId: Id<"scripts">) => {
   const insertScene = useMutation(api.scenes.saveScene);
-  const getSceneByNumber = (sceneNumber?: string | null) => {
-    if (!sceneNumber) return null;
-    return useQuery(api.scenes.getSceneByNumber, {
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const drafts = useQuery(api.scenes.getDrafts, { scriptId }) || [];
+  const deleteDraft = useMutation(api.scenes.deleteDraft);
+
+  const sceneByNumberQuery = (sceneNumber: string) =>
+    useQuery(api.scenes.getSceneAndEntitiesByNumber, {
       scriptId,
       sceneNumber,
     });
+
+  const getSceneAndEntitiesByNumber = (sceneNumber?: string | null) => {
+    if (!sceneNumber) return null;
+    return sceneByNumberQuery(sceneNumber);
   };
 
-  const [isLoading, setIsLoading] = useState(false);
+  const charactersByScriptIdQuery = (scriptId: Id<"scripts">) =>
+    useQuery(api.characters.getCharactersByScriptId, { script_id: scriptId });
 
-  const [error, setError] = useState<string | null>(null);
+  const locationsByScriptIdQuery = (scriptId: Id<"scripts">) =>
+    useQuery(api.locations.getLocationsByScriptId, { script_id: scriptId });
+
+  const propsByScriptIdQuery = (scriptId: Id<"scripts">) =>
+    useQuery(api.props.getPropsByScriptId, { script_id: scriptId });
+
+  const getLocationsByScriptId = (scriptId: Id<"scripts">) => {
+    if (!scriptId) return null;
+    return locationsByScriptIdQuery(scriptId);
+  };
+
+  const getCharactersByScriptId = (scriptId: Id<"scripts">) => {
+    if (!scriptId) return null;
+    return charactersByScriptIdQuery(scriptId);
+  };
+
+  const getPropsByScriptId = (scriptId: Id<"scripts">) => {
+    if (!scriptId) return null;
+    return propsByScriptIdQuery(scriptId);
+  };
 
   const analyze = async (
     text: string,
@@ -82,11 +111,6 @@ export const useScene = (scriptId: Id<"scripts">) => {
     }
   };
 
-  const drafts: DraftSceneAnalysis[] =
-    useQuery(api.scenes.getDrafts, { scriptId }) || [];
-
-  const deleteDraft = useMutation(api.scenes.deleteDraft);
-
   const handleDeleteDraft = async (draftId: Id<"draftScenesAnalysis">) => {
     await deleteDraft({ draftId });
     toast({
@@ -145,6 +169,9 @@ export const useScene = (scriptId: Id<"scripts">) => {
     analyseAndSaveDraft,
     drafts,
     handleDeleteDraft,
-    getSceneByNumber,
+    getSceneAndEntitiesByNumber,
+    getCharactersByScriptId,
+    getLocationsByScriptId,
+    getPropsByScriptId,
   };
 };

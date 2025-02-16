@@ -13,6 +13,10 @@ const useSceneEntities = () => {
     api.locations.createLocationWithScene
   );
 
+  const deduplicateCharacterMutation = useMutation(
+    api.characters.deduplicateCharacter
+  );
+
   const savePropInScene = useMutation(api.props.createPropWithScene);
 
   const { toast } = useToast();
@@ -121,7 +125,32 @@ const useSceneEntities = () => {
       return null;
     }
   };
-  return { createCharacter, createLocation, createProp };
+
+  const deduplicateCharacter = async ({
+    duplicatedCharacterId,
+    targetCharacterId,
+  }: {
+    duplicatedCharacterId: Id<"characters">;
+    targetCharacterId: Id<"characters">;
+  }) => {
+    try {
+      await deduplicateCharacterMutation({
+        duplicated_character_id: duplicatedCharacterId,
+        target_character_id: targetCharacterId,
+      });
+      toast({
+        title: "Character deduplicated",
+      });
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+    }
+  };
+  return { createCharacter, createLocation, createProp, deduplicateCharacter };
 };
 
 export default useSceneEntities;

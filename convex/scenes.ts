@@ -2,8 +2,17 @@ import { httpAction, mutation, query } from "./_generated/server";
 import { parseSceneAnalysis } from "@/lib/llm/parser";
 import { MistralProvider } from "@/lib/llm/providers/mistral";
 import { SceneAnalysis } from "@/lib/llm/providers/index";
+import { FunctionReturnType } from "convex/server";
 
 import { ConvexError, v } from "convex/values";
+import { Doc } from "@/convex/_generated/dataModel";
+import { api } from "./_generated/api";
+
+export type SceneDocument = Doc<"scenes">;
+
+export type SceneWithEntities = FunctionReturnType<
+  typeof api.scenes.getSceneAndEntitiesByNumber
+>;
 
 export const analyzeScene = httpAction(async (ctx, request) => {
   const { text, pageNumber } = await request.json();
@@ -149,17 +158,51 @@ export const saveScene = mutation({
   },
 });
 
-export const getSceneByNumber = query({
+export const getSceneAndEntitiesByNumber = query({
   args: {
     scriptId: v.id("scripts"),
     sceneNumber: v.string(),
   },
-  handler: async (ctx, args) => {
-    return await ctx.db
+  handler: async (ctx, { scriptId, sceneNumber }) => {
+    const scene = await ctx.db
       .query("scenes")
       .withIndex("unique_scene_constraint", (q) =>
-        q.eq("script_id", args.scriptId).eq("scene_number", args.sceneNumber)
+        q.eq("script_id", scriptId).eq("scene_number", sceneNumber)
       )
       .unique();
+
+    if (!scene) {
+      return null;
+    }
+
+    // Fetch characters with their scene-specific notes
+    const characterScenes = await ctx.db
+      .query("character_scenes")
+      .withIndex("by_scene", (q) => q.eq("scene_id", scene._id))
+      .collect();
+
+    const characters = await Promise.all(
+      characterScenes.map(async (cs) => ({
+        character: await ctx.db.get(cs.character_id),
+        notes: cs.notes, // Include notes from junction
+      }))
+    );
+
+    const locations = await ctx.db
+      .query("location_scenes")
+      .withIndex("by_scene", (q) => q.eq("scene_id", scene._id))
+      .collect();
+
+    const props = await ctx.db
+      .query("prop_scenes")
+      .withIndex("by_scene", (q) => q.eq("scene_id", scene._id))
+      .collect();
+
+    return {
+      ...scene,
+      characters,
+      locations,
+      props,
+    };
   },
 });

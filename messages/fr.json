@@ -101,8 +101,64 @@
       "type": "Type",
       "notes": "Notes"
     },
+
+    "removeProp": "Supprimer",
     "prop": {
+      "quantity": "Quantité",
+      "notes": "Notes",
       "name": "Nom"
+    },
+    "addProp": "Ajouter un accessoire"
+  },
+  "ScriptEntitiesScreen": {
+    "scenes": "Scènes",
+    "characters": "Personnages",
+    "locations": "Lieux",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "sceneInfo": {
+      "page": "Page",
+      "scene": "Scène"
+    },
+    "entityTypes": {
+      "main": "Principaux",
+      "others": "Autres"
+    },
+    "entityLabels": {
+      "characters": "Personnages",
+      "locations": "Lieux",
+      "props": "Accessoires"
+    },
+    "characterTypes": {
+      "principal": "Personnages Principaux",
+      "secondary": "Personnages Secondaires",
+      "others": "Personnages de Soutien",
+      "figurant": "Figurant",
+      "silhouette": "Silhouette",
+      "extra": "Extra"
+    },
+    "groupedCharacters": {
+      "principal": "Personnages Principaux",
+      "secondary": "Personnages Secondaires",
+      "others": "Personnages de Soutien"
+    },
+    "characterMerge": {
+      "buttonTitle": "Fusionner avec un autre personnage",
+      "mergeInto": "Fusionner avec {name}",
+      "confirmTitle": "Êtes-vous absolument sûr ?",
+      "confirmDescription": "Le personnage {source} sera fusionné avec {target}. Après la fusion, {target} aura {source} comme alias. Cette action ne peut pas être annulée.",
+      "mergeButton": "Fusionner les personnages"
+    },
+    "scenesCount": "{count, plural, one {# scène} other {# scènes}}",
+    "locationType": {
+      "interior": "Lieux Intérieurs",
+      "exterior": "Lieux Extérieurs"
+    },
+    "props": "Accessoires",
+    "propsDetails": {
+      "recurring": "Accessoires Récurrents",
+      "oneOff": "Accessoires Uniques",
+      "quantity": "{count, plural, one {# unité} other {# unités}}"
     }
   }
 }

@@ -47,11 +47,11 @@ export default defineSchema({
   })
     .index("unique_scene_constraint", ["script_id", "scene_number"])
     .index("by_script", ["script_id"]),
+
   characters: defineTable({
     script_id: v.id("scripts"),
     name: v.string(),
     type: characterTypeValidator,
-    notes: v.optional(v.string()),
     aliases: v.optional(v.array(v.string())),
     searchText: v.string(),
   })
@@ -64,6 +64,7 @@ export default defineSchema({
   character_scenes: defineTable({
     character_id: v.id("characters"),
     scene_id: v.id("scenes"),
+    notes: v.optional(v.string()),
   })
     .index("by_character_scene", ["character_id", "scene_id"])
     .index("by_character", ["character_id"])
@@ -74,7 +75,6 @@ export default defineSchema({
     name: v.string(),
     type: locationTypeValidator,
     time_of_day: timeOfDayValidator,
-    notes: v.optional(v.string()),
   })
     .index("unique_location_per_script", ["script_id", "name", "type"])
     .index("by_script", ["script_id"])
@@ -83,6 +83,7 @@ export default defineSchema({
   location_scenes: defineTable({
     location_id: v.id("locations"),
     scene_id: v.id("scenes"),
+    notes: v.optional(v.string()),
   })
     .index("by_location_scene", ["location_id", "scene_id"])
     .index("by_location", ["location_id"])
@@ -92,7 +93,6 @@ export default defineSchema({
     script_id: v.id("scripts"),
     name: v.string(),
     quantity: v.number(),
-    notes: v.optional(v.string()),
   })
     .index("by_script", ["script_id"])
     .index("by_name", ["name"])
@@ -100,6 +100,7 @@ export default defineSchema({
   prop_scenes: defineTable({
     prop_id: v.id("props"),
     scene_id: v.id("scenes"),
+    notes: v.optional(v.string()),
   })
     .index("by_prop_scene", ["prop_id", "scene_id"])
     .index("by_prop", ["prop_id"])

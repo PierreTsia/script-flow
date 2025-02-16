@@ -34,7 +34,6 @@ export function NavUser({
   const { signOut } = useAuth();
   const router = useRouter();
   const handleSignOut = () => {
-    console.log("signing out");
     signOut();
     router.push("/");
   };

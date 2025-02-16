@@ -106,6 +106,56 @@
       "notes": "Notes"
     },
     "addProp": "Add Prop"
-    
+  },
+  "ScriptEntitiesScreen": {
+    "scenes": "Scenes",
+    "characters": "Characters",
+    "locations": "Locations",
+
+    "edit": "Edit",
+    "delete": "Delete",
+    "sceneInfo": {
+      "page": "Page",
+      "scene": "Scene"
+    },
+    "entityTypes": {
+      "main": "Main",
+      "others": "Others"
+    },
+    "entityLabels": {
+      "characters": "Characters",
+      "locations": "Locations",
+      "props": "Props"
+    },
+    "characterTypes": {
+      "principal": "Principal Character",
+      "secondary": "Secondary Character",
+      "figurant": "Figurant",
+      "silhouette": "Silhouette",
+      "extra": "Extra"
+    },
+    "groupedCharacters": {
+      "principal": "Principal Characters",
+      "secondary": "Secondary Characters",
+      "others": "Supporting Characters"
+    },
+    "characterMerge": {
+      "buttonTitle": "Merge with another character",
+      "mergeInto": "Merge into {name}",
+      "confirmTitle": "Are you absolutely sure?",
+      "confirmDescription": "The character {source} will be merged into {target}. After merging, {target} will have {source} as an alias. This action cannot be undone.",
+      "mergeButton": "Merge Characters"
+    },
+    "scenesCount": "{count, plural, one {# scene} other {# scenes}}",
+    "locationType": {
+      "interior": "Interior Locations",
+      "exterior": "Exterior Locations"
+    },
+    "props": "Props",
+    "propsDetails": {
+      "recurring": "Recurring Props",
+      "oneOff": "Single Scene Props",
+      "quantity": "{count, plural, one {# unit} other {# units}}"
+    }
   }
 }
