@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { ConvexError } from "convex/values";
 
@@ -84,5 +84,41 @@ export const createPropWithScene = mutation({
     });
 
     return propId;
+  },
+});
+
+export const getPropsByScriptId = query({
+  args: { script_id: v.id("scripts") },
+  handler: async (ctx, { script_id }) => {
+    // Get all props for this script
+    const props = await ctx.db
+      .query("props")
+      .withIndex("by_script", (q) => q.eq("script_id", script_id))
+      .collect();
+
+    // Fetch scenes for each prop
+    return await Promise.all(
+      props.map(async (prop) => {
+        const propScenes = await ctx.db
+          .query("prop_scenes")
+          .withIndex("by_prop", (q) => q.eq("prop_id", prop._id))
+          .collect();
+
+        const scenes = await Promise.all(
+          propScenes.map(async (ps) => {
+            const scene = await ctx.db.get(ps.scene_id);
+            return {
+              ...scene!,
+              notes: ps.notes,
+            };
+          })
+        );
+
+        return {
+          ...prop,
+          scenes,
+        };
+      })
+    );
   },
 });

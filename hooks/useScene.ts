@@ -34,6 +34,9 @@ export const useScene = (scriptId: Id<"scripts">) => {
   const locationsByScriptIdQuery = (scriptId: Id<"scripts">) =>
     useQuery(api.locations.getLocationsByScriptId, { script_id: scriptId });
 
+  const propsByScriptIdQuery = (scriptId: Id<"scripts">) =>
+    useQuery(api.props.getPropsByScriptId, { script_id: scriptId });
+
   const getLocationsByScriptId = (scriptId: Id<"scripts">) => {
     if (!scriptId) return null;
     return locationsByScriptIdQuery(scriptId);
@@ -42,6 +45,11 @@ export const useScene = (scriptId: Id<"scripts">) => {
   const getCharactersByScriptId = (scriptId: Id<"scripts">) => {
     if (!scriptId) return null;
     return charactersByScriptIdQuery(scriptId);
+  };
+
+  const getPropsByScriptId = (scriptId: Id<"scripts">) => {
+    if (!scriptId) return null;
+    return propsByScriptIdQuery(scriptId);
   };
 
   const analyze = async (
@@ -164,5 +172,6 @@ export const useScene = (scriptId: Id<"scripts">) => {
     getSceneAndEntitiesByNumber,
     getCharactersByScriptId,
     getLocationsByScriptId,
+    getPropsByScriptId,
   };
 };

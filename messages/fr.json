@@ -114,7 +114,6 @@
     "scenes": "Scènes",
     "characters": "Personnages",
     "locations": "Lieux",
-    "props": "Accessoires",
     "edit": "Modifier",
     "delete": "Supprimer",
     "sceneInfo": {
@@ -131,11 +130,17 @@
       "props": "Accessoires"
     },
     "characterTypes": {
-      "principal": "Personnage Principal",
-      "secondary": "Personnage Secondaire",
+      "principal": "Personnages Principaux",
+      "secondary": "Personnages Secondaires",
+      "others": "Personnages de Soutien",
       "figurant": "Figurant",
       "silhouette": "Silhouette",
-      "extra": "Figurant"
+      "extra": "Extra"
+    },
+    "groupedCharacters": {
+      "principal": "Personnages Principaux",
+      "secondary": "Personnages Secondaires",
+      "others": "Personnages de Soutien"
     },
     "characterMerge": {
       "buttonTitle": "Fusionner avec un autre personnage",
@@ -148,6 +153,12 @@
     "locationType": {
       "interior": "Lieux Intérieurs",
       "exterior": "Lieux Extérieurs"
+    },
+    "props": "Accessoires",
+    "propsDetails": {
+      "recurring": "Accessoires Récurrents",
+      "oneOff": "Accessoires Uniques",
+      "quantity": "{count, plural, one {# unité} other {# unités}}"
     }
   }
 }

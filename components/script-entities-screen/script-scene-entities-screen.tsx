@@ -8,7 +8,7 @@ import { useState } from "react";
 import ScenesTabContent from "./scenes-tab-content";
 import CharactersTabContent from "./characters-tab-content";
 import LocationsTabContent from "./locations-tab-content";
-
+import PropsTabContent from "./props-tab-content";
 const ScriptSceneEntitiesScreen = ({
   scriptId,
 }: {
@@ -43,11 +43,7 @@ const ScriptSceneEntitiesScreen = ({
           <LocationsTabContent scriptId={scriptId} />
         </TabsContent>
         <TabsContent value="props" className="flex-1">
-          <ScrollArea className="h-[calc(100vh-220px)]">
-            <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-              Props
-            </div>
-          </ScrollArea>
+          <PropsTabContent scriptId={scriptId} />
         </TabsContent>
       </TabsPageMenu>
     </div>
