@@ -39,10 +39,10 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
         >
           <Button
             onClick={toggleSheet}
-            className="absolute top-[90vh] right-[3rem]"
+            className="absolute w-[80vw] left-1/2 -translate-x-1/2 top-[91vh]"
           >
             <Brain className="w-4 h-4" />
-            <span className="ml-2">Analysis</span>
+            <span className="ml-2">Open Analysis Panel</span>
           </Button>
         </ScriptViewerScreen>
       )}
