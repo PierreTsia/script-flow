@@ -141,6 +141,10 @@
       "confirmDescription": "The character {source} will be merged into {target}. After merging, {target} will have {source} as an alias. This action cannot be undone.",
       "mergeButton": "Merge Characters"
     },
-    "scenesCount": "{count, plural, one {# scene} other {# scenes}}"
+    "scenesCount": "{count, plural, one {# scene} other {# scenes}}",
+    "locationType": {
+      "interior": "Interior Locations",
+      "exterior": "Exterior Locations"
+    }
   }
 }

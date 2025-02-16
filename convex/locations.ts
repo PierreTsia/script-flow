@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { locationTypeValidator, timeOfDayValidator } from "./helpers";
 
@@ -57,5 +57,36 @@ export const createLocationWithScene = mutation({
     }
 
     return locationId;
+  },
+});
+
+export const getLocationsByScriptId = query({
+  args: { script_id: v.id("scripts") },
+  handler: async (ctx, { script_id }) => {
+    const locations = await ctx.db
+      .query("locations")
+      .withIndex("by_script", (q) => q.eq("script_id", script_id))
+      .collect();
+
+    return await Promise.all(
+      locations.map(async (location) => {
+        const locationScenes = await ctx.db
+          .query("location_scenes")
+          .withIndex("by_location", (q) => q.eq("location_id", location._id))
+          .collect();
+
+        const scenes = await Promise.all(
+          locationScenes.map(async (ls) => ({
+            ...(await ctx.db.get(ls.scene_id))!,
+            notes: ls.notes,
+          }))
+        );
+
+        return {
+          ...location,
+          scenes,
+        };
+      })
+    );
   },
 });

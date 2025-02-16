@@ -7,6 +7,8 @@ import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { useState } from "react";
 import ScenesTabContent from "./scenes-tab-content";
 import CharactersTabContent from "./characters-tab-content";
+import LocationsTabContent from "./locations-tab-content";
+
 const ScriptSceneEntitiesScreen = ({
   scriptId,
 }: {
@@ -38,11 +40,7 @@ const ScriptSceneEntitiesScreen = ({
           <CharactersTabContent scriptId={scriptId} />
         </TabsContent>
         <TabsContent value="locations" className="flex-1">
-          <ScrollArea className="h-[calc(100vh-220px)]">
-            <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-              Locations
-            </div>
-          </ScrollArea>
+          <LocationsTabContent scriptId={scriptId} />
         </TabsContent>
         <TabsContent value="props" className="flex-1">
           <ScrollArea className="h-[calc(100vh-220px)]">

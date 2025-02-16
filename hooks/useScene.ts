@@ -31,6 +31,14 @@ export const useScene = (scriptId: Id<"scripts">) => {
   const charactersByScriptIdQuery = (scriptId: Id<"scripts">) =>
     useQuery(api.characters.getCharactersByScriptId, { script_id: scriptId });
 
+  const locationsByScriptIdQuery = (scriptId: Id<"scripts">) =>
+    useQuery(api.locations.getLocationsByScriptId, { script_id: scriptId });
+
+  const getLocationsByScriptId = (scriptId: Id<"scripts">) => {
+    if (!scriptId) return null;
+    return locationsByScriptIdQuery(scriptId);
+  };
+
   const getCharactersByScriptId = (scriptId: Id<"scripts">) => {
     if (!scriptId) return null;
     return charactersByScriptIdQuery(scriptId);
@@ -155,5 +163,6 @@ export const useScene = (scriptId: Id<"scripts">) => {
     handleDeleteDraft,
     getSceneAndEntitiesByNumber,
     getCharactersByScriptId,
+    getLocationsByScriptId,
   };
 };

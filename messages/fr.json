@@ -144,6 +144,10 @@
       "confirmDescription": "Le personnage {source} sera fusionné avec {target}. Après la fusion, {target} aura {source} comme alias. Cette action ne peut pas être annulée.",
       "mergeButton": "Fusionner les personnages"
     },
-    "scenesCount": "{count, plural, one {# scène} other {# scènes}}"
+    "scenesCount": "{count, plural, one {# scène} other {# scènes}}",
+    "locationType": {
+      "interior": "Lieux Intérieurs",
+      "exterior": "Lieux Extérieurs"
+    }
   }
 }
