@@ -3,7 +3,6 @@ import { Id } from "@/convex/_generated/dataModel";
 import { TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TabsPageMenu } from "./tabs-page-menu";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { useState } from "react";
 import ScenesTabContent from "./scenes-tab-content";
 import CharactersTabContent from "./characters-tab-content";
