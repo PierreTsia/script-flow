@@ -13,7 +13,7 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
-import ScriptSceneEntitiesScreen from "./script-scene-entities-screen";
+import ScriptSceneEntitiesScreen from "./script-entities-screen/script-scene-entities-screen";
 interface ScriptContentProps {
   script: ScriptDocument;
   fileUrl: string;
@@ -23,7 +23,7 @@ export function ScriptContent({ script, fileUrl }: ScriptContentProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const [activeScreen, setActiveScreen] = useState<"viewer" | "entities">(
-    "viewer"
+    "entities"
   );
 
   const toggleSheet = () => {

@@ -4,6 +4,9 @@ import { MistralProvider } from "@/lib/llm/providers/mistral";
 import { SceneAnalysis } from "@/lib/llm/providers/index";
 
 import { ConvexError, v } from "convex/values";
+import { Doc } from "@/convex/_generated/dataModel";
+
+export type SceneDocument = Doc<"scenes">;
 
 export const analyzeScene = httpAction(async (ctx, request) => {
   const { text, pageNumber } = await request.json();
