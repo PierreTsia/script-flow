@@ -38,6 +38,7 @@ import {
 import { CharacterType } from "@/convex/helpers";
 import { CharacterDocument } from "@/convex/characters";
 import { ScriptEntitiesResult } from "@/hooks/useScripts";
+import { useTranslations } from "next-intl";
 type SceneDocument = ScriptEntitiesResult["scenes"][number];
 
 const partitionSceneCharacter = (
@@ -64,11 +65,14 @@ const partitionSceneCharacter = (
 };
 
 const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
+  const t = useTranslations("ScriptEntitiesScreen");
   return (
     <Card key={scene._id} className="flex flex-col">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Scene {scene.scene_number}</CardTitle>
+          <CardTitle>
+            {t("sceneInfo.scene")} {scene.scene_number}
+          </CardTitle>
           <div className="inline-flex items-center gap-x-2">
             <Dialog>
               <DialogTrigger>
@@ -88,7 +92,9 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
               </DialogContent>
             </Dialog>
 
-            <Badge>Page {scene.page_number}</Badge>
+            <Badge>
+              {t("sceneInfo.page")} {scene.page_number}
+            </Badge>
           </div>
         </div>
       </CardHeader>
@@ -103,7 +109,9 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
           <div className="grid grid-cols-3 gap-4">
             {/* Characters */}
             <div>
-              <h4 className="text-sm font-medium mb-2">Characters</h4>
+              <h4 className="text-sm font-medium mb-2">
+                {t("entityLabels.characters")}
+              </h4>
 
               {/* PRINCIPAL Characters - Always expanded */}
               {!!partitionSceneCharacter(scene?.characters)?.principal
@@ -111,7 +119,7 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
                 <Collapsible defaultOpen className="space-y-2 mb-2">
                   <CollapsibleTrigger className="flex items-center gap-1 text-xs text-muted-foreground">
                     <ChevronDown className="h-4 w-4" />
-                    Main
+                    {t("entityTypes.main")}
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <div className="flex flex-wrap gap-1">
@@ -136,7 +144,7 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
                 <Collapsible className="space-y-2 mb-2">
                   <CollapsibleTrigger className="flex items-center gap-1 text-xs text-muted-foreground">
                     <ChevronDown className="h-4 w-4" />
-                    Others
+                    {t("entityTypes.others")}
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <div className="flex flex-wrap gap-1">
@@ -159,7 +167,9 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
 
             {/* Locations */}
             <div>
-              <h4 className="text-sm font-medium mb-2">Locations</h4>
+              <h4 className="text-sm font-medium mb-2">
+                {t("entityLabels.locations")}
+              </h4>
               <div className="flex flex-wrap gap-1">
                 {scene?.locations.filter(Boolean).map((loc) => (
                   <Badge key={loc?._id} variant="secondary">
@@ -171,7 +181,9 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
 
             {/* Props */}
             <div>
-              <h4 className="text-sm font-medium mb-2">Props</h4>
+              <h4 className="text-sm font-medium mb-2">
+                {t("entityLabels.props")}
+              </h4>
               <div className="flex flex-wrap gap-1">
                 {scene?.props.filter(Boolean).map((prop) => (
                   <Badge key={prop?._id} variant="secondary">
@@ -184,8 +196,8 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
         </div>
       </CardContent>
       <CardFooter className="flex items-center justify-start gap-2">
-        <Button variant="outline">Edit</Button>
-        <Button variant="destructive">Delete</Button>
+        <Button variant="outline">{t("edit")}</Button>
+        <Button variant="destructive">{t("delete")}</Button>
       </CardFooter>
     </Card>
   );
@@ -194,13 +206,14 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
 export default SceneSummaryCard;
 
 const CharacterTypeIcon = ({ type }: { type: CharacterType }) => {
+  const t = useTranslations("ScriptEntitiesScreen");
   const CharacterTypeIconMap: Record<CharacterType, React.ReactNode> = {
     PRINCIPAL: (
       <Tooltip>
         <TooltipTrigger>
           <UserCog className="h-4 w-4" />
         </TooltipTrigger>
-        <TooltipContent>Principal Character</TooltipContent>
+        <TooltipContent>{t("characterTypes.principal")}</TooltipContent>
       </Tooltip>
     ),
     SECONDARY: (
@@ -208,7 +221,7 @@ const CharacterTypeIcon = ({ type }: { type: CharacterType }) => {
         <TooltipTrigger>
           <UserCircle2 className="h-4 w-4" />
         </TooltipTrigger>
-        <TooltipContent>Secondary Character</TooltipContent>
+        <TooltipContent>{t("characterTypes.secondary")}</TooltipContent>
       </Tooltip>
     ),
     FIGURANT: (
@@ -216,7 +229,7 @@ const CharacterTypeIcon = ({ type }: { type: CharacterType }) => {
         <TooltipTrigger>
           <User className="h-4 w-4" />
         </TooltipTrigger>
-        <TooltipContent>Figurant</TooltipContent>
+        <TooltipContent>{t("characterTypes.figurant")}</TooltipContent>
       </Tooltip>
     ),
     SILHOUETTE: (
@@ -224,7 +237,7 @@ const CharacterTypeIcon = ({ type }: { type: CharacterType }) => {
         <TooltipTrigger>
           <UserMinus className="h-4 w-4" />
         </TooltipTrigger>
-        <TooltipContent>Silhouette</TooltipContent>
+        <TooltipContent>{t("characterTypes.silhouette")}</TooltipContent>
       </Tooltip>
     ),
     EXTRA: (
@@ -232,7 +245,7 @@ const CharacterTypeIcon = ({ type }: { type: CharacterType }) => {
         <TooltipTrigger>
           <Users className="h-4 w-4" />
         </TooltipTrigger>
-        <TooltipContent>Extra</TooltipContent>
+        <TooltipContent>{t("characterTypes.extra")}</TooltipContent>
       </Tooltip>
     ),
   };

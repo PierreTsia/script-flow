@@ -6,28 +6,17 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { GitMerge, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Clapperboard } from "lucide-react";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { useState } from "react";
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+import { useTranslations } from "next-intl";
 
 import { CharactersWithScenes } from "@/convex/characters";
-import useSceneEntities from "@/hooks/useSceneEntities";
-import { Id } from "@/convex/_generated/dataModel";
+import DeduplicateCharacterButton from "@/components/script-entities-screen/deduplicate-character-button";
 
 const CharacterSummaryCard = ({
   character,
@@ -36,6 +25,8 @@ const CharacterSummaryCard = ({
   character: CharactersWithScenes[number];
   potentialDuplicates?: CharactersWithScenes[number][];
 }) => {
+  const t = useTranslations("ScriptEntitiesScreen");
+
   return (
     <Card className="hover:bg-accent transition-colors">
       <CardHeader className="pb-2">
@@ -57,13 +48,25 @@ const CharacterSummaryCard = ({
       </CardHeader>
       <CardContent>
         <div className="text-sm text-muted-foreground">
-          <p className="mb-2">{character.scenes.length} scenes</p>
+          <p className="mb-2">
+            {t("scenesCount", { count: character.scenes.length })}
+          </p>
           <div className="flex flex-wrap gap-1">
             {character.scenes.length &&
               character.scenes.slice(0, 3).map((scene) => (
-                <Badge key={scene?._id} variant="outline">
-                  Scene {scene.scene_number}
-                </Badge>
+                <Tooltip key={scene?._id}>
+                  <TooltipTrigger>
+                    <Badge key={scene?._id} variant="outline">
+                      <Clapperboard className="h-3 w-3 mr-1 inline" />{" "}
+                      {scene.scene_number}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <pre className="text-xs max-w-[300px] whitespace-pre-wrap">
+                      {scene.summary}
+                    </pre>
+                  </TooltipContent>
+                </Tooltip>
               ))}
             {character.scenes.length > 3 && (
               <Badge variant="outline">
@@ -110,70 +113,3 @@ const CharacterSummaryCard = ({
 };
 
 export default CharacterSummaryCard;
-
-const DeduplicateCharacterButton = ({
-  character,
-  allCharacters,
-}: {
-  character: CharactersWithScenes[number];
-  allCharacters: CharactersWithScenes[number][];
-}) => {
-  const { deduplicateCharacter } = useSceneEntities();
-  const [selectedTargetId, setSelectedTargetId] = useState<string | null>(null);
-  const selectedTarget = allCharacters.find((c) => c._id === selectedTargetId);
-
-  const handleMerge = () => {
-    if (!selectedTargetId) return;
-    deduplicateCharacter({
-      duplicatedCharacterId: character._id,
-      targetCharacterId: selectedTargetId as Id<"characters">,
-    });
-    setSelectedTargetId(null); // Reset after merge
-  };
-
-  return (
-    <div className="w-[60px] hover:text-green-500 transition-colors">
-      <Select
-        onValueChange={(targetCharId) => {
-          setSelectedTargetId(targetCharId);
-        }}
-      >
-        <SelectTrigger className="" title="Merge with another character">
-          <GitMerge className="h-4 w-4" />
-        </SelectTrigger>
-        <SelectContent>
-          {allCharacters.map((targetChar) => (
-            <SelectItem key={`${targetChar._id}`} value={targetChar._id}>
-              Merge into {targetChar.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <AlertDialog
-        open={!!selectedTargetId}
-        onOpenChange={() => setSelectedTargetId(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              The character {character.name} will be merged into
-              {selectedTarget?.name}. After merging, {selectedTarget?.name} will
-              have {character.name} as an alias. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleMerge}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              Merge Characters
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-};

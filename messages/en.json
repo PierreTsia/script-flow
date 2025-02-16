@@ -108,9 +108,39 @@
     "addProp": "Add Prop"
   },
   "ScriptEntitiesScreen": {
-      "scenes": "Scenes",
+    "scenes": "Scenes",
+    "characters": "Characters",
+    "locations": "Locations",
+    "props": "Props",
+    "edit": "Edit",
+    "delete": "Delete",
+    "sceneInfo": {
+      "page": "Page",
+      "scene": "Scene"
+    },
+    "entityTypes": {
+      "main": "Main",
+      "others": "Others"
+    },
+    "entityLabels": {
       "characters": "Characters",
       "locations": "Locations",
       "props": "Props"
-    }
+    },
+    "characterTypes": {
+      "principal": "Principal Character",
+      "secondary": "Secondary Character",
+      "figurant": "Figurant",
+      "silhouette": "Silhouette",
+      "extra": "Extra"
+    },
+    "characterMerge": {
+      "buttonTitle": "Merge with another character",
+      "mergeInto": "Merge into {name}",
+      "confirmTitle": "Are you absolutely sure?",
+      "confirmDescription": "The character {source} will be merged into {target}. After merging, {target} will have {source} as an alias. This action cannot be undone.",
+      "mergeButton": "Merge Characters"
+    },
+    "scenesCount": "{count, plural, one {# scene} other {# scenes}}"
+  }
 }
