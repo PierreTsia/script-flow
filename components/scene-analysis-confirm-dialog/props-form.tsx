@@ -14,15 +14,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import useSceneEntities from "@/hooks/useSceneEntities";
 import { useState, useEffect } from "react";
-import { Id } from "@/convex/_generated/dataModel";
 import { useFieldArray } from "react-hook-form";
-import { DraftSceneAnalysis } from "@/hooks/useScene";
 import { Button } from "@/components/ui/button";
 import { Trash2Icon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
-import { TabType } from "./entities-tabs";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
+import { EntitiesFormProps } from "./scene-analysis-confirm-dialog";
 
 const EMPTY_PROP = {
   name: "",
@@ -30,21 +28,13 @@ const EMPTY_PROP = {
   notes: "",
 } as const;
 
-interface PropsFormProps {
-  scriptId: Id<"scripts">;
-  sceneId: Id<"scenes"> | null;
-  selectedDraftAnalysis: DraftSceneAnalysis | null;
-  setCurrentTab: (tab: TabType) => void;
-  children: React.ReactNode;
-}
-
 const PropsForm = ({
   scriptId,
   sceneId,
   selectedDraftAnalysis,
-  setCurrentTab,
+  onNextTab,
   children,
-}: PropsFormProps) => {
+}: EntitiesFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const t = useTranslations("SceneAnalysis");
@@ -95,7 +85,6 @@ const PropsForm = ({
             quantity: prop.quantity,
             notes: prop.notes,
           });
-          console.log("propId", propId);
           return propId;
         })
       );
@@ -103,7 +92,7 @@ const PropsForm = ({
       const allSuccessful = propIds.every(Boolean);
 
       if (allSuccessful) {
-        setCurrentTab("characters");
+        onNextTab();
       }
     } catch (error) {
       console.error("Submission failed:", error);

@@ -24,6 +24,14 @@ import LocationsForm from "./locations-form";
 
 type TabType = "scene_info" | "locations" | "characters" | "props";
 
+export interface EntitiesFormProps {
+  scriptId: Id<"scripts">;
+  sceneId: Id<"scenes"> | null;
+  selectedDraftAnalysis: DraftSceneAnalysis | null;
+  onNextTab: () => void;
+  children: React.ReactNode;
+}
+
 export const SceneAnalysisConfirmDialog = ({
   selectedDraftAnalysis,
   children,
@@ -110,7 +118,7 @@ export const SceneAnalysisConfirmDialog = ({
                 scriptId={scriptId}
                 sceneId={savedSceneId}
                 selectedDraftAnalysis={selectedDraftAnalysis}
-                setCurrentTab={setCurrentTab}
+                onNextTab={() => setCurrentTab("characters")}
               >
                 <CancelButton setIsOpen={setIsOpen} />
               </LocationsForm>
@@ -122,7 +130,7 @@ export const SceneAnalysisConfirmDialog = ({
                 scriptId={scriptId}
                 sceneId={savedSceneId}
                 selectedDraftAnalysis={selectedDraftAnalysis}
-                setCurrentTab={setCurrentTab}
+                onNextTab={() => setCurrentTab("props")}
               >
                 <CancelButton setIsOpen={setIsOpen} />
               </CharactersForm>
@@ -134,7 +142,7 @@ export const SceneAnalysisConfirmDialog = ({
                 scriptId={scriptId}
                 sceneId={savedSceneId}
                 selectedDraftAnalysis={selectedDraftAnalysis}
-                setCurrentTab={setCurrentTab}
+                onNextTab={() => setCurrentTab("scene_info")}
               >
                 <CancelButton setIsOpen={setIsOpen} />
               </PropsForm>
