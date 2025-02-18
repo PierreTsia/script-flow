@@ -3,10 +3,13 @@ import SceneSummaryCard from "./scene-summary-card";
 import { Id } from "@/convex/_generated/dataModel";
 import { useScripts } from "@/hooks/useScripts";
 import EntityScreenSkeleton from "./entity-screen-skeleton";
+import { useScene } from "@/hooks/useScene";
 
 const ScenesTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
-  const { getScriptEntities } = useScripts();
-  const scenes = getScriptEntities(scriptId)?.scenes;
+  const { useGetScriptEntities } = useScripts();
+  const scenes = useGetScriptEntities(scriptId)?.scenes;
+
+  const { deleteScene } = useScene(scriptId);
 
   if (!scenes) {
     return <EntityScreenSkeleton />;

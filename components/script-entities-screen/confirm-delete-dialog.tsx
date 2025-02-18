@@ -10,16 +10,18 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 
-import { Trash2 } from "lucide-react";
+import { Trash2, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 const ConfirmDeleteDialog = ({
   onDelete,
   entityType,
   entityName,
+  isLoading = false,
 }: {
   onDelete: () => Promise<void>;
-  entityType: "character" | "location" | "prop";
+  entityType: "character" | "location" | "prop" | "scene";
   entityName: string;
+  isLoading: boolean;
 }) => {
   const t = useTranslations("ScriptEntitiesScreen");
   return (
@@ -55,11 +57,16 @@ const ConfirmDeleteDialog = ({
           </AlertDialogCancel>
           <Button
             variant="destructive"
+            disabled={isLoading}
             onClick={async () => {
               await onDelete();
             }}
           >
-            {t("confirmDeleteDialog.delete")}
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              t("confirmDeleteDialog.delete")
+            )}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

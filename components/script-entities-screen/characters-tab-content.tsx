@@ -10,8 +10,8 @@ import { Star, Users, User } from "lucide-react";
 
 const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const t = useTranslations("ScriptEntitiesScreen");
-  const { getCharactersByScriptId } = useScene(scriptId);
-  const characters = getCharactersByScriptId(scriptId);
+  const { useGetCharactersByScriptId } = useScene(scriptId);
+  const characters = useGetCharactersByScriptId(scriptId);
 
   if (!characters) {
     return <EntityScreenSkeleton />;

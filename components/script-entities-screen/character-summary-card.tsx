@@ -59,10 +59,12 @@ const CharacterSummaryCard = ({
           </p>
           <div className="flex flex-wrap gap-1">
             {character.scenes.length &&
-              character.scenes.slice(0, 3).map((scene) => (
-                <Tooltip key={scene?._id}>
+              character.scenes.slice(0, 3).map((scene, index) => (
+                <Tooltip
+                  key={`character-scene-${character._id}-${scene._id}-${index}`}
+                >
                   <TooltipTrigger>
-                    <Badge key={scene?._id} variant="outline">
+                    <Badge variant="outline">
                       <Clapperboard className="h-3 w-3 mr-1 inline" />{" "}
                       {scene.scene_number}
                     </Badge>
@@ -93,6 +95,7 @@ const CharacterSummaryCard = ({
         <ConfirmDeleteDialog
           entityType="character"
           entityName={character.name}
+          isLoading={isLoading}
           onDelete={async () => {
             await deleteCharacter({ characterId: character._id });
           }}
@@ -101,16 +104,17 @@ const CharacterSummaryCard = ({
           character={character}
           isOpen={isEditDialogOpen}
           onClose={() => setIsEditDialogOpen(false)}
-        />
-        <Button
-          variant="ghost"
-          size="icon"
-          title="Edit character"
-          className="hover:text-primary transition-colors"
-          onClick={() => setIsEditDialogOpen(true)}
         >
-          <Pencil className="h-4 w-4" />
-        </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            title="Edit character"
+            className="hover:text-primary transition-colors"
+            onClick={() => setIsEditDialogOpen(true)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+        </EditCharacterDialog>
       </CardFooter>
     </Card>
   );

@@ -15,8 +15,8 @@ import EntityScreenSkeleton from "@/components/script-entities-screen/entity-scr
 
 const LocationsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const t = useTranslations("ScriptEntitiesScreen");
-  const { getLocationsByScriptId } = useScene(scriptId);
-  const locations = getLocationsByScriptId(scriptId);
+  const { useGetLocationsByScriptId } = useScene(scriptId);
+  const locations = useGetLocationsByScriptId(scriptId);
 
   if (!locations) return <EntityScreenSkeleton />;
 

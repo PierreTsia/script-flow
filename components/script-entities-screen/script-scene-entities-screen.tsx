@@ -13,8 +13,8 @@ const ScriptSceneEntitiesScreen = ({
 }: {
   scriptId: Id<"scripts">;
 }) => {
-  const { getScriptEntities } = useScripts();
-  const entities = getScriptEntities(scriptId);
+  const { useGetScriptEntities } = useScripts();
+  const entities = useGetScriptEntities(scriptId);
 
   const [currentTab, setCurrentTab] = useState<
     "scenes" | "characters" | "locations" | "props"

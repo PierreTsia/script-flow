@@ -15,8 +15,8 @@ import EntityScreenSkeleton from "./entity-screen-skeleton";
 
 const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const t = useTranslations("ScriptEntitiesScreen");
-  const { getPropsByScriptId } = useScene(scriptId);
-  const props = getPropsByScriptId(scriptId);
+  const { useGetPropsByScriptId } = useScene(scriptId);
+  const props = useGetPropsByScriptId(scriptId);
 
   if (!props) return <EntityScreenSkeleton />;
 

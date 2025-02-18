@@ -165,7 +165,8 @@
       "entityType": {
         "character": "the character",
         "location": "the location",
-        "prop": "the prop"
+        "prop": "the prop",
+        "scene": "the scene"
       }
     },
     "editCharacterDialog": {

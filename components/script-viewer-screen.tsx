@@ -21,7 +21,7 @@ const ScriptViewerScreen = ({
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectionRect, setSelectionRect] = useState<DOMRect | null>(null);
-  const { isLoading, analyseAndSaveDraft } = useScene(scriptId);
+  const { isLoading, analyseAndSaveDraft } = useScene();
 
   const {
     viewerRef,
@@ -35,11 +35,11 @@ const ScriptViewerScreen = ({
 
   const handleAnalyze = useCallback(
     async (text: string, pageNumber: number) => {
-      await analyseAndSaveDraft(text, pageNumber);
+      await analyseAndSaveDraft(text, pageNumber, scriptId);
       setSelectedText(text);
       setIsDialogOpen(false);
     },
-    [analyseAndSaveDraft, setSelectedText]
+    [analyseAndSaveDraft, setSelectedText, scriptId]
   );
 
   const handleOpenDialogChange = useCallback(

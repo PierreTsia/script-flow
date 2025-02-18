@@ -206,3 +206,58 @@ export const getSceneAndEntitiesByNumber = query({
     };
   },
 });
+
+export const deleteScene = mutation({
+  args: {
+    sceneId: v.id("scenes"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError({
+        message: "Unauthorized",
+        code: "UNAUTHORIZED",
+      });
+    }
+
+    const scene = await ctx.db.get(args.sceneId);
+    if (!scene) {
+      throw new ConvexError({
+        message: "Scene not found",
+        code: "SCENE_NOT_FOUND",
+      });
+    }
+
+    const script = await ctx.db.get(scene.script_id);
+    if (script?.userId !== identity.subject) {
+      throw new ConvexError({
+        message: "Unauthorized: Cannot delete another user's scene",
+        code: "UNAUTHORIZED",
+      });
+    }
+
+    // Collect all records to delete
+    const characterScenes = await ctx.db
+      .query("character_scenes")
+      .withIndex("by_scene", (q) => q.eq("scene_id", args.sceneId))
+      .collect();
+
+    const locationScenes = await ctx.db
+      .query("location_scenes")
+      .withIndex("by_scene", (q) => q.eq("scene_id", args.sceneId))
+      .collect();
+
+    const propScenes = await ctx.db
+      .query("prop_scenes")
+      .withIndex("by_scene", (q) => q.eq("scene_id", args.sceneId))
+      .collect();
+
+    // Batch all deletions in a single Promise.all
+    await Promise.all([
+      ctx.db.delete(args.sceneId),
+      ...characterScenes.map((cs) => ctx.db.delete(cs._id)),
+      ...locationScenes.map((ls) => ctx.db.delete(ls._id)),
+      ...propScenes.map((ps) => ctx.db.delete(ps._id)),
+    ]);
+  },
+});
