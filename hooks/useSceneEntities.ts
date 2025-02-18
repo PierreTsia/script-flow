@@ -9,6 +9,7 @@ const useSceneEntities = () => {
   const saveCharacterInScene = useMutation(
     api.characters.createCharacterWithScene
   );
+  const deleteCharacterMutation = useMutation(api.characters.deleteCharacter);
   const saveLocationInScene = useMutation(
     api.locations.createLocationWithScene
   );
@@ -16,6 +17,8 @@ const useSceneEntities = () => {
   const deduplicateCharacterMutation = useMutation(
     api.characters.deduplicateCharacter
   );
+
+  const updateCharacterMutation = useMutation(api.characters.updateCharacter);
 
   const savePropInScene = useMutation(api.props.createPropWithScene);
 
@@ -54,6 +57,28 @@ const useSceneEntities = () => {
         });
       }
       return null;
+    }
+  };
+
+  const deleteCharacter = async ({
+    characterId,
+  }: {
+    characterId: Id<"characters">;
+  }) => {
+    try {
+      await deleteCharacterMutation({
+        character_id: characterId,
+      });
+      toast({
+        title: "Character deleted",
+      });
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -150,7 +175,46 @@ const useSceneEntities = () => {
       }
     }
   };
-  return { createCharacter, createLocation, createProp, deduplicateCharacter };
+
+  const updateCharacter = async ({
+    characterId,
+    updates,
+  }: {
+    characterId: Id<"characters">;
+    updates: {
+      name: string;
+      type: CharacterType;
+      aliases: string[];
+    };
+  }) => {
+    try {
+      await updateCharacterMutation({
+        character_id: characterId,
+        name: updates.name,
+        type: updates.type,
+        aliases: updates.aliases,
+      });
+      toast({
+        title: "Character updated",
+      });
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  return {
+    createCharacter,
+    createLocation,
+    createProp,
+    deduplicateCharacter,
+    deleteCharacter,
+    updateCharacter,
+  };
 };
 
 export default useSceneEntities;

@@ -6,6 +6,10 @@ import { FunctionReturnType } from "convex/server";
 import { api } from "./_generated/api";
 
 export type CharacterDocument = Doc<"characters">;
+export type CharacterSceneDocument = Doc<"character_scenes">;
+export type CharacterSceneWithNotes = CharacterSceneDocument & {
+  notes: string;
+};
 
 export type CharactersWithScenes = FunctionReturnType<
   typeof api.characters.getCharactersByScriptId
@@ -153,11 +157,15 @@ export const deduplicateCharacter = mutation({
 
     // Update target character with merged data
     await ctx.db.patch(args.target_character_id, {
-      aliases: [
-        ...(targetCharacter.aliases || []),
-        duplicatedCharacter.name,
-        ...(duplicatedCharacter.aliases || []),
-      ],
+      aliases: Array.from(
+        new Set([
+          ...(targetCharacter.aliases || []),
+          duplicatedCharacter.name,
+          ...(duplicatedCharacter.aliases || []),
+        ])
+      ).filter(
+        (alias) => alias !== targetCharacter.name // Remove if same as target name
+      ),
       searchText:
         [
           targetCharacter.name,
@@ -211,5 +219,57 @@ export const deduplicateCharacter = mutation({
 
     // delete character
     await ctx.db.delete(args.duplicated_character_id);
+  },
+});
+
+export const deleteCharacter = mutation({
+  args: {
+    character_id: v.id("characters"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("Unauthorized");
+    }
+
+    const characterToDelete = await ctx.db.get(args.character_id);
+    if (!characterToDelete) {
+      throw new ConvexError("Character not found");
+    }
+
+    // delete join tables rows
+    const characterScenes = await ctx.db
+      .query("character_scenes")
+      .withIndex("by_character", (q) => q.eq("character_id", args.character_id))
+      .collect();
+
+    // Batch delete all related records in a single transaction
+    const mutations = [
+      ctx.db.delete(args.character_id),
+      ...characterScenes.map((cs) => ctx.db.delete(cs._id)),
+    ];
+
+    await Promise.all(mutations);
+  },
+});
+
+export const updateCharacter = mutation({
+  args: {
+    character_id: v.id("characters"),
+    name: v.string(),
+    type: characterTypeValidator,
+    aliases: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("Unauthorized");
+    }
+
+    await ctx.db.patch(args.character_id, {
+      name: args.name,
+      type: args.type,
+      aliases: args.aliases,
+    });
   },
 });

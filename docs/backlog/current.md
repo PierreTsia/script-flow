@@ -93,9 +93,10 @@
 9. **Script Entities Screen** (4h)
    - [x] Script entities screen
    - [x] Script entities screen layout
-   - [x] Script entities screen layout
-   - [x] Script entities screen layout
-   - [x] Script entities screen layout
+   - [x] Tabs for Locations, Characters, Props
+   - [ ] finish crud
+   - [ ] finish dedup
+   - [ ] dynamic button in save draft analysis stepper
    **Files:** `src/app/[scriptId]/page.tsx`
 
 ## Error Handling (3h)
@@ -110,3 +111,48 @@
 - [ ] Deployment verification
 - [ ] Clear console logs
 - [ ] i18n keys audit
+
+## Analytics & Insights (Using Convex Aggregate Component)
+
+1. **Setup & Infrastructure** (3h)
+   - [ ] Install and configure @convex-dev/aggregate
+   - [ ] Set up aggregation tables and indexes
+   - [ ] Create base analytics utilities in `convex/analytics/`
+
+2. **Portfolio-Level Analytics** (4h)
+   - [ ] Script Volume Tracking
+     - [ ] Implement script count over time using `TableAggregate`
+     - [ ] Track total page count across all scripts
+     - [ ] Monitor script upload frequency patterns
+   - [ ] Entity Statistics
+     - [ ] Aggregate character counts across scripts
+     - [ ] Track location type distribution (INT/EXT ratio)
+     - [ ] Monitor props usage patterns
+
+3. **Writer's Analytics Dashboard** (5h)
+   - [ ] Writing Patterns Analysis
+     - [ ] Average scenes per script
+     - [ ] Character density (characters per scene) trends
+     - [ ] Location reuse patterns
+   - [ ] Time-based Analysis
+     - [ ] Script completion velocity
+     - [ ] Most productive writing periods
+     - [ ] Script complexity evolution over time
+
+4. **Performance Optimization** (3h)
+   - [ ] Implement proper namespacing for better throughput
+   - [ ] Set up bounds for aggregated data
+   - [ ] Configure lazy aggregation where appropriate
+   - [ ] Add caching for frequently accessed metrics
+
+5. **Analytics UI Components** (4h)
+   - [ ] Create reusable chart components
+   - [ ] Build analytics dashboard layout
+   - [ ] Implement real-time updates for analytics
+   - [ ] Add date range filters
+
+Technical Notes:
+- Use `namespace` for script-specific aggregations
+- Implement proper bounds to optimize query performance
+- Consider lazy aggregation for less frequently accessed metrics
+- Ensure proper transaction handling for accurate counts

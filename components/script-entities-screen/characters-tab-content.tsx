@@ -34,23 +34,15 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   });
 
   const getPotentialDuplicates = (character: CharactersWithScenes[number]) => {
-    // Define character groups
-    const mainCharacters = ["PRINCIPAL", "SECONDARY"];
-    const isMainCharacter = mainCharacters.includes(character.type);
-
-    // Filter characters based on group membership
-    return characters.filter((c) => {
-      // Different character (not itself)
-      if (c._id === character._id) return false;
-
-      // For main characters (PRINCIPAL/SECONDARY), allow merging within the main group
-      if (isMainCharacter) {
-        return mainCharacters.includes(c.type);
-      }
-
-      // For other characters, allow merging with any non-main character
-      return !mainCharacters.includes(c.type);
-    });
+    return characters
+      .filter((c) => c._id !== character._id)
+      .sort((a, b) => {
+        // Same type characters come first
+        if (a.type === character.type && b.type !== character.type) return -1;
+        if (b.type === character.type && a.type !== character.type) return 1;
+        // Then sort alphabetically by name within each group
+        return a.name.localeCompare(b.name);
+      });
   };
 
   const getGroupIcon = (group: string) => {

@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Clapperboard } from "lucide-react";
+import { Pencil, Clapperboard } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -17,6 +17,10 @@ import { useTranslations } from "next-intl";
 
 import { CharactersWithScenes } from "@/convex/characters";
 import DeduplicateCharacterButton from "@/components/script-entities-screen/deduplicate-character-button";
+import useSceneEntities from "@/hooks/useSceneEntities";
+import ConfirmDeleteDialog from "@/components/script-entities-screen/confirm-delete-dialog";
+import { EditCharacterDialog } from "./edit-character-dialog";
+import { useState } from "react";
 
 const CharacterSummaryCard = ({
   character,
@@ -26,6 +30,8 @@ const CharacterSummaryCard = ({
   potentialDuplicates?: CharactersWithScenes[number][];
 }) => {
   const t = useTranslations("ScriptEntitiesScreen");
+  const { deleteCharacter } = useSceneEntities();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   return (
     <Card className="hover:bg-accent transition-colors">
@@ -83,29 +89,27 @@ const CharacterSummaryCard = ({
             allCharacters={potentialDuplicates}
           />
         )}
+
+        <ConfirmDeleteDialog
+          entityType="character"
+          entityName={character.name}
+          onDelete={async () => {
+            await deleteCharacter({ characterId: character._id });
+          }}
+        />
+        <EditCharacterDialog
+          character={character}
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+        />
         <Button
           variant="ghost"
           size="icon"
           title="Edit character"
           className="hover:text-primary transition-colors"
-          onClick={() => {
-            // TODO: Implement edit logic
-            console.log("Edit", character._id);
-          }}
+          onClick={() => setIsEditDialogOpen(true)}
         >
           <Pencil className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          title="Delete character"
-          className="hover:text-red-500 transition-colors"
-          onClick={() => {
-            // TODO: Implement delete logic
-            console.log("Delete", character._id);
-          }}
-        >
-          <Trash2 className="h-4 w-4" />
         </Button>
       </CardFooter>
     </Card>

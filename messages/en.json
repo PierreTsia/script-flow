@@ -156,6 +156,49 @@
       "recurring": "Recurring Props",
       "oneOff": "Single Scene Props",
       "quantity": "{count, plural, one {# unit} other {# units}}"
+    },
+    "confirmDeleteDialog": {
+      "title": "Are you sure?",
+      "description": "Are you sure you want to delete {entityType} {entityName}?",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "entityType": {
+        "character": "the character",
+        "location": "the location",
+        "prop": "the prop"
+      }
+    },
+    "editCharacterDialog": {
+      "title": "Edit Character",
+      "description": "Edit the character details below.",
+      "characterType": {
+        "PRINCIPAL": "Principal Character",
+        "SECONDARY": "Secondary Character",
+        "OTHERS": "Supporting Character",
+        "FIGURANT": "Figurant",
+        "SILHOUETTE": "Silhouette",
+        "EXTRA": "Extra"
+      },
+      "form": {
+        "name": {
+          "label": "Name",
+          "placeholder": "Character name"
+        },
+        "type": {
+          "label": "Type",
+          "placeholder": "Select character type"
+        },
+        "aliases": {
+          "label": "Aliases",
+          "placeholder": "e.g. Bob, Bobby, Robert",
+          "description": "Separate aliases with commas"
+        }
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save changes",
+        "saving": "Saving..."
+      }
     }
   }
 }
