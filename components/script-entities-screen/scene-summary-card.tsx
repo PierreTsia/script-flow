@@ -42,7 +42,10 @@ import { ScriptEntitiesResult } from "@/hooks/useScripts";
 import { useTranslations } from "next-intl";
 import ConfirmDeleteDialog from "@/components/script-entities-screen/confirm-delete-dialog";
 import { useScene } from "@/hooks/useScene";
-type SceneDocument = ScriptEntitiesResult["scenes"][number];
+import { useState } from "react";
+import EditSceneDialog from "./edit-scene-dialog";
+
+export type SceneWithEntities = ScriptEntitiesResult["scenes"][number];
 
 const partitionSceneCharacter = (
   characters?: (CharacterDocument | undefined)[]
@@ -67,8 +70,9 @@ const partitionSceneCharacter = (
   );
 };
 
-const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
+const SceneSummaryCard = ({ scene }: { scene: SceneWithEntities }) => {
   const t = useTranslations("ScriptEntitiesScreen");
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { deleteScene, isLoading } = useScene();
   return (
     <Card key={`scene-${scene._id}`} className="flex flex-col">
@@ -206,14 +210,21 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
         </div>
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
+        <EditSceneDialog
+          scene={scene}
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+        />
         <Button
           variant="ghost"
           size="icon"
-          title={t("edit")}
+          title="Edit scene"
           className="hover:text-primary transition-colors"
+          onClick={() => setIsEditDialogOpen(true)}
         >
           <Pencil className="h-4 w-4" />
         </Button>
+
         <ConfirmDeleteDialog
           entityType="scene"
           entityName={scene.scene_number}

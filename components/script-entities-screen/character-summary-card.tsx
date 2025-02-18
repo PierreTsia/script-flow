@@ -104,17 +104,17 @@ const CharacterSummaryCard = ({
           character={character}
           isOpen={isEditDialogOpen}
           onClose={() => setIsEditDialogOpen(false)}
+        />
+
+        <Button
+          variant="ghost"
+          size="icon"
+          title="Edit character"
+          className="hover:text-primary transition-colors"
+          onClick={() => setIsEditDialogOpen(true)}
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            title="Edit character"
-            className="hover:text-primary transition-colors"
-            onClick={() => setIsEditDialogOpen(true)}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-        </EditCharacterDialog>
+          <Pencil className="h-4 w-4" />
+        </Button>
       </CardFooter>
     </Card>
   );

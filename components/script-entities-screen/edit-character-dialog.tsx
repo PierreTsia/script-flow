@@ -1,7 +1,6 @@
-import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { z } from "zod";
 import { Id } from "@/convex/_generated/dataModel";
 import {
   Form,
@@ -19,7 +18,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,7 +50,6 @@ interface EditCharacterDialogProps {
   };
   isOpen: boolean;
   onClose: () => void;
-  children: React.ReactNode;
 }
 
 const formSchema = z.object({
@@ -65,7 +62,6 @@ export function EditCharacterDialog({
   character,
   isOpen,
   onClose,
-  children,
 }: EditCharacterDialogProps) {
   const { updateCharacter } = useSceneEntities();
   const t = useTranslations("ScriptEntitiesScreen.editCharacterDialog");
@@ -98,7 +94,6 @@ export function EditCharacterDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{t("title")}</AlertDialogTitle>
