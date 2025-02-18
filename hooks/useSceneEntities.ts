@@ -5,7 +5,9 @@ import { useMutation } from "convex/react";
 import { useToast } from "@/hooks/use-toast";
 import { ConvexError } from "convex/values";
 import { LocationType, TimeOfDay } from "@/convex/helpers";
+import { useState } from "react";
 const useSceneEntities = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const saveCharacterInScene = useMutation(
     api.characters.createCharacterWithScene
   );
@@ -39,6 +41,7 @@ const useSceneEntities = () => {
     sceneId: Id<"scenes">;
     scriptId: Id<"scripts">;
   }) => {
+    setIsLoading(true);
     try {
       const characterId = await saveCharacterInScene({
         name,
@@ -57,6 +60,8 @@ const useSceneEntities = () => {
         });
       }
       return null;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -65,6 +70,7 @@ const useSceneEntities = () => {
   }: {
     characterId: Id<"characters">;
   }) => {
+    setIsLoading(true);
     try {
       await deleteCharacterMutation({
         character_id: characterId,
@@ -79,6 +85,8 @@ const useSceneEntities = () => {
           variant: "destructive",
         });
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -97,6 +105,7 @@ const useSceneEntities = () => {
     scriptId: Id<"scripts">;
     notes?: string;
   }) => {
+    setIsLoading(true);
     try {
       const locationId = await saveLocationInScene({
         name,
@@ -115,6 +124,8 @@ const useSceneEntities = () => {
         });
       }
       return null;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -131,6 +142,7 @@ const useSceneEntities = () => {
     scriptId: Id<"scripts">;
     notes?: string;
   }) => {
+    setIsLoading(true);
     try {
       const propId = await savePropInScene({
         name,
@@ -148,6 +160,8 @@ const useSceneEntities = () => {
         });
       }
       return null;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -158,6 +172,7 @@ const useSceneEntities = () => {
     duplicatedCharacterId: Id<"characters">;
     targetCharacterId: Id<"characters">;
   }) => {
+    setIsLoading(true);
     try {
       await deduplicateCharacterMutation({
         duplicated_character_id: duplicatedCharacterId,
@@ -173,6 +188,8 @@ const useSceneEntities = () => {
           variant: "destructive",
         });
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -214,6 +231,7 @@ const useSceneEntities = () => {
     deduplicateCharacter,
     deleteCharacter,
     updateCharacter,
+    isLoading,
   };
 };
 

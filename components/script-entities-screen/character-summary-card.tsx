@@ -30,7 +30,7 @@ const CharacterSummaryCard = ({
   potentialDuplicates?: CharactersWithScenes[number][];
 }) => {
   const t = useTranslations("ScriptEntitiesScreen");
-  const { deleteCharacter } = useSceneEntities();
+  const { deleteCharacter, isLoading } = useSceneEntities();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   return (

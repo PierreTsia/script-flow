@@ -30,7 +30,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
 import useSceneEntities from "@/hooks/useSceneEntities";
 import { useTranslations } from "next-intl";
 
@@ -68,7 +67,6 @@ export function EditCharacterDialog({
   onClose,
   children,
 }: EditCharacterDialogProps) {
-  const [isLoading, setIsLoading] = useState(false);
   const { updateCharacter } = useSceneEntities();
   const t = useTranslations("ScriptEntitiesScreen.editCharacterDialog");
 
@@ -82,7 +80,6 @@ export function EditCharacterDialog({
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
     await updateCharacter({
       characterId: character._id,
       updates: {
@@ -96,7 +93,6 @@ export function EditCharacterDialog({
           : [],
       },
     });
-    setIsLoading(false);
     onClose();
   }
 
