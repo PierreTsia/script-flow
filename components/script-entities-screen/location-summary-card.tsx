@@ -51,7 +51,6 @@ const LocationSummaryCard = ({
 }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { deleteLocation, isLoading } = useSceneEntities();
-  const t = useTranslations("ScriptEntitiesScreen");
 
   return (
     <Card className="hover:bg-accent transition-colors">
