@@ -18,7 +18,7 @@ import { DraftSceneAnalysis } from "@/hooks/useScene";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
-
+import { ScrollArea } from "@/components/ui/scroll-area";
 interface SceneInfoFormProps {
   scriptId: Id<"scripts">;
   selectedDraftAnalysis: DraftSceneAnalysis | null;
@@ -94,7 +94,7 @@ const SceneInfoForm = ({
     <div className="space-y-6 px-6">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} id="scene-info-form">
-          <div className="space-y-4">
+          <div className="space-y-4 gap-y-4">
             <FormField
               control={form.control}
               name="scene_number"
@@ -144,11 +144,17 @@ const SceneInfoForm = ({
               control={form.control}
               name="text"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-4 mb-4">
                   <div className="space-y-4">
                     <FormLabel>{t("text")}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} className="resize-none" rows={10} />
+                      <ScrollArea className="h-[300px]">
+                        <Textarea
+                          {...field}
+                          className="resize-none"
+                          rows={10}
+                        />
+                      </ScrollArea>
                     </FormControl>
                     <FormMessage />
                   </div>
@@ -158,7 +164,7 @@ const SceneInfoForm = ({
           </div>
           <AlertDialogFooter>
             <Button type="submit" form="scene-info-form">
-              {t("confirmSaveButton")}
+              {t("confirmSave.sceneInfo")}
             </Button>
             {children}
           </AlertDialogFooter>

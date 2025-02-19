@@ -5,7 +5,6 @@ import {
   AlertDialogDescription,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { DraftSceneAnalysis } from "@/hooks/useScene";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -34,16 +33,18 @@ export interface EntitiesFormProps {
 
 export const SceneAnalysisConfirmDialog = ({
   selectedDraftAnalysis,
-  children,
+
   isOpen,
   setIsOpen,
 }: {
   selectedDraftAnalysis: DraftSceneAnalysis | null;
-  children: React.ReactNode;
+
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) => {
   const t = useTranslations("SceneAnalysis");
+
+  console.log("selectedDraftAnalysis", selectedDraftAnalysis);
 
   const params = useParams();
   const scriptId = params.scriptId as Id<"scripts">;
@@ -82,8 +83,7 @@ export const SceneAnalysisConfirmDialog = ({
   };
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+    <AlertDialog open={isOpen}>
       <AlertDialogContent className="max-w-4xl h-[80vh]">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-2xl">
@@ -111,7 +111,7 @@ export const SceneAnalysisConfirmDialog = ({
                 selectedDraftAnalysis={selectedDraftAnalysis}
                 onCreateScene={onCreateScene}
               >
-                <CancelButton setIsOpen={setIsOpen} />
+                <CancelButton onClose={() => setIsOpen(false)} />
               </SceneInfoForm>
             </TabsContent>
 
@@ -123,7 +123,7 @@ export const SceneAnalysisConfirmDialog = ({
                 selectedDraftAnalysis={selectedDraftAnalysis}
                 onNextTab={() => setCurrentTab("characters")}
               >
-                <CancelButton setIsOpen={setIsOpen} />
+                <CancelButton onClose={() => setIsOpen(false)} />
               </LocationsForm>
             </TabsContent>
 
@@ -135,7 +135,7 @@ export const SceneAnalysisConfirmDialog = ({
                 selectedDraftAnalysis={selectedDraftAnalysis}
                 onNextTab={() => setCurrentTab("props")}
               >
-                <CancelButton setIsOpen={setIsOpen} />
+                <CancelButton onClose={() => setIsOpen(false)} />
               </CharactersForm>
             </TabsContent>
 
@@ -147,7 +147,7 @@ export const SceneAnalysisConfirmDialog = ({
                 selectedDraftAnalysis={selectedDraftAnalysis}
                 onNextTab={() => setCurrentTab("scene_info")}
               >
-                <CancelButton setIsOpen={setIsOpen} />
+                <CancelButton onClose={() => setIsOpen(false)} />
               </PropsForm>
             </TabsContent>
           </EntitiesTabs>
@@ -157,18 +157,14 @@ export const SceneAnalysisConfirmDialog = ({
   );
 };
 
-const CancelButton = ({
-  setIsOpen,
-}: {
-  setIsOpen: (isOpen: boolean) => void;
-}) => {
+const CancelButton = ({ onClose }: { onClose: () => void }) => {
   const t = useTranslations("SceneAnalysis");
   return (
     <Button
       variant="outline"
       onClick={(e) => {
         e.preventDefault();
-        setIsOpen(false);
+        onClose();
       }}
     >
       {t("cancelButton")}

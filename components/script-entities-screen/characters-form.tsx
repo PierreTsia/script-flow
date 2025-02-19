@@ -211,7 +211,7 @@ const CharactersForm = ({
 
       <AlertDialogFooter>
         <Button type="submit" form="character-form" disabled={isLoading}>
-          {t("confirmSaveButton")}
+          {t("confirmSave.characters")}
         </Button>
         {children}
       </AlertDialogFooter>

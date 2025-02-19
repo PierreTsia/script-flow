@@ -1,12 +1,15 @@
 import { Id } from "@/convex/_generated/dataModel";
-import { useScene } from "@/hooks/useScene";
+import { DraftSceneAnalysis, useScene } from "@/hooks/useScene";
 import { usePdfViewer } from "@/hooks/usePdfViewer";
 import { useState, useCallback, useEffect } from "react";
 import { FloatingTextSelectButton } from "./floating-text-select-button";
 import SelectedTextDialog from "./selected-text-dialog";
 import SceneAnalysisSheet from "./scene-analysis-sheet";
 import { useSearchParams, useRouter } from "next/navigation";
-
+import SceneAnalysisConfirmDialog from "./scene-analysis-confirm-dialog";
+import { Button } from "./ui/button";
+import { Save } from "lucide-react";
+import { useTranslations } from "next-intl";
 const ScriptViewerScreen = ({
   fileUrl,
   scriptId,
@@ -26,6 +29,7 @@ const ScriptViewerScreen = ({
   const searchParams = useSearchParams();
   const pageParam = searchParams.get("page");
   const router = useRouter();
+
   const {
     viewerRef,
     pdfSlickViewerRef,
@@ -36,11 +40,17 @@ const ScriptViewerScreen = ({
     setSelectedText,
   } = usePdfViewer(fileUrl);
 
+  const [lastAnalyzedText, setLastAnalyzedText] =
+    useState<DraftSceneAnalysis | null>(null);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+
   const handleAnalyze = useCallback(
     async (text: string, pageNumber: number) => {
-      await analyseAndSaveDraft(text, pageNumber, scriptId);
       setSelectedText(text);
+      const draft = await analyseAndSaveDraft(text, pageNumber, scriptId);
+      setLastAnalyzedText(draft);
       setIsDialogOpen(false);
+      setIsConfirmDialogOpen(true);
     },
     [analyseAndSaveDraft, setSelectedText, scriptId]
   );
@@ -112,6 +122,14 @@ const ScriptViewerScreen = ({
             isAnalyzing={isLoading}
             onConfirmClick={() => handleAnalyze(selectedText, selectedPages[0])}
           />
+
+          {lastAnalyzedText && (
+            <SceneAnalysisConfirmDialog
+              selectedDraftAnalysis={lastAnalyzedText}
+              isOpen={isConfirmDialogOpen}
+              setIsOpen={() => setIsConfirmDialogOpen(false)}
+            />
+          )}
 
           <SceneAnalysisSheet
             isOpen={isSheetOpen}

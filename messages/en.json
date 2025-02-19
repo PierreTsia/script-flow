@@ -47,6 +47,9 @@
     "summary": "Summary",
     "text": "Text",
     "title": "Scene Analysis",
+    "scriptViewerScreen": {
+      "saveDraft": "Save draft"
+    },
     "description": "Manage your script scenes here",
     "draftStatus": {
       "savedDraft": "Saved draft locally",
@@ -89,6 +92,12 @@
     "saveConfirmationDescription": "For scene {sceneNumber} with {locationsCount} locations and {charactersCount} characters.",
     "cancelButton": "Cancel",
     "confirmSaveButton": "Confirm Save",
+    "confirmSave": {
+      "sceneInfo": "Save scene to add elements",
+      "locations": "Save locations",
+      "characters": "Save characters",
+      "props": "Save props"
+    },
     "saveConfirmationSuccess": "Analysis saved",
     "saveConfirmationError": "Error saving analysis",
     "addCharacter": "Add Character",
@@ -158,11 +167,11 @@
       "quantity": "{count, plural, one {# unit} other {# units}}"
     },
     "timeOfDay": {
-      "DAY": "Day",
-      "NIGHT": "Night",
-      "DAWN": "Dawn",
-      "DUSK": "Dusk",
-      "UNSPECIFIED": "Unspecified"
+      "day": "Day",
+      "night": "Night",
+      "dawn": "Dawn",
+      "dusk": "Dusk",
+      "unspecified": "Unspecified"
     },
     "confirmDeleteDialog": {
       "title": "Are you sure?",

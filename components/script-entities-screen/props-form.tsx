@@ -177,7 +177,7 @@ const PropsForm = ({
 
       <AlertDialogFooter>
         <Button type="submit" form="character-form" disabled={isLoading}>
-          {t("confirmSaveButton")}
+          {t("confirmSave.props")}
         </Button>
         {children}
       </AlertDialogFooter>

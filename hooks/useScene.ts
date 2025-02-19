@@ -87,15 +87,16 @@ export const useScene = () => {
     try {
       const analysis = await analyze(text, pageNumber);
       if (analysis) {
-        await saveDraft({
+        const draft = await saveDraft({
           scriptId,
           sceneNumber: analysis.scene_number,
           analysis: JSON.stringify(analysis),
           text,
           pageNumber,
         });
+        return draft;
       }
-      return analysis;
+      return null;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Analysis request failed");
       toast({

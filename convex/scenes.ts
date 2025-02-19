@@ -79,7 +79,7 @@ export const saveDraft = mutation({
   handler: async (ctx, args) => {
     const analysis: SceneAnalysis = JSON.parse(args.analysis);
 
-    await ctx.db.insert("draftScenesAnalysis", {
+    const draftId = await ctx.db.insert("draftScenesAnalysis", {
       script_id: args.scriptId,
       scene_number: args.sceneNumber,
       locations: analysis.locations,
@@ -89,6 +89,9 @@ export const saveDraft = mutation({
       summary: analysis.summary || "",
       page_number: args.pageNumber,
     });
+
+    const draft = await ctx.db.get(draftId);
+    return draft;
   },
 });
 

@@ -72,6 +72,15 @@
     "saveConfirmationTitle": "Analyse de scène",
     "saveConfirmationDescription": "Pour la scène {sceneNumber} avec {locationsCount} lieux et {charactersCount} personnages.",
     "cancelButton": "Annuler",
+    "scriptViewerScreen": {
+      "saveDraft": "Enregistrer le brouillon"
+    },
+    "confirmSave": {
+      "sceneInfo": "Sauvegarder la scene pour ajouter des elements",
+      "locations": "Sauvegarder les lieux",
+      "characters": "Sauvegarder les personnages",
+      "props": "Sauvegarder les accessoires"
+    },
     "confirmSaveButton": "Enregistrer l'analyse",
     "saveConfirmationSuccess": "Analyse enregistrée",
     "saveConfirmationError": "Erreur lors de l'enregistrement de l'analyse",
@@ -101,7 +110,14 @@
       "notes": "Notes",
       "name": "Nom"
     },
-    "addProp": "Ajouter un accessoire"
+    "addProp": "Ajouter un accessoire",
+    "timeOfDay": {
+      "day": "Jour",
+      "night": "Nuit",
+      "dawn": "Aube",
+      "dusk": "Crépuscule",
+      "unspecified": "Non spécifié"
+    }
   },
   "ScriptEntitiesScreen": {
     "timeOfDay": {
