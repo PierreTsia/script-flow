@@ -1,8 +1,7 @@
-import ScriptViewer from "@/components/script-viewer";
+import { notFound, redirect } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
-import { notFound } from "next/navigation";
 interface PageProps {
-  params: Promise<{ scriptId: string }>;
+  params: Promise<{ scriptId: Id<"scripts"> }>;
 }
 
 export default async function ScriptPage({ params }: PageProps) {
@@ -11,5 +10,6 @@ export default async function ScriptPage({ params }: PageProps) {
   if (!scriptId) {
     notFound();
   }
-  return <ScriptViewer scriptId={scriptId as Id<"scripts">} />;
+
+  redirect(`/scripts/${scriptId}/viewer`);
 }

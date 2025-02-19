@@ -28,7 +28,7 @@ import { useTranslations } from "next-intl";
 import { LocationsWithScenes } from "@/convex/locations";
 import { z } from "zod";
 import useSceneEntities from "@/hooks/useSceneEntities";
-import { useState } from "react";
+
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   type: z.enum(["INT", "EXT"]),
@@ -139,19 +139,13 @@ export const EditLocationDialog = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="DAY">{t("timeOfDay.day")}</SelectItem>
-                      <SelectItem value="NIGHT">
-                        {t("timeOfDay.night")}
-                      </SelectItem>
-                      <SelectItem value="DAWN">
-                        {t("timeOfDay.dawn")}
-                      </SelectItem>
-                      <SelectItem value="DUSK">
-                        {t("timeOfDay.dusk")}
-                      </SelectItem>
-                      <SelectItem value="UNSPECIFIED">
-                        {t("timeOfDay.unspecified")}
-                      </SelectItem>
+                      {["DAY", "NIGHT", "DAWN", "DUSK", "UNSPECIFIED"].map(
+                        (timeOfDay) => (
+                          <SelectItem key={timeOfDay} value={timeOfDay}>
+                            {t(`timeOfDay.${timeOfDay.toLowerCase()}`)}
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
