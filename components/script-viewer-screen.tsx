@@ -89,7 +89,6 @@ const ScriptViewerScreen = ({
       const pageNumberParam = parseInt(pageParam, 10);
       if (!isNaN(pageNumberParam)) {
         pdfSlick.gotoPage(pageNumberParam);
-        // remove route param
         router.push(window.location.pathname);
       }
     }
