@@ -5,8 +5,8 @@ import { useScripts } from "@/hooks/useScripts";
 import EntityScreenSkeleton from "./entity-screen-skeleton";
 
 const ScenesTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
-  const { getScriptEntities } = useScripts();
-  const scenes = getScriptEntities(scriptId)?.scenes;
+  const { useGetScriptEntities } = useScripts();
+  const scenes = useGetScriptEntities(scriptId)?.scenes;
 
   if (!scenes) {
     return <EntityScreenSkeleton />;
@@ -16,7 +16,7 @@ const ScenesTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
     <ScrollArea className="h-[calc(100vh-220px)]">
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         {scenes.map((scene) => (
-          <SceneSummaryCard key={scene._id} scene={scene} />
+          <SceneSummaryCard key={scene._id} scene={scene} scriptId={scriptId} />
         ))}
       </div>
     </ScrollArea>

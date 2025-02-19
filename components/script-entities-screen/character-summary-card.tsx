@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Clapperboard } from "lucide-react";
+import { Pencil, Clapperboard } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -17,7 +17,10 @@ import { useTranslations } from "next-intl";
 
 import { CharactersWithScenes } from "@/convex/characters";
 import DeduplicateCharacterButton from "@/components/script-entities-screen/deduplicate-character-button";
-
+import useSceneEntities from "@/hooks/useSceneEntities";
+import ConfirmDeleteDialog from "@/components/script-entities-screen/confirm-delete-dialog";
+import { EditCharacterDialog } from "./edit-character-dialog";
+import { useState } from "react";
 const CharacterSummaryCard = ({
   character,
   potentialDuplicates,
@@ -26,6 +29,8 @@ const CharacterSummaryCard = ({
   potentialDuplicates?: CharactersWithScenes[number][];
 }) => {
   const t = useTranslations("ScriptEntitiesScreen");
+  const { deleteCharacter, isLoading } = useSceneEntities();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   return (
     <Card className="hover:bg-accent transition-colors">
@@ -53,10 +58,12 @@ const CharacterSummaryCard = ({
           </p>
           <div className="flex flex-wrap gap-1">
             {character.scenes.length &&
-              character.scenes.slice(0, 3).map((scene) => (
-                <Tooltip key={scene?._id}>
+              character.scenes.slice(0, 3).map((scene, index) => (
+                <Tooltip
+                  key={`character-scene-${character._id}-${scene._id}-${index}`}
+                >
                   <TooltipTrigger>
-                    <Badge key={scene?._id} variant="outline">
+                    <Badge variant="outline">
                       <Clapperboard className="h-3 w-3 mr-1 inline" />{" "}
                       {scene.scene_number}
                     </Badge>
@@ -83,29 +90,29 @@ const CharacterSummaryCard = ({
             allCharacters={potentialDuplicates}
           />
         )}
+
+        <ConfirmDeleteDialog
+          entityType="character"
+          entityName={character.name}
+          isLoading={isLoading}
+          onDelete={async () => {
+            await deleteCharacter({ characterId: character._id });
+          }}
+        />
+        <EditCharacterDialog
+          character={character}
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+        />
+
         <Button
           variant="ghost"
           size="icon"
           title="Edit character"
           className="hover:text-primary transition-colors"
-          onClick={() => {
-            // TODO: Implement edit logic
-            console.log("Edit", character._id);
-          }}
+          onClick={() => setIsEditDialogOpen(true)}
         >
           <Pencil className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          title="Delete character"
-          className="hover:text-red-500 transition-colors"
-          onClick={() => {
-            // TODO: Implement delete logic
-            console.log("Delete", character._id);
-          }}
-        >
-          <Trash2 className="h-4 w-4" />
         </Button>
       </CardFooter>
     </Card>

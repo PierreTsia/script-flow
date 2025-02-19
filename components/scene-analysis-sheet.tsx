@@ -36,7 +36,8 @@ const SceneAnalysisSheet = ({
   scriptId: Id<"scripts">;
 }) => {
   const t = useTranslations("SceneAnalysis");
-  const { drafts, handleDeleteDraft } = useScene(scriptId);
+  const { useGetDrafts, handleDeleteDraft } = useScene();
+  const drafts = useGetDrafts(scriptId);
 
   const [selectedDraftAnalysis, setselectedDraftAnalysis] =
     useState<DraftSceneAnalysis | null>(null);

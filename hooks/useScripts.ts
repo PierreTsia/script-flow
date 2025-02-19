@@ -15,7 +15,7 @@ export const useScripts = () => {
     api.scripts.createNewScriptFromStorageId
   );
 
-  const getScriptEntities = (scriptId: Id<"scripts">) =>
+  const useGetScriptEntities = (scriptId: Id<"scripts">) =>
     useQuery(api.scripts.getScriptEntities, { scriptId });
 
   const uploadFile = async (file: File, url: string) => {
@@ -53,7 +53,7 @@ export const useScripts = () => {
     deleteScript({ scriptId });
   };
 
-  const scriptById = (scriptId: Id<"scripts">) => {
+  const useScriptById = (scriptId: Id<"scripts">) => {
     const result = useQuery(api.scripts.getScript, {
       scriptId,
     });
@@ -67,7 +67,7 @@ export const useScripts = () => {
     uploadScript,
     scripts,
     deleteScriptById,
-    scriptById,
-    getScriptEntities,
+    useScriptById,
+    useGetScriptEntities,
   };
 };

@@ -29,6 +29,7 @@ import {
   User,
   UserMinus,
   Users,
+  Pencil,
 } from "lucide-react";
 import {
   Tooltip,
@@ -39,7 +40,13 @@ import { CharacterType } from "@/convex/helpers";
 import { CharacterDocument } from "@/convex/characters";
 import { ScriptEntitiesResult } from "@/hooks/useScripts";
 import { useTranslations } from "next-intl";
-type SceneDocument = ScriptEntitiesResult["scenes"][number];
+import ConfirmDeleteDialog from "@/components/script-entities-screen/confirm-delete-dialog";
+import { useScene } from "@/hooks/useScene";
+import { useState } from "react";
+import EditSceneDialog from "./edit-scene-dialog";
+import { Id } from "@/convex/_generated/dataModel";
+
+export type SceneWithEntities = ScriptEntitiesResult["scenes"][number];
 
 const partitionSceneCharacter = (
   characters?: (CharacterDocument | undefined)[]
@@ -64,10 +71,18 @@ const partitionSceneCharacter = (
   );
 };
 
-const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
+const SceneSummaryCard = ({
+  scene,
+  scriptId,
+}: {
+  scene: SceneWithEntities;
+  scriptId: Id<"scripts">;
+}) => {
   const t = useTranslations("ScriptEntitiesScreen");
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { deleteScene, isLoading } = useScene();
   return (
-    <Card key={scene._id} className="flex flex-col">
+    <Card key={`scene-${scene._id}`} className="flex flex-col">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>
@@ -124,9 +139,9 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
                   <CollapsibleContent>
                     <div className="flex flex-wrap gap-1">
                       {partitionSceneCharacter(scene?.characters).principal.map(
-                        (char) => (
+                        (char, index) => (
                           <Badge
-                            key={char?._id}
+                            key={`partitioned-character-scene-${char?._id}-${scene._id}-${index}`}
                             variant="secondary"
                             className="inline-flex items-center gap-1"
                           >
@@ -151,7 +166,7 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
                       {partitionSceneCharacter(scene?.characters)?.others?.map(
                         (char) => (
                           <Badge
-                            key={char?._id}
+                            key={`character-scene-${char?._id}-${scene._id}`}
                             variant="secondary"
                             className="inline-flex items-center gap-1"
                           >
@@ -171,8 +186,11 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
                 {t("entityLabels.locations")}
               </h4>
               <div className="flex flex-wrap gap-1">
-                {scene?.locations.filter(Boolean).map((loc) => (
-                  <Badge key={loc?._id} variant="secondary">
+                {scene?.locations.filter(Boolean).map((loc, index) => (
+                  <Badge
+                    key={`location-scene-${loc?._id}-${scene._id}-${index}`}
+                    variant="secondary"
+                  >
                     {loc?.name} ({loc?.type}/{loc?.time_of_day})
                   </Badge>
                 ))}
@@ -185,8 +203,11 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
                 {t("entityLabels.props")}
               </h4>
               <div className="flex flex-wrap gap-1">
-                {scene?.props.filter(Boolean).map((prop) => (
-                  <Badge key={prop?._id} variant="secondary">
+                {scene?.props.filter(Boolean).map((prop, index) => (
+                  <Badge
+                    key={`prop-scene-${prop?._id}-${scene._id}-${index}`}
+                    variant="secondary"
+                  >
                     {prop?.name} ({prop?.quantity})
                   </Badge>
                 ))}
@@ -195,9 +216,31 @@ const SceneSummaryCard = ({ scene }: { scene: SceneDocument }) => {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex items-center justify-start gap-2">
-        <Button variant="outline">{t("edit")}</Button>
-        <Button variant="destructive">{t("delete")}</Button>
+      <CardFooter className="flex justify-end gap-2">
+        <EditSceneDialog
+          scene={scene}
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          scriptId={scriptId}
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          title="Edit scene"
+          className="hover:text-primary transition-colors"
+          onClick={() => setIsEditDialogOpen(true)}
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+
+        <ConfirmDeleteDialog
+          entityType="scene"
+          entityName={scene.scene_number}
+          isLoading={isLoading}
+          onDelete={async () => {
+            await deleteScene(scene._id);
+          }}
+        />
       </CardFooter>
     </Card>
   );

@@ -5,10 +5,13 @@ import { useMutation } from "convex/react";
 import { useToast } from "@/hooks/use-toast";
 import { ConvexError } from "convex/values";
 import { LocationType, TimeOfDay } from "@/convex/helpers";
+import { useState } from "react";
 const useSceneEntities = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const saveCharacterInScene = useMutation(
     api.characters.createCharacterWithScene
   );
+  const deleteCharacterMutation = useMutation(api.characters.deleteCharacter);
   const saveLocationInScene = useMutation(
     api.locations.createLocationWithScene
   );
@@ -16,6 +19,8 @@ const useSceneEntities = () => {
   const deduplicateCharacterMutation = useMutation(
     api.characters.deduplicateCharacter
   );
+
+  const updateCharacterMutation = useMutation(api.characters.updateCharacter);
 
   const savePropInScene = useMutation(api.props.createPropWithScene);
 
@@ -36,6 +41,7 @@ const useSceneEntities = () => {
     sceneId: Id<"scenes">;
     scriptId: Id<"scripts">;
   }) => {
+    setIsLoading(true);
     try {
       const characterId = await saveCharacterInScene({
         name,
@@ -54,6 +60,33 @@ const useSceneEntities = () => {
         });
       }
       return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteCharacter = async ({
+    characterId,
+  }: {
+    characterId: Id<"characters">;
+  }) => {
+    setIsLoading(true);
+    try {
+      await deleteCharacterMutation({
+        character_id: characterId,
+      });
+      toast({
+        title: "Character deleted",
+      });
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -72,6 +105,7 @@ const useSceneEntities = () => {
     scriptId: Id<"scripts">;
     notes?: string;
   }) => {
+    setIsLoading(true);
     try {
       const locationId = await saveLocationInScene({
         name,
@@ -90,6 +124,8 @@ const useSceneEntities = () => {
         });
       }
       return null;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -106,6 +142,7 @@ const useSceneEntities = () => {
     scriptId: Id<"scripts">;
     notes?: string;
   }) => {
+    setIsLoading(true);
     try {
       const propId = await savePropInScene({
         name,
@@ -123,6 +160,8 @@ const useSceneEntities = () => {
         });
       }
       return null;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -133,6 +172,7 @@ const useSceneEntities = () => {
     duplicatedCharacterId: Id<"characters">;
     targetCharacterId: Id<"characters">;
   }) => {
+    setIsLoading(true);
     try {
       await deduplicateCharacterMutation({
         duplicated_character_id: duplicatedCharacterId,
@@ -148,9 +188,51 @@ const useSceneEntities = () => {
           variant: "destructive",
         });
       }
+    } finally {
+      setIsLoading(false);
     }
   };
-  return { createCharacter, createLocation, createProp, deduplicateCharacter };
+
+  const updateCharacter = async ({
+    characterId,
+    updates,
+  }: {
+    characterId: Id<"characters">;
+    updates: {
+      name: string;
+      type: CharacterType;
+      aliases: string[];
+    };
+  }) => {
+    try {
+      await updateCharacterMutation({
+        character_id: characterId,
+        name: updates.name,
+        type: updates.type,
+        aliases: updates.aliases,
+      });
+      toast({
+        title: "Character updated",
+      });
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  return {
+    createCharacter,
+    createLocation,
+    createProp,
+    deduplicateCharacter,
+    deleteCharacter,
+    updateCharacter,
+    isLoading,
+  };
 };
 
 export default useSceneEntities;

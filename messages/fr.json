@@ -159,6 +159,50 @@
       "recurring": "Accessoires Récurrents",
       "oneOff": "Accessoires Uniques",
       "quantity": "{count, plural, one {# unité} other {# unités}}"
+    },
+    "confirmDeleteDialog": {
+      "title": "Êtes-vous sûr ?",
+      "description": "Êtes-vous sûr de vouloir supprimer {entityType} {entityName} ?",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "entityType": {
+        "character": "le personnage",
+        "location": "le lieu",
+        "prop": "l'accessoire",
+        "scene": "la scène"
+      }
+    },
+    "editCharacterDialog": {
+      "title": "Modifier le personnage",
+      "description": "Modifiez les détails du personnage ci-dessous.",
+      "characterType": {
+        "PRINCIPAL": "Personnage Principal",
+        "SECONDARY": "Personnage Secondaire",
+        "OTHERS": "Personnage de Soutien",
+        "FIGURANT": "Figurant",
+        "SILHOUETTE": "Silhouette",
+        "EXTRA": "Extra"
+      },
+      "form": {
+        "name": {
+          "label": "Nom",
+          "placeholder": "Nom du personnage"
+        },
+        "type": {
+          "label": "Type",
+          "placeholder": "Sélectionner le type"
+        },
+        "aliases": {
+          "label": "Alias",
+          "placeholder": "ex: Bob, Bobby, Robert",
+          "description": "Séparez les alias par des virgules"
+        }
+      },
+      "actions": {
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "saving": "Enregistrement..."
+      }
     }
   }
 }

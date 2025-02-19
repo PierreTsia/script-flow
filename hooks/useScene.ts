@@ -9,47 +9,41 @@ const API_URL = "https://animated-mole-731.convex.site";
 
 export type DraftSceneAnalysis = Doc<"draftScenesAnalysis">;
 
-export const useScene = (scriptId: Id<"scripts">) => {
+export const useScene = () => {
   const insertScene = useMutation(api.scenes.saveScene);
-
+  const deleteSceneMutation = useMutation(api.scenes.deleteScene);
+  const updateSceneMutation = useMutation(api.scenes.updateScene);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const drafts = useQuery(api.scenes.getDrafts, { scriptId }) || [];
+  const useGetDrafts = (scriptId: Id<"scripts">) => {
+    return useQuery(api.scenes.getDrafts, { scriptId }) || [];
+  };
   const deleteDraft = useMutation(api.scenes.deleteDraft);
 
-  const sceneByNumberQuery = (sceneNumber: string) =>
-    useQuery(api.scenes.getSceneAndEntitiesByNumber, {
+  const useGetSceneAndEntitiesByNumber = (
+    scriptId: Id<"scripts">,
+    sceneNumber: string
+  ) => {
+    return useQuery(api.scenes.getSceneAndEntitiesByNumber, {
       scriptId,
       sceneNumber,
     });
-
-  const getSceneAndEntitiesByNumber = (sceneNumber?: string | null) => {
-    if (!sceneNumber) return null;
-    return sceneByNumberQuery(sceneNumber);
   };
 
-  const charactersByScriptIdQuery = (scriptId: Id<"scripts">) =>
-    useQuery(api.characters.getCharactersByScriptId, { script_id: scriptId });
-
-  const locationsByScriptIdQuery = (scriptId: Id<"scripts">) =>
-    useQuery(api.locations.getLocationsByScriptId, { script_id: scriptId });
-
-  const propsByScriptIdQuery = (scriptId: Id<"scripts">) =>
-    useQuery(api.props.getPropsByScriptId, { script_id: scriptId });
-
-  const getLocationsByScriptId = (scriptId: Id<"scripts">) => {
-    if (!scriptId) return null;
-    return locationsByScriptIdQuery(scriptId);
+  const useGetLocationsByScriptId = (scriptId: Id<"scripts">) => {
+    return useQuery(api.locations.getLocationsByScriptId, {
+      script_id: scriptId,
+    });
   };
 
-  const getCharactersByScriptId = (scriptId: Id<"scripts">) => {
-    if (!scriptId) return null;
-    return charactersByScriptIdQuery(scriptId);
+  const useGetCharactersByScriptId = (scriptId: Id<"scripts">) => {
+    return useQuery(api.characters.getCharactersByScriptId, {
+      script_id: scriptId,
+    });
   };
 
-  const getPropsByScriptId = (scriptId: Id<"scripts">) => {
-    if (!scriptId) return null;
-    return propsByScriptIdQuery(scriptId);
+  const useGetPropsByScriptId = (scriptId: Id<"scripts">) => {
+    return useQuery(api.props.getPropsByScriptId, { script_id: scriptId });
   };
 
   const analyze = async (
@@ -83,7 +77,11 @@ export const useScene = (scriptId: Id<"scripts">) => {
 
   const saveDraft = useMutation(api.scenes.saveDraft);
 
-  const analyseAndSaveDraft = async (text: string, pageNumber: number) => {
+  const analyseAndSaveDraft = async (
+    text: string,
+    pageNumber: number,
+    scriptId: Id<"scripts">
+  ) => {
     setIsLoading(true);
     setError(null);
     try {
@@ -161,17 +159,74 @@ export const useScene = (scriptId: Id<"scripts">) => {
     }
   };
 
+  const deleteScene = async (sceneId: Id<"scenes">) => {
+    setIsLoading(true);
+    try {
+      await deleteSceneMutation({ sceneId });
+      toast({
+        title: "Scene deleted",
+      });
+    } catch (error) {
+      toast({
+        title: `Scene deletion failed: ${error}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateScene = async (
+    sceneId: Id<"scenes">,
+    sceneNumber: string,
+    summary: string,
+    charactersIdsToDelete: Id<"characters">[],
+    locationsIdsToDelete: Id<"locations">[],
+    propsIdsToDelete: Id<"props">[],
+    charactersIdsToAdd: Id<"characters">[],
+    locationsIdsToAdd: Id<"locations">[],
+    propsIdsToAdd: Id<"props">[]
+  ) => {
+    setIsLoading(true);
+    try {
+      const updatedSceneId = await updateSceneMutation({
+        sceneId,
+        sceneNumber,
+        summary,
+        charactersIdsToDelete,
+        locationsIdsToDelete,
+        propsIdsToDelete,
+        charactersIdsToAdd,
+        locationsIdsToAdd,
+        propsIdsToAdd,
+      });
+      toast({
+        title: "Scene updated",
+      });
+      return updatedSceneId;
+    } catch (error) {
+      toast({
+        title: `Scene update failed: ${error}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     isLoading,
     createScene,
     error,
     saveDraft,
     analyseAndSaveDraft,
-    drafts,
+    useGetDrafts,
     handleDeleteDraft,
-    getSceneAndEntitiesByNumber,
-    getCharactersByScriptId,
-    getLocationsByScriptId,
-    getPropsByScriptId,
+    useGetSceneAndEntitiesByNumber,
+    useGetCharactersByScriptId,
+    useGetLocationsByScriptId,
+    useGetPropsByScriptId,
+    deleteScene,
+    updateScene,
   };
 };
