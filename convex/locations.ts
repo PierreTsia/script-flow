@@ -1,7 +1,15 @@
 import { mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { locationTypeValidator, timeOfDayValidator } from "./helpers";
+import { Doc } from "./_generated/dataModel";
+import { FunctionReturnType } from "convex/server";
+import { api } from "./_generated/api";
+export type LocationDocument = Doc<"locations">;
+export type LocationSceneDocument = Doc<"location_scenes">;
 
+export type LocationsWithScenes = FunctionReturnType<
+  typeof api.locations.getLocationsByScriptId
+>;
 const createLocationWithSceneValidator = v.object({
   script_id: v.id("scripts"),
   name: v.string(),
@@ -35,7 +43,10 @@ export const createLocationWithScene = mutation({
       locationId = existingLocation._id;
     } else {
       // Insert new location
+
       const { scene_id, notes, ...locationData } = args;
+      console.log("scene_id", scene_id);
+      console.log("notes", notes);
       locationId = await ctx.db.insert("locations", locationData);
     }
 
@@ -88,5 +99,30 @@ export const getLocationsByScriptId = query({
         };
       })
     );
+  },
+});
+
+export const deleteLocation = mutation({
+  args: { location_id: v.id("locations") },
+  handler: async (ctx, { location_id }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("Unauthorized");
+    }
+
+    const location = await ctx.db.get(location_id);
+    if (!location) {
+      throw new ConvexError("Location not found");
+    }
+
+    const locationScenes = await ctx.db
+      .query("location_scenes")
+      .withIndex("by_location", (q) => q.eq("location_id", location_id))
+      .collect();
+
+    await Promise.all([
+      ...locationScenes.map(async (ls) => await ctx.db.delete(ls._id)),
+      ctx.db.delete(location_id),
+    ]);
   },
 });
