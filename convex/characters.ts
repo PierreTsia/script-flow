@@ -75,15 +75,15 @@ export const createCharacterWithScene = mutation({
     if (existingCharacter) {
       characterId = existingCharacter._id;
     } else {
-      // Insert new character
-      const { scene_id, notes, ...characterData } = args;
+      const { name, aliases, type } = args;
       const searchText =
-        [characterData.name, ...(characterData.aliases || [])]
-          .join(" ")
-          .toLowerCase() + ` ${characterData.type}`;
+        [name, ...(aliases || [])].join(" ").toLowerCase() + ` ${type}`;
 
       characterId = await ctx.db.insert("characters", {
-        ...characterData,
+        script_id: args.script_id,
+        name,
+        type,
+        aliases,
         searchText,
       });
     }

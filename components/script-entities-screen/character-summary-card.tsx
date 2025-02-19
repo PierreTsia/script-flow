@@ -21,7 +21,6 @@ import useSceneEntities from "@/hooks/useSceneEntities";
 import ConfirmDeleteDialog from "@/components/script-entities-screen/confirm-delete-dialog";
 import { EditCharacterDialog } from "./edit-character-dialog";
 import { useState } from "react";
-
 const CharacterSummaryCard = ({
   character,
   potentialDuplicates,

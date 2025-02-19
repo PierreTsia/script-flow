@@ -44,6 +44,7 @@ import ConfirmDeleteDialog from "@/components/script-entities-screen/confirm-del
 import { useScene } from "@/hooks/useScene";
 import { useState } from "react";
 import EditSceneDialog from "./edit-scene-dialog";
+import { Id } from "@/convex/_generated/dataModel";
 
 export type SceneWithEntities = ScriptEntitiesResult["scenes"][number];
 
@@ -70,7 +71,13 @@ const partitionSceneCharacter = (
   );
 };
 
-const SceneSummaryCard = ({ scene }: { scene: SceneWithEntities }) => {
+const SceneSummaryCard = ({
+  scene,
+  scriptId,
+}: {
+  scene: SceneWithEntities;
+  scriptId: Id<"scripts">;
+}) => {
   const t = useTranslations("ScriptEntitiesScreen");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { deleteScene, isLoading } = useScene();
@@ -214,6 +221,7 @@ const SceneSummaryCard = ({ scene }: { scene: SceneWithEntities }) => {
           scene={scene}
           isOpen={isEditDialogOpen}
           onClose={() => setIsEditDialogOpen(false)}
+          scriptId={scriptId}
         />
         <Button
           variant="ghost"

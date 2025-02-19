@@ -268,6 +268,7 @@ export const updateScene = mutation({
     sceneNumber: v.string(),
     summary: v.string(),
     charactersIdsToDelete: v.optional(v.array(v.id("characters"))),
+
     locationsIdsToDelete: v.optional(v.array(v.id("locations"))),
     propsIdsToDelete: v.optional(v.array(v.id("props"))),
     charactersIdsToAdd: v.optional(v.array(v.id("characters"))),

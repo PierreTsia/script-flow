@@ -32,7 +32,6 @@ import useSceneEntities from "@/hooks/useSceneEntities";
 import { useTranslations } from "next-intl";
 
 import { CharacterType } from "@/convex/helpers";
-
 const characterTypeOptions = [
   "PRINCIPAL",
   "SECONDARY",
@@ -65,7 +64,6 @@ export function EditCharacterDialog({
 }: EditCharacterDialogProps) {
   const { updateCharacter } = useSceneEntities();
   const t = useTranslations("ScriptEntitiesScreen.editCharacterDialog");
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

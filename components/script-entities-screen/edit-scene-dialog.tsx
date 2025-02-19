@@ -31,11 +31,21 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Plus } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState } from "react";
 
 type EditSceneDialogProps = {
   scene: SceneWithEntities;
   isOpen: boolean;
   onClose: () => void;
+  scriptId: Id<"scripts">;
 };
 
 const formSchema = z.object({
@@ -71,9 +81,24 @@ const formSchema = z.object({
   ),
 });
 
-const EditSceneDialog = ({ scene, isOpen, onClose }: EditSceneDialogProps) => {
+const EditSceneDialog = ({
+  scene,
+  isOpen,
+  onClose,
+  scriptId,
+}: EditSceneDialogProps) => {
   const { characters, locations, summary, props } = scene;
   const { updateScene, isLoading } = useScene();
+  const { useGetCharactersByScriptId } = useScene();
+  console.log("scriptId", scriptId);
+
+  const [showCharacterSelect, setShowCharacterSelect] = useState(false);
+
+  const allCharacters = useGetCharactersByScriptId(scriptId);
+
+  const availableCharacters = allCharacters?.filter(
+    (char) => !characters.some((c) => c?._id === char?._id)
+  );
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     const charactersIdsToDelete = data.characters
@@ -85,13 +110,39 @@ const EditSceneDialog = ({ scene, isOpen, onClose }: EditSceneDialogProps) => {
     const propsIdsToDelete = data.props
       .filter((prop) => prop.markedForDeletion)
       .map((prop) => prop._id);
+
+    const charactersIdsToAdd = data.characters
+      .filter(
+        (char) =>
+          !char.markedForDeletion &&
+          (!characters.length || !characters.some((c) => c?._id === char?._id))
+      )
+      .map((char) => char._id);
+
+    const locationsIdsToAdd = data.locations
+      .filter(
+        (loc) =>
+          !loc.markedForDeletion && !locations.some((l) => l?._id == loc?._id)
+      )
+      .map((loc) => loc._id);
+
+    const propsIdsToAdd = data.props
+      .filter(
+        (prop) =>
+          !prop.markedForDeletion && !props.some((p) => p?._id == prop?._id)
+      )
+      .map((prop) => prop._id);
+
     const updatedSceneId = await updateScene(
       scene._id,
       data.scene_number,
       data.summary,
       charactersIdsToDelete,
       locationsIdsToDelete,
-      propsIdsToDelete
+      propsIdsToDelete,
+      charactersIdsToAdd,
+      locationsIdsToAdd,
+      propsIdsToAdd
     );
     if (updatedSceneId) {
       onClose();
@@ -235,6 +286,56 @@ const EditSceneDialog = ({ scene, isOpen, onClose }: EditSceneDialogProps) => {
                                 }
                               />
                             ))}
+
+                            <div className="flex items-center gap-2">
+                              {showCharacterSelect ? (
+                                <Select
+                                  onValueChange={(value) => {
+                                    const character = availableCharacters?.find(
+                                      (c) => c._id === value
+                                    );
+                                    if (character) {
+                                      const currentChars =
+                                        form.getValues("characters");
+                                      form.setValue("characters", [
+                                        ...currentChars,
+                                        {
+                                          ...character,
+                                          markedForDeletion: false,
+                                        },
+                                      ]);
+                                      setShowCharacterSelect(false);
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger className="w-[200px]">
+                                    <SelectValue placeholder="Add a character..." />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {availableCharacters?.map((char) => (
+                                      <SelectItem
+                                        key={char._id}
+                                        value={char._id}
+                                      >
+                                        {char.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setShowCharacterSelect(true);
+                                  }}
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         )}
                       />

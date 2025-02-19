@@ -16,7 +16,7 @@ const ScenesTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
     <ScrollArea className="h-[calc(100vh-220px)]">
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         {scenes.map((scene) => (
-          <SceneSummaryCard key={scene._id} scene={scene} />
+          <SceneSummaryCard key={scene._id} scene={scene} scriptId={scriptId} />
         ))}
       </div>
     </ScrollArea>

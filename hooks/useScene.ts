@@ -182,7 +182,10 @@ export const useScene = () => {
     summary: string,
     charactersIdsToDelete: Id<"characters">[],
     locationsIdsToDelete: Id<"locations">[],
-    propsIdsToDelete: Id<"props">[]
+    propsIdsToDelete: Id<"props">[],
+    charactersIdsToAdd: Id<"characters">[],
+    locationsIdsToAdd: Id<"locations">[],
+    propsIdsToAdd: Id<"props">[]
   ) => {
     setIsLoading(true);
     try {
@@ -193,6 +196,9 @@ export const useScene = () => {
         charactersIdsToDelete,
         locationsIdsToDelete,
         propsIdsToDelete,
+        charactersIdsToAdd,
+        locationsIdsToAdd,
+        propsIdsToAdd,
       });
       toast({
         title: "Scene updated",
