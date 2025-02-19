@@ -210,7 +210,7 @@ const EditSceneDialog = ({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent className="h-[90vh] flex flex-col min-w-full lg:min-w-[80vw] xl:min-w-[60vw]">
+      <AlertDialogContent className="min-h-[90vh] max-h-[90vh] flex flex-col min-w-full lg:min-w-[80vw] xl:min-w-[60vw]">
         <AlertDialogHeader>
           <AlertDialogTitle>Edit Scene {scene.scene_number}</AlertDialogTitle>
           <AlertDialogDescription>
@@ -218,13 +218,10 @@ const EditSceneDialog = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col flex-1"
-          >
-            <ScrollArea className="flex-1 pr-4">
-              <div className="space-y-6">
+        <ScrollArea className="flex-1 overflow-y-auto">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="space-y-6 pr-4">
                 <FormField
                   control={form.control}
                   name="scene_number"
@@ -393,18 +390,18 @@ const EditSceneDialog = ({
                   </AccordionItem>
                 </Accordion>
               </div>
-            </ScrollArea>
+            </form>
+          </Form>
+        </ScrollArea>
 
-            <AlertDialogFooter className="mt-4">
-              <Button variant="outline" onClick={onClose} type="button">
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save"}
-              </Button>
-            </AlertDialogFooter>
-          </form>
-        </Form>
+        <AlertDialogFooter className="mt-4">
+          <Button variant="outline" onClick={onClose} type="button">
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Saving..." : "Save"}
+          </Button>
+        </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
