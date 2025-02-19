@@ -126,3 +126,25 @@ export const deleteLocation = mutation({
     ]);
   },
 });
+
+export const updateLocation = mutation({
+  args: {
+    location_id: v.id("locations"),
+    name: v.string(),
+    type: locationTypeValidator,
+    time_of_day: timeOfDayValidator,
+  },
+  handler: async (ctx, { location_id, name, type, time_of_day }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("Unauthorized");
+    }
+
+    const location = await ctx.db.get(location_id);
+    if (!location) {
+      throw new ConvexError("Location not found");
+    }
+
+    await ctx.db.patch(location_id, { name, type, time_of_day });
+  },
+});

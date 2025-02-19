@@ -22,6 +22,8 @@ const useSceneEntities = () => {
 
   const updateCharacterMutation = useMutation(api.characters.updateCharacter);
 
+  const updateLocationMutation = useMutation(api.locations.updateLocation);
+
   const savePropInScene = useMutation(api.props.createPropWithScene);
   const deleteLocationMutation = useMutation(api.locations.deleteLocation);
   const { toast } = useToast();
@@ -249,6 +251,40 @@ const useSceneEntities = () => {
     }
   };
 
+  const updateLocation = async ({
+    locationId,
+    updates,
+  }: {
+    locationId: Id<"locations">;
+    updates: {
+      name: string;
+      type: LocationType;
+      time_of_day: TimeOfDay;
+    };
+  }) => {
+    setIsLoading(true);
+    try {
+      await updateLocationMutation({
+        location_id: locationId,
+        name: updates.name,
+        type: updates.type,
+        time_of_day: updates.time_of_day,
+      });
+      toast({
+        title: "Location updated",
+      });
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     createCharacter,
     createLocation,
@@ -257,6 +293,7 @@ const useSceneEntities = () => {
     deleteCharacter,
     updateCharacter,
     deleteLocation,
+    updateLocation,
     isLoading,
   };
 };

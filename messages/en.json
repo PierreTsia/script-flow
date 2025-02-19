@@ -157,6 +157,13 @@
       "oneOff": "Single Scene Props",
       "quantity": "{count, plural, one {# unit} other {# units}}"
     },
+    "timeOfDay": {
+      "DAY": "Day",
+      "NIGHT": "Night",
+      "DAWN": "Dawn",
+      "DUSK": "Dusk",
+      "UNSPECIFIED": "Unspecified"
+    },
     "confirmDeleteDialog": {
       "title": "Are you sure?",
       "description": "Are you sure you want to delete {entityType} {entityName}?",
@@ -215,5 +222,26 @@
     "props": "Props",
     "summary": "Summary",
     "summaryPlaceholder": "Enter a summary for the scene"
+  },
+  "EditLocationDialog": {
+    "title": "Edit Location",
+    "description": "Edit the location details below.",
+    "nameLabel": "Name",
+    "typeLabel": "Type",
+    "timeLabel": "Time of Day",
+    "timeOfDay": {
+      "day": "Day",
+      "night": "Night",
+      "dawn": "Dawn",
+      "dusk": "Dusk",
+      "unspecified": "Unspecified"
+    },
+    "locationType": {
+      "interior": "Interior",
+      "exterior": "Exterior"
+    },
+    "save": "Save",
+    "cancel": "Cancel",
+    "saving": "Saving..."
   }
 }

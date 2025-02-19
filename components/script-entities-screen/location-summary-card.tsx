@@ -5,7 +5,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sun, Moon, Clapperboard } from "lucide-react";
+import { Sun, Moon, Clapperboard, Sunrise, Sunset, Clock } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -18,6 +18,31 @@ import ConfirmDeleteDialog from "./confirm-delete-dialog";
 import { useState } from "react";
 import { Pencil } from "lucide-react";
 import useSceneEntities from "@/hooks/useSceneEntities";
+import { EditLocationDialog } from "./edit-location-dialog";
+import { useTranslations } from "next-intl";
+import { TimeOfDay } from "@/convex/helpers";
+
+const TimeOfDayIcon = ({ timeOfDay }: { timeOfDay: TimeOfDay }) => {
+  const t = useTranslations("ScriptEntitiesScreen");
+  const iconMap: Record<TimeOfDay, React.ReactNode> = {
+    DAY: <Sun className="h-4 w-4" />,
+    NIGHT: <Moon className="h-4 w-4" />,
+    DAWN: <Sunrise className="h-4 w-4" />,
+    DUSK: <Sunset className="h-4 w-4" />,
+    UNSPECIFIED: <Clock className="h-4 w-4" />,
+  };
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div>{iconMap[timeOfDay]}</div>
+      </TooltipTrigger>
+      <TooltipContent>
+        {t(`timeOfDay.${timeOfDay.toLowerCase()}`)}
+      </TooltipContent>
+    </Tooltip>
+  );
+};
 
 const LocationSummaryCard = ({
   location,
@@ -26,16 +51,14 @@ const LocationSummaryCard = ({
 }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { deleteLocation, isLoading } = useSceneEntities();
+  const t = useTranslations("ScriptEntitiesScreen");
+
   return (
     <Card className="hover:bg-accent transition-colors">
       <CardHeader>
         <div className="flex justify-between items-center">
           <h4 className="font-semibold">{location.name}</h4>
-          {location.time_of_day === "DAY" ? (
-            <Sun className="h-4 w-4" />
-          ) : location.time_of_day === "NIGHT" ? (
-            <Moon className="h-4 w-4" />
-          ) : null}
+          <TimeOfDayIcon timeOfDay={location.time_of_day} />
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-2 flex-1">
@@ -66,6 +89,12 @@ const LocationSummaryCard = ({
                 locationId: location._id,
               });
             }}
+          />
+
+          <EditLocationDialog
+            location={location}
+            isOpen={isEditDialogOpen}
+            onClose={() => setIsEditDialogOpen(false)}
           />
 
           <Button
