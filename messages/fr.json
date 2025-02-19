@@ -52,13 +52,6 @@
     "noAnalysisSelected": "Aucune analyse sélectionnée",
     "locations": "Lieux",
     "addLocation": "Ajouter un lieu",
-    "timeOfDay": {
-      "DAY": "Jour",
-      "NIGHT": "Nuit",
-      "DAWN": "Aube",
-      "DUSK": "Crépuscule",
-      "UNSPECIFIED": "Non spécifié"
-    },
     "removeLocation": "Supprimer",
     "locationType": {
       "INT": "Intérieur",
@@ -79,6 +72,15 @@
     "saveConfirmationTitle": "Analyse de scène",
     "saveConfirmationDescription": "Pour la scène {sceneNumber} avec {locationsCount} lieux et {charactersCount} personnages.",
     "cancelButton": "Annuler",
+    "scriptViewerScreen": {
+      "saveDraft": "Enregistrer le brouillon"
+    },
+    "confirmSave": {
+      "sceneInfo": "Sauvegarder la scene pour ajouter des elements",
+      "locations": "Sauvegarder les lieux",
+      "characters": "Sauvegarder les personnages",
+      "props": "Sauvegarder les accessoires"
+    },
     "confirmSaveButton": "Enregistrer l'analyse",
     "saveConfirmationSuccess": "Analyse enregistrée",
     "saveConfirmationError": "Erreur lors de l'enregistrement de l'analyse",
@@ -108,9 +110,23 @@
       "notes": "Notes",
       "name": "Nom"
     },
-    "addProp": "Ajouter un accessoire"
+    "addProp": "Ajouter un accessoire",
+    "timeOfDay": {
+      "day": "Jour",
+      "night": "Nuit",
+      "dawn": "Aube",
+      "dusk": "Crépuscule",
+      "unspecified": "Non spécifié"
+    }
   },
   "ScriptEntitiesScreen": {
+    "timeOfDay": {
+      "day": "Jour",
+      "night": "Nuit",
+      "dawn": "Aube",
+      "dusk": "Crépuscule",
+      "unspecified": "Non spécifié"
+    },
     "scenes": "Scènes",
     "characters": "Personnages",
     "locations": "Lieux",
@@ -160,6 +176,7 @@
       "oneOff": "Accessoires Uniques",
       "quantity": "{count, plural, one {# unité} other {# unités}}"
     },
+
     "confirmDeleteDialog": {
       "title": "Êtes-vous sûr ?",
       "description": "Êtes-vous sûr de vouloir supprimer {entityType} {entityName} ?",
@@ -204,5 +221,42 @@
         "saving": "Enregistrement..."
       }
     }
+  },
+  "EditSceneDialog": {
+    "title": "Modifier la scène {number}",
+    "addCharacter": "Ajouter un personnage...",
+    "description": "Modifiez les détails de la scène",
+    "addLocation": "Ajouter un lieu...",
+    "addProp": "Ajouter un accessoire...",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "characters": "Personnages",
+    "locations": "Lieux",
+    "props": "Accessoires",
+    "summary": "Résumé",
+    "summaryPlaceholder": "Entrez un résumé pour la scène",
+    "sceneNumber": "Scène"
+  },
+  "EditLocationDialog": {
+    "title": "Modifier le lieu",
+    "description": "Modifiez les détails du lieu",
+    "nameLabel": "Nom",
+    "typeLabel": "Type",
+    "timeLabel": "Temps de la journée",
+    "timeOfDay": {
+      "day": "Jour",
+      "night": "Nuit",
+      "dawn": "Aube",
+      "dusk": "Crépuscule",
+      "unspecified": "Non spécifié"
+    },
+    "locationType": {
+      "interior": "Intérieur",
+      "exterior": "Extérieur"
+    },
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "saving": "Enregistrement..."
   }
 }

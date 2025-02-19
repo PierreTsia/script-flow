@@ -42,7 +42,7 @@ export class MistralProvider implements LLMProvider {
               model: this.model,
               messages: [{ role: "user", content: buildPrompt(text) }],
               temperature: 0.7,
-              max_tokens: 500,
+              max_tokens: 800,
             }),
           });
 

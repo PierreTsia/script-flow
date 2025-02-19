@@ -1,6 +1,10 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { ConvexError } from "convex/values";
+import { Doc } from "./_generated/dataModel";
+
+export type PropDocument = Doc<"props">;
+export type PropSceneDocument = Doc<"prop_scenes">;
 
 const createPropValidator = v.object({
   script_id: v.id("scripts"),

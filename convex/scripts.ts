@@ -90,6 +90,8 @@ export const getScriptEntities = query({
   handler: async (ctx, { scriptId }) => {
     const identity = await ctx.auth.getUserIdentity();
     const userId = identity?.subject;
+    console.log("scriptId", scriptId);
+    console.log("userId", userId);
     const script = await ctx.db.get(scriptId);
     if (!script) {
       throw new ConvexError("Script not found");

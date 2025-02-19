@@ -20,7 +20,7 @@ import { Trash2Icon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
-import { EntitiesFormProps } from "./scene-analysis-confirm-dialog";
+import { EntitiesFormProps } from "../scene-analysis-confirm-dialog";
 
 const EMPTY_PROP = {
   name: "",
@@ -177,7 +177,7 @@ const PropsForm = ({
 
       <AlertDialogFooter>
         <Button type="submit" form="character-form" disabled={isLoading}>
-          {t("confirmSaveButton")}
+          {t("confirmSave.props")}
         </Button>
         {children}
       </AlertDialogFooter>

@@ -1,21 +1,9 @@
 "use client";
 
 import * as React from "react";
-import {
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  LifeBuoy,
-  Map,
-  PieChart,
-  Send,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react";
+import { Command, SquareTerminal } from "lucide-react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
-import { NavProjects } from "@/components/sidebar/nav-projects";
 import { NavSecondary } from "@/components/sidebar/nav-secondary";
 import { NavUser } from "@/components/sidebar/nav-user";
 import { useState } from "react";
@@ -51,7 +39,7 @@ const data = {
         },
       ],
     },
-    {
+    /*  {
       title: "Models",
       url: "/models",
       icon: Bot,
@@ -100,8 +88,8 @@ const data = {
           url: "/documentation/changelog",
         },
       ],
-    },
-    {
+    }, */
+    /*     {
       title: "Settings",
       url: "/settings",
       icon: Settings2,
@@ -127,10 +115,10 @@ const data = {
           url: "/settings/limits",
         },
       ],
-    },
+    }, */
   ],
   navSecondary: [
-    {
+    /* {
       title: "Support",
       url: "/support",
       icon: LifeBuoy,
@@ -139,24 +127,7 @@ const data = {
       title: "Feedback",
       url: "/feedback",
       icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "/projects/design-engineering",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "/projects/sales-marketing",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "/projects/travel",
-      icon: Map,
-    },
+    }, */
   ],
 };
 
@@ -209,7 +180,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {user && (
           <>
             <NavMain items={data.navMain} />
-            <NavProjects projects={data.projects} />
+
             <NavSecondary items={data.navSecondary} className="mt-auto" />
           </>
         )}

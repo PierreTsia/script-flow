@@ -1,27 +1,25 @@
 import { Id } from "@/convex/_generated/dataModel";
-import { useScene } from "@/hooks/useScene";
+import { DraftSceneAnalysis, useScene } from "@/hooks/useScene";
 import { usePdfViewer } from "@/hooks/usePdfViewer";
 import { useState, useCallback, useEffect } from "react";
 import { FloatingTextSelectButton } from "./floating-text-select-button";
 import SelectedTextDialog from "./selected-text-dialog";
-import SceneAnalysisSheet from "./scene-analysis-sheet";
+import { useSearchParams, useRouter } from "next/navigation";
+import SceneAnalysisConfirmDialog from "./scene-analysis-confirm-dialog";
 
 const ScriptViewerScreen = ({
   fileUrl,
   scriptId,
-  isSheetOpen,
-  setIsSheetOpen,
-  children,
 }: {
   fileUrl: string;
   scriptId: Id<"scripts">;
-  isSheetOpen: boolean;
-  setIsSheetOpen: (open: boolean) => void;
-  children: React.ReactNode;
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectionRect, setSelectionRect] = useState<DOMRect | null>(null);
   const { isLoading, analyseAndSaveDraft } = useScene();
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get("page");
+  const router = useRouter();
 
   const {
     viewerRef,
@@ -33,30 +31,39 @@ const ScriptViewerScreen = ({
     setSelectedText,
   } = usePdfViewer(fileUrl);
 
+  const [lastAnalyzedText, setLastAnalyzedText] =
+    useState<DraftSceneAnalysis | null>(null);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [selectionStartPage, setSelectionStartPage] = useState<number | null>(
+    null
+  );
+
   const handleAnalyze = useCallback(
     async (text: string, pageNumber: number) => {
-      await analyseAndSaveDraft(text, pageNumber, scriptId);
       setSelectedText(text);
+      const startPage = selectionStartPage ?? pageNumber;
+      const draft = await analyseAndSaveDraft(text, startPage, scriptId);
+      setLastAnalyzedText(draft);
       setIsDialogOpen(false);
+      setIsConfirmDialogOpen(true);
+      setSelectionStartPage(null);
     },
-    [analyseAndSaveDraft, setSelectedText, scriptId]
+    [analyseAndSaveDraft, setSelectedText, scriptId, selectionStartPage]
   );
 
   const handleOpenDialogChange = useCallback(
     (open: boolean) => {
       setIsDialogOpen(open);
-      if (!open) setSelectedText("");
+      if (!open) {
+        setSelectedText("");
+        setSelectionStartPage(null);
+      }
     },
-    [setIsDialogOpen, setSelectedText]
+    [setSelectedText]
   );
 
-  const handleSheetOpenChange = useCallback(
-    (open: boolean) => {
-      setIsSheetOpen(open);
-      if (!open) setSelectedText("");
-    },
-    [setIsSheetOpen, setSelectedText]
-  );
+  const pdfSlick = usePDFSlickStore((s) => s.pdfSlick);
+  const pageNumber = usePDFSlickStore((s) => s.pageNumber);
 
   const updateSelectionPosition = useCallback(() => {
     const selection = window.getSelection();
@@ -71,12 +78,33 @@ const ScriptViewerScreen = ({
     }
   }, []);
 
-  // Add effect to update position when text is selected
+  useEffect(() => {
+    const handleMouseDown = () => {
+      if (!window.getSelection()?.toString()) {
+        // Only if no existing selection
+        setSelectionStartPage(pageNumber);
+      }
+    };
+
+    document.addEventListener("mousedown", handleMouseDown);
+    return () => document.removeEventListener("mousedown", handleMouseDown);
+  }, [pageNumber]);
+
   useEffect(() => {
     if (selectedText) {
       updateSelectionPosition();
     }
   }, [selectedText, updateSelectionPosition]);
+
+  useEffect(() => {
+    if (pageParam && pdfSlick && pageNumber) {
+      const pageNumberParam = parseInt(pageParam, 10);
+      if (!isNaN(pageNumberParam)) {
+        pdfSlick.gotoPage(pageNumberParam);
+        router.push(window.location.pathname);
+      }
+    }
+  }, [pdfSlick, pageParam, router, pageNumber]);
 
   return (
     <div className="flex flex-col w-full bg-background flex-1">
@@ -92,32 +120,32 @@ const ScriptViewerScreen = ({
             isDialogOpen={isDialogOpen}
             onOpenChange={handleOpenDialogChange}
             selectedText={selectedText}
-            selectedPage={selectedPages[0]}
+            selectedPage={selectionStartPage ?? pageNumber}
             isAnalyzing={isLoading}
             onConfirmClick={() => handleAnalyze(selectedText, selectedPages[0])}
           />
 
-          <SceneAnalysisSheet
-            isOpen={isSheetOpen}
-            selectedText={selectedText}
-            selectedPage={selectedPages[0]}
-            scriptId={scriptId}
-            onOpenChange={handleSheetOpenChange}
-            onAnalyze={() => handleAnalyze(selectedText, selectedPages[0])}
-            isAnalyzing={isLoading}
-          />
+          {lastAnalyzedText && (
+            <SceneAnalysisConfirmDialog
+              selectedDraftAnalysis={lastAnalyzedText}
+              isOpen={isConfirmDialogOpen}
+              setIsOpen={() => setIsConfirmDialogOpen(false)}
+            />
+          )}
         </div>
       </div>
 
-      {selectedText && selectionRect && !isDialogOpen && !isSheetOpen && (
-        <FloatingTextSelectButton
-          selectionRect={selectionRect}
-          onClick={() => {
-            setIsDialogOpen(true);
-          }}
-        />
-      )}
-      {children}
+      {selectedText &&
+        selectionRect &&
+        !isDialogOpen &&
+        !isConfirmDialogOpen && (
+          <FloatingTextSelectButton
+            selectionRect={selectionRect}
+            onClick={() => {
+              setIsDialogOpen(true);
+            }}
+          />
+        )}
     </div>
   );
 };

@@ -32,7 +32,9 @@ const SelectedTextDialog = ({
           <AlertDialogTitle>Extract from page {selectedPage}</AlertDialogTitle>
           <AlertDialogDescription asChild>
             <ScrollArea className="h-full rounded-md bg-foreground/10  max-h-[30vh] text-muted-foreground p-4">
-              {selectedText}
+              <pre className="text-sm w-full text-center overflow-x-auto whitespace-pre-wrap">
+                {selectedText}
+              </pre>
             </ScrollArea>
           </AlertDialogDescription>
         </AlertDialogHeader>

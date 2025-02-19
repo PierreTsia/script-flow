@@ -26,7 +26,7 @@ import { Trash2Icon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
-import { EntitiesFormProps } from "./scene-analysis-confirm-dialog";
+import { EntitiesFormProps } from "../scene-analysis-confirm-dialog";
 
 const EMPTY_LOCATION = {
   name: "",
@@ -190,7 +190,7 @@ const LocationsForm = ({
                               "UNSPECIFIED",
                             ].map((timeOfDay) => (
                               <SelectItem key={timeOfDay} value={timeOfDay}>
-                                {t(`timeOfDay.${timeOfDay}`)}
+                                {t(`timeOfDay.${timeOfDay.toLowerCase()}`)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -238,7 +238,7 @@ const LocationsForm = ({
 
       <AlertDialogFooter>
         <Button type="submit" form="character-form" disabled={isLoading}>
-          {t("confirmSaveButton")}
+          {t("confirmSave.locations")}
         </Button>
         {children}
       </AlertDialogFooter>

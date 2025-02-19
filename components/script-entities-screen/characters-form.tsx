@@ -26,7 +26,7 @@ import { Trash2Icon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
-import { EntitiesFormProps } from "./scene-analysis-confirm-dialog";
+import { EntitiesFormProps } from "../scene-analysis-confirm-dialog";
 const EMPTY_CHARACTER = {
   name: "",
   type: "PRINCIPAL",
@@ -211,7 +211,7 @@ const CharactersForm = ({
 
       <AlertDialogFooter>
         <Button type="submit" form="character-form" disabled={isLoading}>
-          {t("confirmSaveButton")}
+          {t("confirmSave.characters")}
         </Button>
         {children}
       </AlertDialogFooter>

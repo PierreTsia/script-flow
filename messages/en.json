@@ -47,6 +47,9 @@
     "summary": "Summary",
     "text": "Text",
     "title": "Scene Analysis",
+    "scriptViewerScreen": {
+      "saveDraft": "Save draft"
+    },
     "description": "Manage your script scenes here",
     "draftStatus": {
       "savedDraft": "Saved draft locally",
@@ -89,6 +92,12 @@
     "saveConfirmationDescription": "For scene {sceneNumber} with {locationsCount} locations and {charactersCount} characters.",
     "cancelButton": "Cancel",
     "confirmSaveButton": "Confirm Save",
+    "confirmSave": {
+      "sceneInfo": "Save scene to add elements",
+      "locations": "Save locations",
+      "characters": "Save characters",
+      "props": "Save props"
+    },
     "saveConfirmationSuccess": "Analysis saved",
     "saveConfirmationError": "Error saving analysis",
     "addCharacter": "Add Character",
@@ -157,6 +166,13 @@
       "oneOff": "Single Scene Props",
       "quantity": "{count, plural, one {# unit} other {# units}}"
     },
+    "timeOfDay": {
+      "day": "Day",
+      "night": "Night",
+      "dawn": "Dawn",
+      "dusk": "Dusk",
+      "unspecified": "Unspecified"
+    },
     "confirmDeleteDialog": {
       "title": "Are you sure?",
       "description": "Are you sure you want to delete {entityType} {entityName}?",
@@ -201,5 +217,40 @@
         "saving": "Saving..."
       }
     }
+  },
+  "EditSceneDialog": {
+    "title": "Edit Scene {number}",
+    "addCharacter": "Add a character...",
+    "addLocation": "Add a location...",
+    "addProp": "Add a prop...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "characters": "Characters",
+    "locations": "Locations",
+    "props": "Props",
+    "summary": "Summary",
+    "summaryPlaceholder": "Enter a summary for the scene"
+  },
+  "EditLocationDialog": {
+    "title": "Edit Location",
+    "description": "Edit the location details below.",
+    "nameLabel": "Name",
+    "typeLabel": "Type",
+    "timeLabel": "Time of Day",
+    "timeOfDay": {
+      "day": "Day",
+      "night": "Night",
+      "dawn": "Dawn",
+      "dusk": "Dusk",
+      "unspecified": "Unspecified"
+    },
+    "locationType": {
+      "interior": "Interior",
+      "exterior": "Exterior"
+    },
+    "save": "Save",
+    "cancel": "Cancel",
+    "saving": "Saving..."
   }
 }

@@ -31,15 +31,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Plus } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useState } from "react";
+
+import { useTranslations } from "next-intl";
+import { EntitySelect } from "./entity-select";
 
 type EditSceneDialogProps = {
   scene: SceneWithEntities;
@@ -88,17 +82,40 @@ const EditSceneDialog = ({
   scriptId,
 }: EditSceneDialogProps) => {
   const { characters, locations, summary, props } = scene;
-  const { updateScene, isLoading } = useScene();
-  const { useGetCharactersByScriptId } = useScene();
-  console.log("scriptId", scriptId);
 
-  const [showCharacterSelect, setShowCharacterSelect] = useState(false);
+  const t = useTranslations("EditSceneDialog");
+
+  const { updateScene, isLoading } = useScene();
+  const {
+    useGetCharactersByScriptId,
+    useGetLocationsByScriptId,
+    useGetPropsByScriptId,
+  } = useScene();
 
   const allCharacters = useGetCharactersByScriptId(scriptId);
+  const allLocations = useGetLocationsByScriptId(scriptId);
+  const allProps = useGetPropsByScriptId(scriptId);
 
-  const availableCharacters = allCharacters?.filter(
-    (char) => !characters.some((c) => c?._id === char?._id)
-  );
+  const availableCharacters = allCharacters
+    ?.filter((char) => !characters.some((c) => c?._id === char?._id))
+    .map((char) => ({
+      ...char,
+      markedForDeletion: false,
+    }));
+
+  const availableLocations = allLocations
+    ?.filter((loc) => !locations.some((l) => l?._id === loc?._id))
+    .map((loc) => ({
+      ...loc,
+      markedForDeletion: false,
+    }));
+
+  const availableProps = allProps
+    ?.filter((prop) => !props.some((p) => p?._id === prop?._id))
+    .map((prop) => ({
+      ...prop,
+      markedForDeletion: false,
+    }));
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     const charactersIdsToDelete = data.characters
@@ -112,20 +129,18 @@ const EditSceneDialog = ({
       .map((prop) => prop._id);
 
     const charactersIdsToAdd = data.characters
-      .filter(
-        (char) =>
-          !char.markedForDeletion &&
-          (!characters.length || !characters.some((c) => c?._id === char?._id))
-      )
-      .map((char) => char._id);
+      .filter((char) => {
+        const isNew = !characters.some((c) => c?._id === char?._id);
 
+        return !char.markedForDeletion && (!characters.length || isNew);
+      })
+      .map((char) => char._id);
     const locationsIdsToAdd = data.locations
       .filter(
         (loc) =>
-          !loc.markedForDeletion && !locations.some((l) => l?._id == loc?._id)
+          !loc.markedForDeletion && !locations.some((l) => l?._id === loc?._id)
       )
       .map((loc) => loc._id);
-
     const propsIdsToAdd = data.props
       .filter(
         (prop) =>
@@ -212,10 +227,10 @@ const EditSceneDialog = ({
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent className="min-h-[90vh] max-h-[90vh] flex flex-col  min-w-full lg:min-w-[80vw] xl:min-w-[60vw]">
         <AlertDialogHeader>
-          <AlertDialogTitle>Edit Scene {scene.scene_number}</AlertDialogTitle>
-          <AlertDialogDescription>
-            Edit the scene details and content.
-          </AlertDialogDescription>
+          <AlertDialogTitle>
+            {t("title", { number: scene.scene_number })}
+          </AlertDialogTitle>
+          <AlertDialogDescription>{t("description")}</AlertDialogDescription>
         </AlertDialogHeader>
         <Form {...form}>
           <form
@@ -229,7 +244,7 @@ const EditSceneDialog = ({
                   name="scene_number"
                   render={({ field }) => (
                     <FormItem className="inline-flex justify-start items-baseline gap-2 gap-x-6 w-full mb-2">
-                      <FormLabel>Scene Number</FormLabel>
+                      <FormLabel>{t("sceneNumber")}</FormLabel>
                       <FormControl>
                         <Input {...field} className="w-[80px]" />
                       </FormControl>
@@ -243,13 +258,13 @@ const EditSceneDialog = ({
                   name="summary"
                   render={({ field }) => (
                     <FormItem className="mb-2">
-                      <FormLabel>Summary</FormLabel>
+                      <FormLabel>{t("summary")}</FormLabel>
                       <FormControl>
                         <ScrollArea className="max-h-[400px]">
                           <Textarea
                             {...field}
                             className="resize-none min-h-[100px] w-full"
-                            placeholder="Enter a summary for the scene"
+                            placeholder={t("summaryPlaceholder")}
                           />
                         </ScrollArea>
                       </FormControl>
@@ -264,13 +279,13 @@ const EditSceneDialog = ({
                   className="mt-6"
                 >
                   <AccordionItem value="characters">
-                    <AccordionTrigger>Characters</AccordionTrigger>
+                    <AccordionTrigger>{t("characters")}</AccordionTrigger>
                     <AccordionContent>
                       <FormField
                         control={form.control}
                         name="characters"
                         render={({ field }) => (
-                          <div className="space-y-2">
+                          <div className="space-y-2 gap-y-2">
                             {field.value.map((char) => (
                               <SceneEntityItem
                                 key={char._id}
@@ -286,55 +301,18 @@ const EditSceneDialog = ({
                               />
                             ))}
 
-                            <div className="flex items-center gap-2">
-                              {showCharacterSelect ? (
-                                <Select
-                                  onValueChange={(value) => {
-                                    const character = availableCharacters?.find(
-                                      (c) => c._id === value
-                                    );
-                                    if (character) {
-                                      const currentChars =
-                                        form.getValues("characters");
-                                      form.setValue("characters", [
-                                        ...currentChars,
-                                        {
-                                          ...character,
-                                          markedForDeletion: false,
-                                        },
-                                      ]);
-                                      setShowCharacterSelect(false);
-                                    }
-                                  }}
-                                >
-                                  <SelectTrigger className="w-[200px]">
-                                    <SelectValue placeholder="Add a character..." />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {availableCharacters?.map((char) => (
-                                      <SelectItem
-                                        key={char._id}
-                                        value={char._id}
-                                      >
-                                        {char.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              ) : (
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setShowCharacterSelect(true);
-                                  }}
-                                >
-                                  <Plus className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
+                            <EntitySelect
+                              availableEntities={availableCharacters}
+                              onSelect={(character) => {
+                                const currentChars =
+                                  form.getValues("characters");
+                                form.setValue("characters", [
+                                  ...currentChars,
+                                  { ...character, markedForDeletion: false },
+                                ]);
+                              }}
+                              placeholder={t("addCharacter")}
+                            />
                           </div>
                         )}
                       />
@@ -342,13 +320,13 @@ const EditSceneDialog = ({
                   </AccordionItem>
 
                   <AccordionItem value="locations">
-                    <AccordionTrigger>Locations</AccordionTrigger>
+                    <AccordionTrigger>{t("locations")}</AccordionTrigger>
                     <AccordionContent>
                       <FormField
                         control={form.control}
                         name="locations"
                         render={({ field }) => (
-                          <div className="space-y-2">
+                          <div className="space-y-2 gap-y-2">
                             {field.value.map((loc) => (
                               <SceneEntityItem
                                 key={loc._id}
@@ -363,17 +341,28 @@ const EditSceneDialog = ({
                           </div>
                         )}
                       />
+                      <EntitySelect
+                        availableEntities={availableLocations}
+                        onSelect={(location) => {
+                          const currentLocs = form.getValues("locations");
+                          form.setValue("locations", [
+                            ...currentLocs,
+                            location,
+                          ]);
+                        }}
+                        placeholder={t("addLocation")}
+                      />
                     </AccordionContent>
                   </AccordionItem>
 
                   <AccordionItem value="props">
-                    <AccordionTrigger>Props</AccordionTrigger>
+                    <AccordionTrigger>{t("props")}</AccordionTrigger>
                     <AccordionContent>
                       <FormField
                         control={form.control}
                         name="props"
                         render={({ field }) => (
-                          <div className="space-y-2">
+                          <div className="space-y-2 gap-y-2">
                             {field.value.map((prop) => (
                               <SceneEntityItem
                                 key={prop._id}
@@ -388,6 +377,14 @@ const EditSceneDialog = ({
                           </div>
                         )}
                       />
+                      <EntitySelect
+                        availableEntities={availableProps}
+                        onSelect={(prop) => {
+                          const currentProps = form.getValues("props");
+                          form.setValue("props", [...currentProps, prop]);
+                        }}
+                        placeholder={t("addProp")}
+                      />
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
@@ -395,10 +392,10 @@ const EditSceneDialog = ({
             </ScrollArea>
             <AlertDialogFooter className="">
               <Button variant="outline" onClick={onClose} type="button">
-                Cancel
+                {t("cancel")}
               </Button>
-              <Button disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save"}
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? t("saving") : t("save")}
               </Button>
             </AlertDialogFooter>
           </form>
