@@ -12,6 +12,7 @@ export type DraftSceneAnalysis = Doc<"draftScenesAnalysis">;
 export const useScene = () => {
   const insertScene = useMutation(api.scenes.saveScene);
   const deleteSceneMutation = useMutation(api.scenes.deleteScene);
+  const updateSceneMutation = useMutation(api.scenes.updateScene);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const useGetDrafts = (scriptId: Id<"scripts">) => {
@@ -175,6 +176,38 @@ export const useScene = () => {
     }
   };
 
+  const updateScene = async (
+    sceneId: Id<"scenes">,
+    sceneNumber: string,
+    summary: string,
+    charactersIdsToDelete: Id<"characters">[],
+    locationsIdsToDelete: Id<"locations">[],
+    propsIdsToDelete: Id<"props">[]
+  ) => {
+    setIsLoading(true);
+    try {
+      const updatedSceneId = await updateSceneMutation({
+        sceneId,
+        sceneNumber,
+        summary,
+        charactersIdsToDelete,
+        locationsIdsToDelete,
+        propsIdsToDelete,
+      });
+      toast({
+        title: "Scene updated",
+      });
+      return updatedSceneId;
+    } catch (error) {
+      toast({
+        title: `Scene update failed: ${error}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     isLoading,
     createScene,
@@ -188,5 +221,6 @@ export const useScene = () => {
     useGetLocationsByScriptId,
     useGetPropsByScriptId,
     deleteScene,
+    updateScene,
   };
 };

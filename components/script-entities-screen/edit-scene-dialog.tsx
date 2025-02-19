@@ -24,7 +24,7 @@ import { Input } from "../ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Id } from "@/convex/_generated/dataModel";
 import SceneEntityItem from "./scene-entity-item";
-
+import { useScene } from "@/hooks/useScene";
 import {
   Accordion,
   AccordionContent,
@@ -43,7 +43,7 @@ const formSchema = z.object({
   summary: z.string().min(50),
   characters: z.array(
     z.object({
-      _id: z.string(),
+      _id: z.custom<Id<"characters">>(),
       name: z.string(),
       type: z.enum([
         "PRINCIPAL",
@@ -57,15 +57,14 @@ const formSchema = z.object({
   ),
   locations: z.array(
     z.object({
-      _id: z.string(),
+      _id: z.custom<Id<"locations">>(),
       name: z.string(),
-      type: z.enum(["INT", "EXT"]),
       markedForDeletion: z.boolean(),
     })
   ),
   props: z.array(
     z.object({
-      _id: z.string(),
+      _id: z.custom<Id<"props">>(),
       name: z.string(),
       markedForDeletion: z.boolean(),
     })
@@ -73,11 +72,30 @@ const formSchema = z.object({
 });
 
 const EditSceneDialog = ({ scene, isOpen, onClose }: EditSceneDialogProps) => {
-  console.log("Dialog rendered", Date.now());
   const { characters, locations, summary, props } = scene;
+  const { updateScene, isLoading } = useScene();
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log("data", data);
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    const charactersIdsToDelete = data.characters
+      .filter((char) => char.markedForDeletion)
+      .map((char) => char._id);
+    const locationsIdsToDelete = data.locations
+      .filter((loc) => loc.markedForDeletion)
+      .map((loc) => loc._id);
+    const propsIdsToDelete = data.props
+      .filter((prop) => prop.markedForDeletion)
+      .map((prop) => prop._id);
+    const updatedSceneId = await updateScene(
+      scene._id,
+      data.scene_number,
+      data.summary,
+      charactersIdsToDelete,
+      locationsIdsToDelete,
+      propsIdsToDelete
+    );
+    if (updatedSceneId) {
+      onClose();
+    }
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -100,21 +118,45 @@ const EditSceneDialog = ({ scene, isOpen, onClose }: EditSceneDialogProps) => {
     },
   });
 
-  const toggleDeletion = (
-    field: "locations" | "characters" | "props",
-    itemId: string
-  ) => {
+  const toggleCharacterDeletion = (id: Id<"characters">) => {
     form.setValue(
-      field,
+      "characters",
       form
-        .getValues(field)
-        .map((item) =>
-          item._id === itemId
-            ? { ...item, markedForDeletion: !item.markedForDeletion }
-            : item
+        .getValues("characters")
+        .map((char) =>
+          char._id === id
+            ? { ...char, markedForDeletion: !char.markedForDeletion }
+            : char
         )
     );
   };
+
+  const toggleLocationDeletion = (id: Id<"locations">) => {
+    form.setValue(
+      "locations",
+      form
+        .getValues("locations")
+        .map((loc) =>
+          loc._id === id
+            ? { ...loc, markedForDeletion: !loc.markedForDeletion }
+            : loc
+        )
+    );
+  };
+
+  const togglePropDeletion = (id: Id<"props">) => {
+    form.setValue(
+      "props",
+      form
+        .getValues("props")
+        .map((prop) =>
+          prop._id === id
+            ? { ...prop, markedForDeletion: !prop.markedForDeletion }
+            : prop
+        )
+    );
+  };
+
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent className="h-[90vh] flex flex-col min-w-full lg:min-w-[80vw] xl:min-w-[60vw]">
@@ -125,10 +167,13 @@ const EditSceneDialog = ({ scene, isOpen, onClose }: EditSceneDialogProps) => {
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <ScrollArea className="flex-1 pr-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="flex-1 overflow-y-auto">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col flex-1"
+          >
+            <ScrollArea className="flex-1 pr-4">
+              <div className="space-y-6">
                 <FormField
                   control={form.control}
                   name="scene_number"
@@ -179,12 +224,14 @@ const EditSceneDialog = ({ scene, isOpen, onClose }: EditSceneDialogProps) => {
                             {field.value.map((char) => (
                               <SceneEntityItem
                                 key={char._id}
-                                id={char._id as Id<"characters">}
+                                id={char._id}
                                 name={char.name}
                                 type={char.type}
                                 markedForDeletion={!!char.markedForDeletion}
                                 onToggleDelete={(id) =>
-                                  toggleDeletion("characters", id)
+                                  toggleCharacterDeletion(
+                                    id as Id<"characters">
+                                  )
                                 }
                               />
                             ))}
@@ -205,12 +252,11 @@ const EditSceneDialog = ({ scene, isOpen, onClose }: EditSceneDialogProps) => {
                             {field.value.map((loc) => (
                               <SceneEntityItem
                                 key={loc._id}
-                                id={loc._id as Id<"locations">}
+                                id={loc._id}
                                 name={loc.name}
-                                type={loc.type}
                                 markedForDeletion={!!loc.markedForDeletion}
                                 onToggleDelete={(id) =>
-                                  toggleDeletion("locations", id)
+                                  toggleLocationDeletion(id as Id<"locations">)
                                 }
                               />
                             ))}
@@ -231,11 +277,11 @@ const EditSceneDialog = ({ scene, isOpen, onClose }: EditSceneDialogProps) => {
                             {field.value.map((prop) => (
                               <SceneEntityItem
                                 key={prop._id}
-                                id={prop._id as Id<"props">}
+                                id={prop._id}
                                 name={prop.name}
                                 markedForDeletion={!!prop.markedForDeletion}
                                 onToggleDelete={(id) =>
-                                  toggleDeletion("props", id)
+                                  togglePropDeletion(id as Id<"props">)
                                 }
                               />
                             ))}
@@ -246,16 +292,18 @@ const EditSceneDialog = ({ scene, isOpen, onClose }: EditSceneDialogProps) => {
                   </AccordionItem>
                 </Accordion>
               </div>
-            </form>
-          </Form>
-        </ScrollArea>
+            </ScrollArea>
 
-        <AlertDialogFooter className="mt-4">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit">Save</Button>
-        </AlertDialogFooter>
+            <AlertDialogFooter className="mt-4">
+              <Button variant="outline" onClick={onClose} type="button">
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Saving..." : "Save"}
+              </Button>
+            </AlertDialogFooter>
+          </form>
+        </Form>
       </AlertDialogContent>
     </AlertDialog>
   );

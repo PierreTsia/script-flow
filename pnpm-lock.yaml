@@ -83,6 +83,9 @@ dependencies:
   convex:
     specifier: ^1.19.0
     version: 1.19.2(react-dom@19.0.0)(react@19.0.0)
+  convex-helpers:
+    specifier: ^0.1.71
+    version: 0.1.71(convex@1.19.2)(react@19.0.0)(zod@3.24.2)
   dompurify:
     specifier: ^3.2.4
     version: 3.2.4
@@ -2990,6 +2993,27 @@ packages:
   /concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==, tarball: https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz}
     dev: true
+
+  /convex-helpers@0.1.71(convex@1.19.2)(react@19.0.0)(zod@3.24.2):
+    resolution: {integrity: sha512-/uucsexesq9CNl1J+wZIdjcvPWd9nXcZKE8sIGokduhmtPI+6GtXz/dkpNm9pgFXx6yPJ51lFMuuZFAkVicI0A==, tarball: https://registry.npmjs.org/convex-helpers/-/convex-helpers-0.1.71.tgz}
+    hasBin: true
+    peerDependencies:
+      convex: ^1.13.0
+      hono: ^4.0.5
+      react: ^17.0.2 || ^18.0.0 || ^19.0.0
+      zod: ^3.22.4
+    peerDependenciesMeta:
+      hono:
+        optional: true
+      react:
+        optional: true
+      zod:
+        optional: true
+    dependencies:
+      convex: 1.19.2(react-dom@19.0.0)(react@19.0.0)
+      react: 19.0.0
+      zod: 3.24.2
+    dev: false
 
   /convex@1.19.2(react-dom@19.0.0)(react@19.0.0):
     resolution: {integrity: sha512-rwhg5uVxFKVWf9zM8+QmpQ0MONE6FfeRoy8I/F2lZ7MIjtZyHVaIqpzmQ5ZvZFduseuBMrNy/Y9H4Olq1FlazQ==, tarball: https://registry.npmjs.org/convex/-/convex-1.19.2.tgz}

@@ -43,7 +43,15 @@ const SceneEntityItem = ({
           </Badge>
         )}
       </div>
-      <Button variant="ghost" size="icon" onClick={() => onToggleDelete(id)}>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          onToggleDelete(id);
+        }}
+      >
         {markedForDeletion ? (
           <Undo2 className="h-4 w-4" />
         ) : (
