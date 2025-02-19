@@ -201,5 +201,19 @@
         "saving": "Saving..."
       }
     }
+  },
+  "EditSceneDialog": {
+    "title": "Edit Scene {number}",
+    "addCharacter": "Add a character...",
+    "addLocation": "Add a location...",
+    "addProp": "Add a prop...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "characters": "Characters",
+    "locations": "Locations",
+    "props": "Props",
+    "summary": "Summary",
+    "summaryPlaceholder": "Enter a summary for the scene"
   }
 }

@@ -204,5 +204,21 @@
         "saving": "Enregistrement..."
       }
     }
+  },
+  "EditSceneDialog": {
+    "title": "Modifier la scène {number}",
+    "addCharacter": "Ajouter un personnage...",
+    "description": "Modifiez les détails de la scène",
+    "addLocation": "Ajouter un lieu...",
+    "addProp": "Ajouter un accessoire...",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "characters": "Personnages",
+    "locations": "Lieux",
+    "props": "Accessoires",
+    "summary": "Résumé",
+    "summaryPlaceholder": "Entrez un résumé pour la scène",
+    "sceneNumber": "Scène"
   }
 }
