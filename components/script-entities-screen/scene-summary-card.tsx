@@ -45,6 +45,7 @@ import { useScene } from "@/hooks/useScene";
 import { useState } from "react";
 import EditSceneDialog from "./edit-scene-dialog";
 import { Id } from "@/convex/_generated/dataModel";
+import Link from "next/link";
 
 export type SceneWithEntities = ScriptEntitiesResult["scenes"][number];
 
@@ -107,9 +108,13 @@ const SceneSummaryCard = ({
               </DialogContent>
             </Dialog>
 
-            <Badge>
-              {t("sceneInfo.page")} {scene.page_number}
-            </Badge>
+            <Link
+              href={`/scripts/${scriptId}/viewer?page=${scene.page_number}`}
+            >
+              <Badge>
+                {t("sceneInfo.page")} {scene.page_number}
+              </Badge>
+            </Link>
           </div>
         </div>
       </CardHeader>

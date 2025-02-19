@@ -5,6 +5,7 @@ import { useState, useCallback, useEffect } from "react";
 import { FloatingTextSelectButton } from "./floating-text-select-button";
 import SelectedTextDialog from "./selected-text-dialog";
 import SceneAnalysisSheet from "./scene-analysis-sheet";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const ScriptViewerScreen = ({
   fileUrl,
@@ -22,7 +23,9 @@ const ScriptViewerScreen = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectionRect, setSelectionRect] = useState<DOMRect | null>(null);
   const { isLoading, analyseAndSaveDraft } = useScene();
-
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get("page");
+  const router = useRouter();
   const {
     viewerRef,
     pdfSlickViewerRef,
@@ -57,6 +60,8 @@ const ScriptViewerScreen = ({
     },
     [setIsSheetOpen, setSelectedText]
   );
+  const pdfSlick = usePDFSlickStore((s) => s.pdfSlick);
+  const pageNumber = usePDFSlickStore((s) => s.pageNumber);
 
   const updateSelectionPosition = useCallback(() => {
     const selection = window.getSelection();
@@ -77,6 +82,18 @@ const ScriptViewerScreen = ({
       updateSelectionPosition();
     }
   }, [selectedText, updateSelectionPosition]);
+
+  // Jump to the specified page when the component mounts or when the page param changes
+  useEffect(() => {
+    if (pageParam && pageNumber && pdfSlick) {
+      const pageNumberParam = parseInt(pageParam, 10);
+      if (!isNaN(pageNumberParam)) {
+        pdfSlick.gotoPage(pageNumberParam);
+        // remove route param
+        router.push(window.location.pathname);
+      }
+    }
+  }, [pdfSlick, pageParam, pageNumber, router]);
 
   return (
     <div className="flex flex-col w-full bg-background flex-1">
