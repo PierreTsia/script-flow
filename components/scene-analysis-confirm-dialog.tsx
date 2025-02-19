@@ -14,13 +14,13 @@ import { TabsContent } from "@/components/ui/tabs";
 
 import { useParams } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
-import { EntitiesTabs } from "./entities-tabs";
-import CharactersForm from "./characters-form";
-import SceneInfoForm from "./scene-info-form";
-import PropsForm from "./props-form";
+import { EntitiesTabs } from "./script-entities-screen/entities-tabs";
+import CharactersForm from "./script-entities-screen/characters-form";
+import SceneInfoForm from "./script-entities-screen/scene-info-form";
+import PropsForm from "./script-entities-screen/props-form";
 import { useScene } from "@/hooks/useScene";
 import { useState, useEffect } from "react";
-import LocationsForm from "./locations-form";
+import LocationsForm from "./script-entities-screen/locations-form";
 
 type TabType = "scene_info" | "locations" | "characters" | "props";
 

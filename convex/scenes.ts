@@ -183,8 +183,8 @@ export const getSceneAndEntitiesByNumber = query({
 
     const characters = await Promise.all(
       characterScenes.map(async (cs) => ({
-        character: await ctx.db.get(cs.character_id),
-        notes: cs.notes, // Include notes from junction
+        ...(await ctx.db.get(cs.character_id)),
+        notes: cs.notes,
       }))
     );
 

@@ -26,14 +26,16 @@ import { Trash2Icon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
-import { EntitiesFormProps } from "./scene-analysis-confirm-dialog";
-const EMPTY_CHARACTER = {
+import { EntitiesFormProps } from "../scene-analysis-confirm-dialog";
+
+const EMPTY_LOCATION = {
   name: "",
-  type: "PRINCIPAL",
+  type: "INT",
+  time_of_day: "DAY",
   notes: "",
 } as const;
 
-const CharactersForm = ({
+const LocationsForm = ({
   scriptId,
   sceneId,
   selectedDraftAnalysis,
@@ -44,21 +46,19 @@ const CharactersForm = ({
   const { toast } = useToast();
   const t = useTranslations("SceneAnalysis");
 
-  const { createCharacter } = useSceneEntities();
+  const { createLocation } = useSceneEntities();
 
-  const characterFormSchema = z.object({
+  const locationFormSchema = z.object({
     name: z.string().min(2).max(50),
-    type: z.enum(["PRINCIPAL", "SECONDARY", "FIGURANT", "SILHOUETTE", "EXTRA"]),
+    type: z.enum(["INT", "EXT"]),
+    time_of_day: z.enum(["DAY", "NIGHT", "DAWN", "DUSK", "UNSPECIFIED"]),
     notes: z.string().optional(),
-    aliases: z.array(z.string()).optional(),
   });
 
-  const form = useForm<{ characters: z.infer<typeof characterFormSchema>[] }>({
-    resolver: zodResolver(
-      z.object({ characters: z.array(characterFormSchema) })
-    ),
+  const form = useForm<{ locations: z.infer<typeof locationFormSchema>[] }>({
+    resolver: zodResolver(z.object({ locations: z.array(locationFormSchema) })),
     defaultValues: {
-      characters: [],
+      locations: [],
     },
   });
 
@@ -66,45 +66,44 @@ const CharactersForm = ({
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "characters",
+    name: "locations",
   });
 
   useEffect(() => {
-    if (selectedDraftAnalysis?.characters) {
-      reset({ characters: selectedDraftAnalysis.characters });
+    if (selectedDraftAnalysis?.locations) {
+      console.log(
+        "selectedDraftAnalysis.locations",
+        selectedDraftAnalysis.locations
+      );
+      reset({ locations: selectedDraftAnalysis.locations });
     }
   }, [selectedDraftAnalysis, reset]);
 
   const onSubmit = async (data: {
-    characters: z.infer<typeof characterFormSchema>[];
+    locations: z.infer<typeof locationFormSchema>[];
   }) => {
     try {
       setIsLoading(true);
       if (!sceneId) {
         throw new Error("Scene ID is required");
       }
-      const characterIds = await Promise.all(
-        data.characters.map((char) => {
-          const characterId = createCharacter({
+      const locationIds = await Promise.all(
+        data.locations.map((location) => {
+          const locationId = createLocation({
             scriptId,
             sceneId,
-            name: char.name,
-            type: char.type,
-            aliases: char.aliases,
-            notes: char.notes,
+            name: location.name,
+            type: location.type,
+            time_of_day: location.time_of_day,
+            notes: location.notes,
           });
-          return characterId;
+          return locationId;
         })
       );
 
-      const allSuccessful = characterIds.every(Boolean);
+      const allSuccessful = locationIds.every(Boolean);
 
       if (allSuccessful) {
-        toast({
-          title: "Characters saved",
-          description: "Characters saved successfully",
-        });
-        console.log("setting props tab");
         onNextTab();
       }
     } catch (error) {
@@ -129,10 +128,10 @@ const CharactersForm = ({
               >
                 <FormField
                   control={form.control}
-                  name={`characters.${index}.name`}
+                  name={`locations.${index}.name`}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("character.name")}</FormLabel>
+                      <FormLabel>{t("location.name")}</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -142,28 +141,22 @@ const CharactersForm = ({
                 />
                 <FormField
                   control={form.control}
-                  name={`characters.${index}.type`}
+                  name={`locations.${index}.type`}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("character.type")}</FormLabel>
+                      <FormLabel>{t("location.type")}</FormLabel>
                       <FormControl>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder={t("character.type")} />
+                            <SelectValue placeholder={t("location.type")} />
                           </SelectTrigger>
                           <SelectContent>
-                            {[
-                              "PRINCIPAL",
-                              "SECONDARY",
-                              "FIGURANT",
-                              "SILHOUETTE",
-                              "EXTRA",
-                            ].map((type) => (
+                            {["INT", "EXT"].map((type) => (
                               <SelectItem key={type} value={type}>
-                                {t(`characterType.${type}`)}
+                                {t(`locationType.${type}`)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -174,14 +167,48 @@ const CharactersForm = ({
                 />
                 <FormField
                   control={form.control}
-                  name={`characters.${index}.notes`}
+                  name={`locations.${index}.time_of_day`}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("character.notes")}</FormLabel>
+                      <FormLabel>{t("location.timeOfDay")}</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger>
+                            <SelectValue
+                              placeholder={t("location.timeOfDay")}
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[
+                              "DAY",
+                              "NIGHT",
+                              "DAWN",
+                              "DUSK",
+                              "UNSPECIFIED",
+                            ].map((timeOfDay) => (
+                              <SelectItem key={timeOfDay} value={timeOfDay}>
+                                {t(`timeOfDay.${timeOfDay}`)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`locations.${index}.notes`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("location.notes")}</FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
-                          placeholder={t("character.notes")}
+                          placeholder={t("location.notes")}
                         />
                       </FormControl>
                     </FormItem>
@@ -193,7 +220,7 @@ const CharactersForm = ({
                   onClick={() => remove(index)}
                 >
                   <Trash2Icon className="w-4 h-4" />
-                  {t("removeCharacter")}
+                  {t("removeLocation")}
                 </Button>
               </div>
             ))}
@@ -204,9 +231,9 @@ const CharactersForm = ({
       <Button
         type="button"
         variant="ghost"
-        onClick={() => append(EMPTY_CHARACTER)}
+        onClick={() => append(EMPTY_LOCATION)}
       >
-        {t("addCharacter")}
+        {t("addLocation")}
       </Button>
 
       <AlertDialogFooter>
@@ -225,4 +252,4 @@ const CharactersForm = ({
   );
 };
 
-export default CharactersForm;
+export default LocationsForm;
