@@ -98,7 +98,11 @@ export function EditCharacterDialog({
           <AlertDialogDescription>{t("description")}</AlertDialogDescription>
         </AlertDialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            id="edit-character-form"
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6"
+          >
             <FormField
               control={form.control}
               name="name"
@@ -161,18 +165,18 @@ export function EditCharacterDialog({
                 </FormItem>
               )}
             />
-            <AlertDialogFooter>
-              <Button variant="outline" onClick={() => onClose()}>
-                {t("actions.cancel")}
-              </Button>
-              <Button type="submit">
-                {form.formState.isSubmitting
-                  ? t("actions.saving")
-                  : t("actions.save")}
-              </Button>
-            </AlertDialogFooter>
           </form>
         </Form>
+        <AlertDialogFooter>
+          <Button variant="outline" onClick={() => onClose()}>
+            {t("actions.cancel")}
+          </Button>
+          <Button type="submit" form="edit-character-form">
+            {form.formState.isSubmitting
+              ? t("actions.saving")
+              : t("actions.save")}
+          </Button>
+        </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );

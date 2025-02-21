@@ -4,6 +4,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogDescription,
+  AlertDialogFooter,
 } from "@/components/ui/alert-dialog";
 import {
   Form,
@@ -79,7 +80,11 @@ export const EditLocationDialog = ({
         </AlertDialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            id="edit-location-form"
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="name"
@@ -152,17 +157,17 @@ export const EditLocationDialog = ({
                 </FormItem>
               )}
             />
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={onClose}>
-                {t("cancel")}
-              </Button>
-              <Button type="submit" disabled={isLoading}>
-                {t("save")}
-              </Button>
-            </div>
           </form>
         </Form>
+
+        <AlertDialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            {t("cancel")}
+          </Button>
+          <Button type="submit" form="edit-location-form" disabled={isLoading}>
+            {t("save")}
+          </Button>
+        </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
