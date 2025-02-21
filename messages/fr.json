@@ -169,6 +169,7 @@
     "propsDetails": {
       "recurring": "Accessoires Récurrents",
       "oneOff": "Accessoires Uniques",
+      "unassigned": "Accessoires Non Affectés",
       "quantity": "{count, plural, one {# unité} other {# unités}}"
     },
 
@@ -275,6 +276,20 @@
         "save": "Enregistrer",
         "saving": "Enregistrement..."
       }
+    },
+    "createNewPropDialog": {
+      "title": "Créer un nouvel accessoire",
+      "description": "Créez un nouvel accessoire pour votre script",
+      "actions": {
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "saving": "Enregistrement..."
+      }
+    },
+    "prop": {
+      "name": "Nom",
+      "quantity": "Quantité",
+      "notes": "Notes"
     }
   },
   "EditSceneDialog": {

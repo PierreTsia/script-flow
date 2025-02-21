@@ -160,23 +160,15 @@
       "mergeButton": "Merge Characters"
     },
     "scenesCount": "{count, plural, one {# scene} other {# scenes}}",
-    "locationType": {
-      "interior": "Interior Locations",
-      "exterior": "Exterior Locations"
-    },
+
     "props": "Props",
     "propsDetails": {
       "recurring": "Recurring Props",
       "oneOff": "Single Scene Props",
+      "unassigned": "Unassigned Props",
       "quantity": "{count, plural, one {# unit} other {# units}}"
     },
-    "timeOfDay": {
-      "day": "Day",
-      "night": "Night",
-      "dawn": "Dawn",
-      "dusk": "Dusk",
-      "unspecified": "Unspecified"
-    },
+
     "confirmDeleteDialog": {
       "title": "Are you sure?",
       "description": "Are you sure you want to delete {entityType} {entityName}?",
@@ -280,6 +272,20 @@
         "save": "Save",
         "saving": "Saving..."
       }
+    },
+    "createNewPropDialog": {
+      "title": "Create New Prop",
+      "description": "Create a new prop for your script",
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving..."
+      }
+    },
+    "prop": {
+      "name": "Name",
+      "quantity": "Quantity",
+      "notes": "Notes"
     }
   },
   "EditSceneDialog": {

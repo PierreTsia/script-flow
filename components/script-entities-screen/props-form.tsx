@@ -39,7 +39,7 @@ const PropsForm = ({
   const { toast } = useToast();
   const t = useTranslations("SceneAnalysis");
 
-  const { createProp } = useSceneEntities();
+  const { addPropInScene } = useSceneEntities();
 
   const propFormSchema = z.object({
     name: z.string().min(2).max(50),
@@ -77,7 +77,7 @@ const PropsForm = ({
       }
       const propIds = await Promise.all(
         data.props.map((prop) => {
-          const propId = createProp({
+          const propId = addPropInScene({
             scriptId,
             sceneId,
             name: prop.name,

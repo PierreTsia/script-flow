@@ -9,6 +9,14 @@ import PropSummaryCard from "./prop-summary-card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import CreateNewPropDialog from "./create-new-prop-dialog";
+import { PropsWithScenes } from "@/convex/props";
+
+type GroupedProps = {
+  recurring: PropsWithScenes;
+  oneOff: PropsWithScenes;
+  unassigned: PropsWithScenes;
+};
 
 const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const t = useTranslations("ScriptEntitiesScreen");
@@ -18,11 +26,24 @@ const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
 
   if (!props) return <EntityScreenSkeleton />;
 
-  // Group props by usage frequency
-  const groupedProps = {
-    recurring: props.filter((prop) => prop.scenes.length > 1),
-    oneOff: props.filter((prop) => prop.scenes.length <= 1),
-  };
+  const groupedProps = props.reduce<GroupedProps>(
+    (acc, prop) => {
+      const scenesCount = prop.scenes?.length || 0;
+      if (scenesCount > 1) {
+        acc.recurring.push(prop);
+      } else if (scenesCount === 1) {
+        acc.oneOff.push(prop);
+      } else {
+        acc.unassigned.push(prop);
+      }
+      return acc;
+    },
+    {
+      recurring: [],
+      oneOff: [],
+      unassigned: [],
+    }
+  );
 
   return (
     <div className="space-y-6">
@@ -33,21 +54,31 @@ const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
           {t("createNew")}
         </Button>
       </div>
+
+      <CreateNewPropDialog
+        scriptId={scriptId}
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
+
       <ScrollArea className="h-[calc(100vh-220px)]">
-        {Object.entries(groupedProps).map(([group, items]) => (
-          <div key={group} className="mb-8">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Package className="h-5 w-5" />
-              {t(`propsDetails.${group}`)}
-              <Badge variant="secondary">{items.length}</Badge>
-            </h3>
-            <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-              {items.map((prop) => (
-                <PropSummaryCard key={prop._id} prop={prop} />
-              ))}
-            </div>
-          </div>
-        ))}
+        {Object.entries(groupedProps).map(
+          ([group, items]) =>
+            items.length > 0 && (
+              <div key={group} className="mb-8">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  {t(`propsDetails.${group}`)}
+                  <Badge variant="secondary">{items.length}</Badge>
+                </h3>
+                <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+                  {items.map((prop) => (
+                    <PropSummaryCard key={prop._id} prop={prop} />
+                  ))}
+                </div>
+              </div>
+            )
+        )}
       </ScrollArea>
     </div>
   );

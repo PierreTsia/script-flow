@@ -34,6 +34,8 @@ const useSceneEntities = () => {
 
   const savePropInScene = useMutation(api.props.createPropWithScene);
 
+  const createPropMutation = useMutation(api.props.createProp);
+
   const deleteLocationMutation = useMutation(api.locations.deleteLocation);
 
   const deletePropMutation = useMutation(api.props.deleteProp);
@@ -358,7 +360,7 @@ const useSceneEntities = () => {
     }
   };
 
-  const createProp = async ({
+  const addPropInScene = async ({
     name,
     quantity,
     sceneId,
@@ -379,6 +381,36 @@ const useSceneEntities = () => {
         script_id: scriptId,
         scene_id: sceneId,
         notes,
+      });
+      return propId;
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createNewProp = async ({
+    name,
+    quantity,
+    scriptId,
+  }: {
+    name: string;
+    quantity: number;
+    scriptId: Id<"scripts">;
+  }) => {
+    setIsLoading(true);
+    try {
+      const propId = await createPropMutation({
+        name,
+        quantity,
+        script_id: scriptId,
       });
       return propId;
     } catch (error) {
@@ -419,7 +451,7 @@ const useSceneEntities = () => {
     createNewCharacter,
     addCharacterInScene,
     addLocationInScene,
-    createProp,
+    addPropInScene,
     deduplicateCharacter,
     deleteCharacter,
     updateCharacter,
@@ -428,6 +460,7 @@ const useSceneEntities = () => {
     updateLocation,
     deleteProp,
     updateProp,
+    createNewProp,
     isLoading,
   };
 };
