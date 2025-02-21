@@ -18,7 +18,7 @@ import CharactersForm from "./script-entities-screen/characters-form";
 import SceneInfoForm from "./script-entities-screen/scene-info-form";
 import PropsForm from "./script-entities-screen/props-form";
 import { useScene } from "@/hooks/useScene";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import LocationsForm from "./script-entities-screen/locations-form";
 
 type TabType = "scene_info" | "locations" | "characters" | "props";
@@ -52,20 +52,7 @@ export const SceneAnalysisConfirmDialog = ({
   const [savedSceneId, setSavedSceneId] = useState<Id<"scenes"> | null>(null);
   const [currentTab, setCurrentTab] = useState<TabType>("scene_info");
 
-  const { createScene, useGetSceneAndEntitiesByNumber } = useScene();
-  const scene = useGetSceneAndEntitiesByNumber(
-    scriptId,
-    selectedDraftAnalysis?.scene_number ?? ""
-  );
-
-  useEffect(() => {
-    if (scene?._id) {
-      setSavedSceneId(scene._id);
-    } else {
-      setSavedSceneId(null);
-      setCurrentTab("scene_info");
-    }
-  }, [scene, setSavedSceneId]);
+  const { createScene } = useScene();
 
   const onCreateScene = async (scene: {
     scene_number: string;
@@ -79,6 +66,7 @@ export const SceneAnalysisConfirmDialog = ({
     });
     if (sceneId) {
       setCurrentTab("locations");
+      setSavedSceneId(sceneId);
     }
   };
 
@@ -107,6 +95,7 @@ export const SceneAnalysisConfirmDialog = ({
             {/* Scene Tab */}
             <TabsContent value="scene_info">
               <SceneInfoForm
+                sceneId={savedSceneId}
                 scriptId={scriptId}
                 selectedDraftAnalysis={selectedDraftAnalysis}
                 onCreateScene={onCreateScene}
@@ -145,7 +134,11 @@ export const SceneAnalysisConfirmDialog = ({
                 scriptId={scriptId}
                 sceneId={savedSceneId}
                 selectedDraftAnalysis={selectedDraftAnalysis}
-                onNextTab={() => setCurrentTab("scene_info")}
+                onNextTab={() => {
+                  setIsOpen(false);
+                  setCurrentTab("scene_info"); // preventing to open props tab on next scene
+                  // redirect(`/scripts/${scriptId}/entities`);
+                }}
               >
                 <CancelButton onClose={() => setIsOpen(false)} />
               </PropsForm>

@@ -252,5 +252,13 @@
     "save": "Save",
     "cancel": "Cancel",
     "saving": "Saving..."
+  },
+  "SelectedTextDialog": {
+    "title": "Extract from page {page}",
+    "analyzeButton": {
+      "analyzing": "Analyzing...",
+      "analyze": "Analyze"
+    },
+    "cancel": "Cancel"
   }
 }

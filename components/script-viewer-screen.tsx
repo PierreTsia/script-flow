@@ -38,29 +38,35 @@ const ScriptViewerScreen = ({
     null
   );
 
-  const handleAnalyze = useCallback(
-    async (text: string, pageNumber: number) => {
-      setSelectedText(text);
-      const startPage = selectionStartPage ?? pageNumber;
-      const draft = await analyseAndSaveDraft(text, startPage, scriptId);
-      setLastAnalyzedText(draft);
-      setIsDialogOpen(false);
-      setIsConfirmDialogOpen(true);
-      setSelectionStartPage(null);
-    },
-    [analyseAndSaveDraft, setSelectedText, scriptId, selectionStartPage]
-  );
+  const clearClipboard = () => {
+    window.getSelection()?.removeAllRanges();
+  };
 
-  const handleOpenDialogChange = useCallback(
-    (open: boolean) => {
-      setIsDialogOpen(open);
-      if (!open) {
-        setSelectedText("");
-        setSelectionStartPage(null);
-      }
-    },
-    [setSelectedText]
-  );
+  const handleAnalyze = async (text: string, pageNumber: number) => {
+    setSelectedText(text);
+    const startPage = selectionStartPage ?? pageNumber;
+    const draft = await analyseAndSaveDraft(text, startPage, scriptId);
+    setLastAnalyzedText(draft);
+    setIsDialogOpen(false);
+    setIsConfirmDialogOpen(true);
+    setSelectionStartPage(null);
+    setSelectedText("");
+    clearClipboard();
+  };
+
+  const handleOpenDialogChange = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      setSelectedText("");
+      setSelectionStartPage(null);
+      clearClipboard();
+    }
+  };
+
+  const handleCancelDialog = () => {
+    setIsDialogOpen(false);
+    clearClipboard();
+  };
 
   const pdfSlick = usePDFSlickStore((s) => s.pdfSlick);
   const pageNumber = usePDFSlickStore((s) => s.pageNumber);
@@ -119,6 +125,7 @@ const ScriptViewerScreen = ({
           <SelectedTextDialog
             isDialogOpen={isDialogOpen}
             onOpenChange={handleOpenDialogChange}
+            onCancelClick={handleCancelDialog}
             selectedText={selectedText}
             selectedPage={selectionStartPage ?? pageNumber}
             isAnalyzing={isLoading}

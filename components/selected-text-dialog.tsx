@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -9,29 +10,37 @@ import {
 } from "./ui/alert-dialog";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
+
+type SelectedTextDialogProps = {
+  isDialogOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  selectedText: string;
+  selectedPage: number;
+  isAnalyzing: boolean;
+  onConfirmClick: () => Promise<void>;
+  onCancelClick: () => void;
+};
+
 const SelectedTextDialog = ({
   isDialogOpen,
   onOpenChange,
   selectedText,
   selectedPage,
   onConfirmClick,
+  onCancelClick,
   isAnalyzing,
-}: {
-  isDialogOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  selectedText: string;
-  selectedPage: number;
-  isAnalyzing: boolean;
+}: SelectedTextDialogProps) => {
+  const t = useTranslations("SelectedTextDialog");
 
-  onConfirmClick: () => Promise<void>;
-}) => {
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent className="max-w-2xl">
         <AlertDialogHeader>
-          <AlertDialogTitle>Extract from page {selectedPage}</AlertDialogTitle>
+          <AlertDialogTitle>
+            {t("title", { page: selectedPage })}
+          </AlertDialogTitle>
           <AlertDialogDescription asChild>
-            <ScrollArea className="h-full rounded-md bg-foreground/10  max-h-[30vh] text-muted-foreground p-4">
+            <ScrollArea className="h-full rounded-md bg-foreground/10 max-h-[30vh] text-muted-foreground p-4">
               <pre className="text-sm w-full text-center overflow-x-auto whitespace-pre-wrap">
                 {selectedText}
               </pre>
@@ -39,13 +48,13 @@ const SelectedTextDialog = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Button
-            onClick={async () => {
-              await onConfirmClick();
-            }}
-          >
-            {isAnalyzing ? "Analyzing..." : "Analyse"}
+          <AlertDialogCancel onClick={onCancelClick}>
+            {t("cancel")}
+          </AlertDialogCancel>
+          <Button onClick={onConfirmClick}>
+            {isAnalyzing
+              ? t("analyzeButton.analyzing")
+              : t("analyzeButton.analyze")}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

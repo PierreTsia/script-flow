@@ -2,6 +2,9 @@
 
 ## Phase Order (MVP Critical Path)
 
+<details>
+<summary>✅ Completed Phases</summary>
+
 1. **App Foundation** (2h)
    - [x] Create Next.js app with TypeScript
    - [x] Configure ESLint + Prettier
@@ -47,6 +50,14 @@
    - [x] Mistral API wrapper
    **Files:** `/hooks/useScene.ts`, `src/convex/scenes.ts`
 
+   8. **Basic UI** (4h)
+   - [x] Upload button
+   - [x] Script view layout
+   - [x] Analysis modal
+   **Files:** `src/app/page.tsx`, `src/components/upload.tsx`
+
+</details>
+
 7. **AI Integration 2** (5h)
    - [ ] handle preview urls cors issue (using debug logs and allowed origins)
    - [x] costs monitoring using Helidome
@@ -84,20 +95,26 @@
      - [ ] Standardize error messages
      - [ ] Implement proper ConvexError usage
 
-8. **Basic UI** (4h)
-   - [x] Upload button
-   - [x] Script view layout
-   - [x] Analysis modal
-   **Files:** `src/app/page.tsx`, `src/components/upload.tsx`
+
 
 9. **Script Entities Screen** (4h)
    - [x] Script entities screen
    - [x] Script entities screen layout
    - [x] Tabs for Locations, Characters, Props
-   - [ ] finish crud
-   - [ ] finish dedup
-   - [ ] dynamic button in save draft analysis stepper
+   - [-] finish crud
+   - [-] finish dedup
+   - [-] dynamic button in save draft analysis stepper
+   - [ ] replace buttons in save analysis tabs + review form layout (name + quqntity in one line)
+
    **Files:** `src/app/[scriptId]/page.tsx`
+
+
+### UI improvements
+
+- [ ] script upload with form to save name and description (and then upload)
+- [ ] replace selected text with a editable text area (mardown editor?)
+- [ ] hunt missing trads in the app
+
 
 ## Error Handling (3h)
 - [ ] Global error boundaries
@@ -156,3 +173,63 @@ Technical Notes:
 - Implement proper bounds to optimize query performance
 - Consider lazy aggregation for less frequently accessed metrics
 - Ensure proper transaction handling for accurate counts
+
+## Enhanced LLM Analysis (6h)
+
+1. **Two-Pass LLM Architecture** (2h)
+   - [ ] Split LLM interface into two methods: `analyzeScene` and `formatScene`
+   - [ ] Enhance SceneAnalysis type to include contextual mentions
+   - [ ] Create new types for formatted scene output
+   - [ ] Update provider interface in `lib/llm/providers/index.ts`
+
+2. **Tagger LLM Implementation** (2h)
+   - [ ] Enhance first LLM prompt to extract contextual snippets
+   - [ ] Update parsing logic to handle new response format
+   - [ ] Add validation for contextual mentions
+   - [ ] Add error handling for malformed context extractions
+
+3. **Formatter LLM Implementation** (1h)
+   - [ ] Create new prompt for text markup
+   - [ ] Implement basic MD/HTML tagging system
+   - [ ] Add validation for marked-up text output
+
+4. **Preview Integration** (1h)
+   - [ ] Add marked text preview to scene analysis UI
+   - [ ] Style entity highlights in preview
+   - [ ] Add toggle between raw/marked text views
+   - [ ] Ensure mobile responsiveness for preview pane
+
+Technical Notes:
+- Keep character position tracking minimal due to raw text limitations
+- Focus on reliable context extraction over precise positioning
+- Consider using a simpler model for the formatting pass
+- Add proper error boundaries for preview rendering
+
+## Prompt Engineering & Entity Taxonomy (5h)
+
+1. **Research & Standards Analysis** (2h)
+   - [ ] Compile industry sources for screenplay entity categorization
+   - [ ] Analyze major screenplay software categorization systems
+   - [ ] Review film production breakdown sheets standards
+   - [ ] Document findings in `docs/entity-standards.md`
+
+2. **Entity Schema Enhancement** (1.5h)
+   - [ ] Add new entity types:
+     - [ ] Vehicles (with types: land, air, water, futuristic)
+     - [ ] Animals (with categories: pets, wildlife, mythical)
+     - [ ] Costumes/Wardrobe (with period, style attributes)
+   - [ ] Revise character types based on industry standards
+   - [ ] Update props categorization system
+   - [ ] Enhance location type taxonomy
+
+3. **Prompt Optimization** (1.5h)
+   - [ ] Rewrite entity extraction prompts with new taxonomy
+   - [ ] Add contextual awareness for entity relationships
+   - [ ] Enhance prompt with examples from industry standards
+   - [ ] Implement better validation rules for entity classification
+
+Technical Notes:
+- Consider using nested categorization for complex entities
+- Add versioning to prompts for tracking effectiveness
+- Plan for backward compatibility with existing analyses
+- Consider adding confidence scores for entity classification

@@ -258,5 +258,13 @@
     "save": "Enregistrer",
     "cancel": "Annuler",
     "saving": "Enregistrement..."
+  },
+  "SelectedTextDialog": {
+    "title": "Extrait de la page {page}",
+    "analyzeButton": {
+      "analyzing": "Analyse en cours...",
+      "analyze": "Analyser"
+    },
+    "cancel": "Annuler"
   }
 }

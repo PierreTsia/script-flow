@@ -22,7 +22,7 @@ import useSceneEntities from "@/hooks/useSceneEntities";
 import { useState, useEffect } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Trash2Icon } from "lucide-react";
+import { Trash2Icon, PlusIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
@@ -125,53 +125,64 @@ const CharactersForm = ({
             {fields.map((field, index) => (
               <div
                 key={field.id}
-                className="space-y-4 border p-4 rounded-lg mb-4"
+                className="relative space-y-4 border p-4 rounded-lg mb-4"
               >
-                <FormField
-                  control={form.control}
-                  name={`characters.${index}.name`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("character.name")}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`characters.${index}.type`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("character.type")}</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder={t("character.type")} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {[
-                              "PRINCIPAL",
-                              "SECONDARY",
-                              "FIGURANT",
-                              "SILHOUETTE",
-                              "EXTRA",
-                            ].map((type) => (
-                              <SelectItem key={type} value={type}>
-                                {t(`characterType.${type}`)}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="hover:text-red-500 absolute top-2 right-2"
+                  onClick={() => remove(index)}
+                >
+                  <Trash2Icon className="w-4 h-4" />
+                </Button>
+
+                <div className="flex gap-4">
+                  <FormField
+                    control={form.control}
+                    name={`characters.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>{t("character.name")}</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`characters.${index}.type`}
+                    render={({ field }) => (
+                      <FormItem className="w-[200px]">
+                        <FormLabel>{t("character.type")}</FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={t("character.type")} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[
+                                "PRINCIPAL",
+                                "SECONDARY",
+                                "FIGURANT",
+                                "SILHOUETTE",
+                                "EXTRA",
+                              ].map((type) => (
+                                <SelectItem key={type} value={type}>
+                                  {t(`characterType.${type}`)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <FormField
                   control={form.control}
                   name={`characters.${index}.notes`}
@@ -187,14 +198,6 @@ const CharactersForm = ({
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => remove(index)}
-                >
-                  <Trash2Icon className="w-4 h-4" />
-                  {t("removeCharacter")}
-                </Button>
               </div>
             ))}
           </div>
@@ -206,6 +209,8 @@ const CharactersForm = ({
         variant="ghost"
         onClick={() => append(EMPTY_CHARACTER)}
       >
+        {" "}
+        <PlusIcon className="w-4 h-4" />
         {t("addCharacter")}
       </Button>
 
