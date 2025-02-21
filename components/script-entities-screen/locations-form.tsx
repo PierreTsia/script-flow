@@ -46,7 +46,7 @@ const LocationsForm = ({
   const { toast } = useToast();
   const t = useTranslations("SceneAnalysis");
 
-  const { createLocation } = useSceneEntities();
+  const { addLocationInScene } = useSceneEntities();
 
   const locationFormSchema = z.object({
     name: z.string().min(2).max(50),
@@ -89,7 +89,7 @@ const LocationsForm = ({
       }
       const locationIds = await Promise.all(
         data.locations.map((location) => {
-          const locationId = createLocation({
+          const locationId = addLocationInScene({
             scriptId,
             sceneId,
             name: location.name,

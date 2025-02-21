@@ -10,6 +10,7 @@ import { useScene } from "@/hooks/useScene";
 import { Id } from "@/convex/_generated/dataModel";
 import EntityScreenSkeleton from "@/components/script-entities-screen/entity-screen-skeleton";
 import LocationSummaryCard from "./location-summary-card";
+import CreateNewLocationDialog from "./create-new-location-dialog";
 
 const LocationsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const t = useTranslations("ScriptEntitiesScreen");
@@ -34,6 +35,13 @@ const LocationsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
           {t("createNew")}
         </Button>
       </div>
+
+      <CreateNewLocationDialog
+        scriptId={scriptId}
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
+
       <ScrollArea className="h-[calc(100vh-220px)]">
         {Object.entries(groupedLocations).map(([type, locs]) => (
           <div key={type} className="mb-8">

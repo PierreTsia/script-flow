@@ -246,10 +246,45 @@
         "save": "Save changes",
         "saving": "Saving..."
       }
+    },
+    "createNewLocationDialog": {
+      "title": "Create New Location",
+      "description": "Create a new location for your script",
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving..."
+      }
+    },
+    "location": {
+      "name": "Name",
+      "type": "Type",
+      "timeOfDay": "Time of Day"
+    },
+    "locationType": {
+      "interior": "Interior",
+      "exterior": "Exterior"
+    },
+    "timeOfDay": {
+      "day": "Day",
+      "night": "Night",
+      "dawn": "Dawn",
+      "dusk": "Dusk",
+      "unspecified": "Unspecified"
+    },
+    "editLocationDialog": {
+      "title": "Edit Location",
+      "description": "Edit the location details below",
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving..."
+      }
     }
   },
   "EditSceneDialog": {
     "title": "Edit Scene {number}",
+    "description": "Edit scene details",
     "addCharacter": "Add a character...",
     "addLocation": "Add a location...",
     "addProp": "Add a prop...",
@@ -260,7 +295,8 @@
     "locations": "Locations",
     "props": "Props",
     "summary": "Summary",
-    "summaryPlaceholder": "Enter a summary for the scene"
+    "summaryPlaceholder": "Enter a summary for the scene",
+    "sceneNumber": "Scene"
   },
   "EditLocationDialog": {
     "title": "Edit Location",

@@ -22,6 +22,8 @@ const useSceneEntities = () => {
     api.locations.createLocationWithScene
   );
 
+  const createLocationMutation = useMutation(api.locations.createLocation);
+
   const deduplicateCharacterMutation = useMutation(
     api.characters.deduplicateCharacter
   );
@@ -196,7 +198,7 @@ const useSceneEntities = () => {
     }
   };
 
-  const createLocation = async ({
+  const addLocationInScene = async ({
     name,
     type,
     time_of_day,
@@ -220,6 +222,39 @@ const useSceneEntities = () => {
         script_id: scriptId,
         scene_id: sceneId,
         notes,
+      });
+      return locationId;
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createNewLocation = async ({
+    name,
+    type,
+    time_of_day,
+    scriptId,
+  }: {
+    name: string;
+    type: LocationType;
+    time_of_day: TimeOfDay;
+    scriptId: Id<"scripts">;
+  }) => {
+    setIsLoading(true);
+    try {
+      const locationId = await createLocationMutation({
+        name,
+        type,
+        time_of_day,
+        script_id: scriptId,
       });
       return locationId;
     } catch (error) {
@@ -383,12 +418,13 @@ const useSceneEntities = () => {
   return {
     createNewCharacter,
     addCharacterInScene,
-    createLocation,
+    addLocationInScene,
     createProp,
     deduplicateCharacter,
     deleteCharacter,
     updateCharacter,
     deleteLocation,
+    createNewLocation,
     updateLocation,
     deleteProp,
     updateProp,

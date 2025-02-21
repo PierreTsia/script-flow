@@ -124,13 +124,7 @@
     "propsTitle": "Accessoires",
     "locationsTitle": "Lieux",
     "charactersTitle": "Personnages",
-    "timeOfDay": {
-      "day": "Jour",
-      "night": "Nuit",
-      "dawn": "Aube",
-      "dusk": "Crépuscule",
-      "unspecified": "Non spécifié"
-    },
+
     "scenes": "Scènes",
     "characters": "Personnages",
     "locations": "Lieux",
@@ -170,10 +164,7 @@
       "mergeButton": "Fusionner les personnages"
     },
     "scenesCount": "{count, plural, one {# scène} other {# scènes}}",
-    "locationType": {
-      "interior": "Lieux Intérieurs",
-      "exterior": "Lieux Extérieurs"
-    },
+
     "props": "Accessoires",
     "propsDetails": {
       "recurring": "Accessoires Récurrents",
@@ -250,12 +241,46 @@
         "save": "Enregistrer",
         "saving": "Enregistrement..."
       }
+    },
+    "createNewLocationDialog": {
+      "title": "Créer un nouveau lieu",
+      "description": "Créez un nouveau lieu pour votre script",
+      "actions": {
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "saving": "Enregistrement..."
+      }
+    },
+    "location": {
+      "name": "Nom",
+      "type": "Type",
+      "timeOfDay": "Moment de la journée"
+    },
+    "locationType": {
+      "interior": "Intérieur",
+      "exterior": "Extérieur"
+    },
+    "timeOfDay": {
+      "day": "Jour",
+      "night": "Nuit",
+      "dawn": "Aube",
+      "dusk": "Crépuscule",
+      "unspecified": "Non spécifié"
+    },
+    "editLocationDialog": {
+      "title": "Modifier le lieu",
+      "description": "Modifiez les détails du lieu",
+      "actions": {
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "saving": "Enregistrement..."
+      }
     }
   },
   "EditSceneDialog": {
     "title": "Modifier la scène {number}",
-    "addCharacter": "Ajouter un personnage...",
     "description": "Modifiez les détails de la scène",
+    "addCharacter": "Ajouter un personnage...",
     "addLocation": "Ajouter un lieu...",
     "addProp": "Ajouter un accessoire...",
     "cancel": "Annuler",
