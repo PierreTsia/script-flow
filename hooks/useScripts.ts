@@ -34,8 +34,8 @@ export const useScripts = () => {
     return json.storageId;
   };
 
-  const uploadScript = async (file: File) => {
-    const name = file.name.replace(/\.[^/.]+$/, ""); // Strip file extension
+  const uploadScript = async (file: File, fileName?: string) => {
+    const name = fileName ?? file.name.replace(/\.[^/.]+$/, ""); // Strip file extension
     const url = await uploadUrl();
     const storageId = await uploadFile(file, url);
     createScript(storageId, name);

@@ -11,18 +11,23 @@
   "Scripts": {
     "recentScripts": "Recent Scripts",
     "noScripts": "No scripts uploaded yet",
-    "uploadError": "Error uploading script",
-    "uploadSuccess": "Script uploaded",
+    "uploadError": "Failed to upload script",
+    "uploadSuccess": "Script uploaded successfully",
     "actions": {
       "view": "View script",
       "delete": "Delete script"
     },
     "upload": "Upload Script",
+    "uploadDescription": "Upload your script file and give it a title",
+    "scriptTitle": "Script Title",
+    "scriptTitlePlaceholder": "Enter a title for your script",
+    "saveScript": "Save Script",
+    "saving": "Saving...",
     "dropzone": {
-      "confirm": "Confirm Upload",
+      "confirm": "Confirm upload",
       "uploading": "Uploading...",
-      "dropPrompt": "Drop the PDF here",
-      "dragPrompt": "Drag & drop script PDF, or click to select"
+      "dropPrompt": "Drop PDF here",
+      "dragPrompt": "Drag and drop a PDF or click to select"
     },
     "notFound": {
       "title": "Script vanished into the void",

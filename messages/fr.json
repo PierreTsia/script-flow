@@ -11,9 +11,14 @@
   "Scripts": {
     "recentScripts": "Scripts récents",
     "noScripts": "Aucun script téléchargé",
-    "uploadError": "Erreur lors de l'envoi du script",
-    "uploadSuccess": "Script envoyé",
     "upload": "Envoyer un script",
+    "uploadDescription": "Envoyez votre script et donnez-lui un titre",
+    "uploadError": "Erreur lors de l'envoi du script",
+    "uploadSuccess": "Script envoyé avec succès",
+    "scriptTitle": "Titre du script",
+    "scriptTitlePlaceholder": "Entrez un titre pour votre script",
+    "saveScript": "Enregistrer le script",
+    "saving": "Enregistrement...",
     "actions": {
       "view": "Voir le script",
       "delete": "Supprimer le script"
