@@ -44,7 +44,7 @@ const CharactersForm = ({
   const { toast } = useToast();
   const t = useTranslations("SceneAnalysis");
 
-  const { createCharacter } = useSceneEntities();
+  const { addCharacterInScene } = useSceneEntities();
 
   const characterFormSchema = z.object({
     name: z.string().min(2).max(50),
@@ -85,7 +85,7 @@ const CharactersForm = ({
       }
       const characterIds = await Promise.all(
         data.characters.map((char) => {
-          const characterId = createCharacter({
+          const characterId = addCharacterInScene({
             scriptId,
             sceneId,
             name: char.name,

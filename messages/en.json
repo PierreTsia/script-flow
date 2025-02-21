@@ -189,6 +189,15 @@
         "scene": "the scene"
       }
     },
+    "createNewCharacterDialog": {
+      "title": "Create New Character",
+      "description": "Create a new character for your script",
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving..."
+      }
+    },
     "editPropDialog": {
       "title": "Edit Prop",
       "description": "Update the prop's details",

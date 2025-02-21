@@ -193,6 +193,15 @@
         "scene": "la scène"
       }
     },
+    "createNewCharacterDialog": {
+      "title": "Créer un nouveau personnage",
+      "description": "Créez un nouveau personnage pour votre script",
+      "actions": {
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "saving": "Enregistrement..."
+      }
+    },
     "editPropDialog": {
       "title": "Modifier l'accessoire",
       "description": "Modifiez les détails de l'accessoire ci-dessous.",

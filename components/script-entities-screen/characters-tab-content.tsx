@@ -9,6 +9,61 @@ import { Badge } from "@/components/ui/badge";
 import { Star, Users, User, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { CreateEntityDialog } from "./create-entity-dialog";
+import CharacterForm from "./character-form";
+import useSceneEntities from "@/hooks/useSceneEntities";
+import { CharacterFormSchema } from "./character-form";
+import { AlertDialogFooter } from "@/components/ui/alert-dialog";
+interface CreateCharacterDialogProps {
+  scriptId: Id<"scripts">;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const CreateCharacterDialog = ({
+  scriptId,
+  isOpen,
+  onClose,
+}: CreateCharacterDialogProps) => {
+  const t = useTranslations("ScriptEntitiesScreen");
+  const { createNewCharacter, isLoading } = useSceneEntities();
+
+  const onSubmit = async (values: CharacterFormSchema) => {
+    await createNewCharacter({
+      scriptId,
+      name: values.name,
+      type: values.type,
+      aliases: values.aliases
+        ? values.aliases
+            .split(",")
+            .map((a) => a.trim())
+            .filter(Boolean)
+        : [],
+    });
+    onClose();
+  };
+
+  return (
+    <CreateEntityDialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t("createNewCharacterDialog.title")}
+      description={t("createNewCharacterDialog.description")}
+    >
+      <CharacterForm onSubmit={onSubmit} />
+      <AlertDialogFooter>
+        <Button variant="outline" onClick={() => onClose()}>
+          {t("createNewCharacterDialog.actions.cancel")}
+        </Button>
+        <Button type="submit" form="edit-character-form">
+          {isLoading
+            ? t("createNewCharacterDialog.actions.saving")
+            : t("createNewCharacterDialog.actions.save")}
+        </Button>
+      </AlertDialogFooter>
+    </CreateEntityDialog>
+  );
+};
 
 const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const t = useTranslations("ScriptEntitiesScreen");
@@ -79,6 +134,11 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
           {t("createNew")}
         </Button>
       </div>
+      <CreateCharacterDialog
+        scriptId={scriptId}
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
       <ScrollArea className="h-[calc(100vh-220px)]">
         {Object.entries(groupedCharacters).map(([group, chars]) => (
           <div key={group} className="mb-8">

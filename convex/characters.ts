@@ -38,6 +38,20 @@ export const createCharacter = mutation({
       throw new Error("Unauthorized");
     }
 
+    const existingCharacter = await ctx.db
+      .query("characters")
+      .withIndex("unique_character_per_script", (q) =>
+        q
+          .eq("script_id", args.script_id)
+          .eq("name", args.name)
+          .eq("type", args.type)
+      )
+      .unique();
+
+    if (existingCharacter) {
+      throw new ConvexError(`Character ${args.name} already exists`);
+    }
+
     const characterId = await ctx.db.insert("characters", {
       script_id: args.script_id,
       name: args.name,
