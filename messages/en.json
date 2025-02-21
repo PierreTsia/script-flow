@@ -117,6 +117,10 @@
     "addProp": "Add Prop"
   },
   "ScriptEntitiesScreen": {
+    "createNew": "Create new",
+    "propsTitle": "Props",
+    "locationsTitle": "Locations",
+    "charactersTitle": "Characters",
     "scenes": "Scenes",
     "characters": "Characters",
     "locations": "Locations",
@@ -184,6 +188,23 @@
         "prop": "the prop",
         "scene": "the scene"
       }
+    },
+    "editPropDialog": {
+      "title": "Edit Prop",
+      "description": "Update the prop's details",
+      "form": {
+        "name": {
+          "label": "Name",
+          "placeholder": "Enter prop name"
+        },
+        "quantity": {
+          "label": "Quantity",
+          "placeholder": "Enter quantity"
+        }
+      },
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
     },
     "editCharacterDialog": {
       "title": "Edit Character",

@@ -6,12 +6,15 @@ import { useToast } from "@/hooks/use-toast";
 import { ConvexError } from "convex/values";
 import { LocationType, TimeOfDay } from "@/convex/helpers";
 import { useState } from "react";
+
 const useSceneEntities = () => {
   const [isLoading, setIsLoading] = useState(false);
+
   const saveCharacterInScene = useMutation(
     api.characters.createCharacterWithScene
   );
   const deleteCharacterMutation = useMutation(api.characters.deleteCharacter);
+
   const saveLocationInScene = useMutation(
     api.locations.createLocationWithScene
   );
@@ -25,7 +28,13 @@ const useSceneEntities = () => {
   const updateLocationMutation = useMutation(api.locations.updateLocation);
 
   const savePropInScene = useMutation(api.props.createPropWithScene);
+
   const deleteLocationMutation = useMutation(api.locations.deleteLocation);
+
+  const deletePropMutation = useMutation(api.props.deleteProp);
+
+  const updatePropMutation = useMutation(api.props.updateProp);
+
   const { toast } = useToast();
 
   const createCharacter = async ({
@@ -285,6 +294,55 @@ const useSceneEntities = () => {
     }
   };
 
+  const updateProp = async ({
+    propId,
+    updates,
+  }: {
+    propId: Id<"props">;
+    updates: { name: string; quantity: number };
+  }) => {
+    setIsLoading(true);
+    try {
+      await updatePropMutation({
+        prop_id: propId,
+        name: updates.name,
+        quantity: updates.quantity,
+      });
+      toast({
+        title: "Prop updated",
+      });
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const deleteProp = async ({ propId }: { propId: Id<"props"> }) => {
+    setIsLoading(true);
+    try {
+      await deletePropMutation({
+        prop_id: propId,
+      });
+      toast({
+        title: "Prop deleted",
+      });
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     createCharacter,
     createLocation,
@@ -294,6 +352,8 @@ const useSceneEntities = () => {
     updateCharacter,
     deleteLocation,
     updateLocation,
+    deleteProp,
+    updateProp,
     isLoading,
   };
 };

@@ -120,6 +120,10 @@
     }
   },
   "ScriptEntitiesScreen": {
+    "createNew": "Créer un nouveau",
+    "propsTitle": "Accessoires",
+    "locationsTitle": "Lieux",
+    "charactersTitle": "Personnages",
     "timeOfDay": {
       "day": "Jour",
       "night": "Nuit",
@@ -188,6 +192,23 @@
         "prop": "l'accessoire",
         "scene": "la scène"
       }
+    },
+    "editPropDialog": {
+      "title": "Modifier l'accessoire",
+      "description": "Modifiez les détails de l'accessoire ci-dessous.",
+      "form": {
+        "name": {
+          "label": "Nom",
+          "placeholder": "Entrez le nom de l'accessoire"
+        },
+        "quantity": {
+          "label": "Quantité",
+          "placeholder": "Entrez la quantité"
+        }
+      },
+      "save": "Enregistrer",
+      "saving": "Enregistrement...",
+      "cancel": "Annuler"
     },
     "editCharacterDialog": {
       "title": "Modifier le personnage",
