@@ -16,7 +16,7 @@ import useSceneEntities from "@/hooks/useSceneEntities";
 import { useState, useEffect } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Trash2Icon } from "lucide-react";
+import { Trash2Icon, PlusIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
@@ -39,7 +39,7 @@ const PropsForm = ({
   const { toast } = useToast();
   const t = useTranslations("SceneAnalysis");
 
-  const { createProp } = useSceneEntities();
+  const { addPropInScene } = useSceneEntities();
 
   const propFormSchema = z.object({
     name: z.string().min(2).max(50),
@@ -63,7 +63,6 @@ const PropsForm = ({
 
   useEffect(() => {
     if (selectedDraftAnalysis?.props) {
-      console.log("selectedDraftAnalysis.props", selectedDraftAnalysis.props);
       reset({ props: selectedDraftAnalysis.props });
     }
   }, [selectedDraftAnalysis, reset]);
@@ -78,7 +77,7 @@ const PropsForm = ({
       }
       const propIds = await Promise.all(
         data.props.map((prop) => {
-          const propId = createProp({
+          const propId = addPropInScene({
             scriptId,
             sceneId,
             name: prop.name,
@@ -112,8 +111,17 @@ const PropsForm = ({
             {fields.map((field, index) => (
               <div
                 key={field.id}
-                className="space-y-4 border p-4 rounded-lg mb-4"
+                className="relative space-y-4 border p-4 rounded-lg mb-4"
               >
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="hover:text-red-500 absolute top-2 right-2"
+                  onClick={() => remove(index)}
+                >
+                  <Trash2Icon className="w-4 h-4" />
+                </Button>
+
                 <div className="flex space-x-4">
                   <div className="flex-1">
                     <FormField
@@ -157,14 +165,6 @@ const PropsForm = ({
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => remove(index)}
-                >
-                  <Trash2Icon className="w-4 h-4" />
-                  {t("removeProp")}
-                </Button>
               </div>
             ))}
           </div>
@@ -172,6 +172,7 @@ const PropsForm = ({
       </Form>
 
       <Button type="button" variant="ghost" onClick={() => append(EMPTY_PROP)}>
+        <PlusIcon className="w-4 h-4" />
         {t("addProp")}
       </Button>
 

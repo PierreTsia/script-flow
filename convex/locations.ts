@@ -19,6 +19,38 @@ const createLocationWithSceneValidator = v.object({
   notes: v.optional(v.string()),
 });
 
+export const createLocation = mutation({
+  args: {
+    script_id: v.id("scripts"),
+    name: v.string(),
+    type: locationTypeValidator,
+    time_of_day: timeOfDayValidator,
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("Unauthorized");
+    }
+
+    const existingLocation = await ctx.db
+      .query("locations")
+      .withIndex("unique_location_per_script", (q) =>
+        q
+          .eq("script_id", args.script_id)
+          .eq("name", args.name)
+          .eq("type", args.type)
+      )
+      .first();
+
+    if (existingLocation) {
+      throw new ConvexError(
+        `Location ${args.name} - ${args.type} already exists`
+      );
+    }
+
+    return await ctx.db.insert("locations", args);
+  },
+});
 export const createLocationWithScene = mutation({
   args: createLocationWithSceneValidator,
   handler: async (ctx, args) => {

@@ -22,7 +22,7 @@ import useSceneEntities from "@/hooks/useSceneEntities";
 import { useState, useEffect } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Trash2Icon } from "lucide-react";
+import { Trash2Icon, PlusIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
@@ -46,7 +46,7 @@ const LocationsForm = ({
   const { toast } = useToast();
   const t = useTranslations("SceneAnalysis");
 
-  const { createLocation } = useSceneEntities();
+  const { addLocationInScene } = useSceneEntities();
 
   const locationFormSchema = z.object({
     name: z.string().min(2).max(50),
@@ -89,7 +89,7 @@ const LocationsForm = ({
       }
       const locationIds = await Promise.all(
         data.locations.map((location) => {
-          const locationId = createLocation({
+          const locationId = addLocationInScene({
             scriptId,
             sceneId,
             name: location.name,
@@ -124,8 +124,17 @@ const LocationsForm = ({
             {fields.map((field, index) => (
               <div
                 key={field.id}
-                className="space-y-4 border p-4 rounded-lg mb-4"
+                className="relative space-y-4 border p-4 rounded-lg mb-4"
               >
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="hover:text-red-500 absolute top-2 right-2"
+                  onClick={() => remove(index)}
+                >
+                  <Trash2Icon className="w-4 h-4" />
+                </Button>
+
                 <FormField
                   control={form.control}
                   name={`locations.${index}.name`}
@@ -139,66 +148,68 @@ const LocationsForm = ({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name={`locations.${index}.type`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("location.type")}</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder={t("location.type")} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {["INT", "EXT"].map((type) => (
-                              <SelectItem key={type} value={type}>
-                                {t(`locationType.${type}`)}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`locations.${index}.time_of_day`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("location.timeOfDay")}</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger>
-                            <SelectValue
-                              placeholder={t("location.timeOfDay")}
-                            />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {[
-                              "DAY",
-                              "NIGHT",
-                              "DAWN",
-                              "DUSK",
-                              "UNSPECIFIED",
-                            ].map((timeOfDay) => (
-                              <SelectItem key={timeOfDay} value={timeOfDay}>
-                                {t(`timeOfDay.${timeOfDay.toLowerCase()}`)}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                <div className="flex gap-4">
+                  <FormField
+                    control={form.control}
+                    name={`locations.${index}.type`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>{t("location.type")}</FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={t("location.type")} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {["INT", "EXT"].map((type) => (
+                                <SelectItem key={type} value={type}>
+                                  {t(`locationType.${type}`)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`locations.${index}.time_of_day`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>{t("location.timeOfDay")}</FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <SelectTrigger>
+                              <SelectValue
+                                placeholder={t("location.timeOfDay")}
+                              />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[
+                                "DAY",
+                                "NIGHT",
+                                "DAWN",
+                                "DUSK",
+                                "UNSPECIFIED",
+                              ].map((timeOfDay) => (
+                                <SelectItem key={timeOfDay} value={timeOfDay}>
+                                  {t(`timeOfDay.${timeOfDay.toLowerCase()}`)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <FormField
                   control={form.control}
                   name={`locations.${index}.notes`}
@@ -214,14 +225,6 @@ const LocationsForm = ({
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => remove(index)}
-                >
-                  <Trash2Icon className="w-4 h-4" />
-                  {t("removeLocation")}
-                </Button>
               </div>
             ))}
           </div>
@@ -233,6 +236,7 @@ const LocationsForm = ({
         variant="ghost"
         onClick={() => append(EMPTY_LOCATION)}
       >
+        <PlusIcon className="w-4 h-4" />
         {t("addLocation")}
       </Button>
 

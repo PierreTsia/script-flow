@@ -234,8 +234,9 @@ const EditSceneDialog = ({
         </AlertDialogHeader>
         <Form {...form}>
           <form
+            id="edit-scene-form"
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col flex-1 justify-between"
+            className="flex flex-col flex-1"
           >
             <ScrollArea>
               <div className="space-y-6 pr-4 flex-1 max-h-[70vh]">
@@ -390,16 +391,16 @@ const EditSceneDialog = ({
                 </Accordion>
               </div>
             </ScrollArea>
-            <AlertDialogFooter className="">
-              <Button variant="outline" onClick={onClose} type="button">
-                {t("cancel")}
-              </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? t("saving") : t("save")}
-              </Button>
-            </AlertDialogFooter>
           </form>
         </Form>
+        <AlertDialogFooter>
+          <Button variant="outline" onClick={onClose} type="button">
+            {t("cancel")}
+          </Button>
+          <Button type="submit" form="edit-scene-form" disabled={isLoading}>
+            {isLoading ? t("saving") : t("save")}
+          </Button>
+        </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );

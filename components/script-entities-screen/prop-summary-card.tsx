@@ -1,0 +1,87 @@
+import { useTranslations } from "next-intl";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Clapperboard, Pencil } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { PropsWithScenes } from "@/convex/props";
+import useSceneEntities from "@/hooks/useSceneEntities";
+import ConfirmDeleteDialog from "./confirm-delete-dialog";
+import { EditPropDialog } from "./edit-prop-dialog";
+import { useState } from "react";
+
+export default function PropSummaryCard({
+  prop,
+}: {
+  prop: PropsWithScenes[number];
+}) {
+  const t = useTranslations("ScriptEntitiesScreen");
+  const { deleteProp, isLoading } = useSceneEntities();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <h4 className="font-semibold">{prop.name}</h4>
+          <Badge>{t("propsDetails.quantity", { count: prop.quantity })}</Badge>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-wrap gap-1">
+          {prop.scenes?.map((scene) => (
+            <TooltipProvider key={scene._id}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge variant="outline">
+                    <Clapperboard className="h-3 w-3 mr-1" />
+                    {scene.scene_number}
+                  </Badge>
+                </TooltipTrigger>
+                {scene.notes && (
+                  <TooltipContent>
+                    <p className="max-w-xs">{scene.notes}</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          ))}
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-end gap-2">
+        <ConfirmDeleteDialog
+          entityType="prop"
+          entityName={prop.name}
+          isLoading={isLoading}
+          onDelete={async () => {
+            await deleteProp({ propId: prop._id });
+          }}
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          title="Edit prop"
+          className="hover:text-primary transition-colors"
+          onClick={() => setIsEditDialogOpen(true)}
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+        <EditPropDialog
+          prop={prop}
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+        />
+      </CardFooter>
+    </Card>
+  );
+}

@@ -117,6 +117,10 @@
     "addProp": "Add Prop"
   },
   "ScriptEntitiesScreen": {
+    "createNew": "Create new",
+    "propsTitle": "Props",
+    "locationsTitle": "Locations",
+    "charactersTitle": "Characters",
     "scenes": "Scenes",
     "characters": "Characters",
     "locations": "Locations",
@@ -156,23 +160,15 @@
       "mergeButton": "Merge Characters"
     },
     "scenesCount": "{count, plural, one {# scene} other {# scenes}}",
-    "locationType": {
-      "interior": "Interior Locations",
-      "exterior": "Exterior Locations"
-    },
+
     "props": "Props",
     "propsDetails": {
       "recurring": "Recurring Props",
       "oneOff": "Single Scene Props",
+      "unassigned": "Unassigned Props",
       "quantity": "{count, plural, one {# unit} other {# units}}"
     },
-    "timeOfDay": {
-      "day": "Day",
-      "night": "Night",
-      "dawn": "Dawn",
-      "dusk": "Dusk",
-      "unspecified": "Unspecified"
-    },
+
     "confirmDeleteDialog": {
       "title": "Are you sure?",
       "description": "Are you sure you want to delete {entityType} {entityName}?",
@@ -184,6 +180,32 @@
         "prop": "the prop",
         "scene": "the scene"
       }
+    },
+    "createNewCharacterDialog": {
+      "title": "Create New Character",
+      "description": "Create a new character for your script",
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving..."
+      }
+    },
+    "editPropDialog": {
+      "title": "Edit Prop",
+      "description": "Update the prop's details",
+      "form": {
+        "name": {
+          "label": "Name",
+          "placeholder": "Enter prop name"
+        },
+        "quantity": {
+          "label": "Quantity",
+          "placeholder": "Enter quantity"
+        }
+      },
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
     },
     "editCharacterDialog": {
       "title": "Edit Character",
@@ -216,10 +238,59 @@
         "save": "Save changes",
         "saving": "Saving..."
       }
+    },
+    "createNewLocationDialog": {
+      "title": "Create New Location",
+      "description": "Create a new location for your script",
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving..."
+      }
+    },
+    "location": {
+      "name": "Name",
+      "type": "Type",
+      "timeOfDay": "Time of Day"
+    },
+    "locationType": {
+      "interior": "Interior",
+      "exterior": "Exterior"
+    },
+    "timeOfDay": {
+      "day": "Day",
+      "night": "Night",
+      "dawn": "Dawn",
+      "dusk": "Dusk",
+      "unspecified": "Unspecified"
+    },
+    "editLocationDialog": {
+      "title": "Edit Location",
+      "description": "Edit the location details below",
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving..."
+      }
+    },
+    "createNewPropDialog": {
+      "title": "Create New Prop",
+      "description": "Create a new prop for your script",
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving..."
+      }
+    },
+    "prop": {
+      "name": "Name",
+      "quantity": "Quantity",
+      "notes": "Notes"
     }
   },
   "EditSceneDialog": {
     "title": "Edit Scene {number}",
+    "description": "Edit scene details",
     "addCharacter": "Add a character...",
     "addLocation": "Add a location...",
     "addProp": "Add a prop...",
@@ -230,7 +301,8 @@
     "locations": "Locations",
     "props": "Props",
     "summary": "Summary",
-    "summaryPlaceholder": "Enter a summary for the scene"
+    "summaryPlaceholder": "Enter a summary for the scene",
+    "sceneNumber": "Scene"
   },
   "EditLocationDialog": {
     "title": "Edit Location",
@@ -252,5 +324,13 @@
     "save": "Save",
     "cancel": "Cancel",
     "saving": "Saving..."
+  },
+  "SelectedTextDialog": {
+    "title": "Extract from page {page}",
+    "analyzeButton": {
+      "analyzing": "Analyzing...",
+      "analyze": "Analyze"
+    },
+    "cancel": "Cancel"
   }
 }

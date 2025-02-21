@@ -6,15 +6,23 @@ import { useToast } from "@/hooks/use-toast";
 import { ConvexError } from "convex/values";
 import { LocationType, TimeOfDay } from "@/convex/helpers";
 import { useState } from "react";
+
 const useSceneEntities = () => {
   const [isLoading, setIsLoading] = useState(false);
+
   const saveCharacterInScene = useMutation(
     api.characters.createCharacterWithScene
   );
+
+  const createCharacterMutation = useMutation(api.characters.createCharacter);
+
   const deleteCharacterMutation = useMutation(api.characters.deleteCharacter);
+
   const saveLocationInScene = useMutation(
     api.locations.createLocationWithScene
   );
+
+  const createLocationMutation = useMutation(api.locations.createLocation);
 
   const deduplicateCharacterMutation = useMutation(
     api.characters.deduplicateCharacter
@@ -25,10 +33,51 @@ const useSceneEntities = () => {
   const updateLocationMutation = useMutation(api.locations.updateLocation);
 
   const savePropInScene = useMutation(api.props.createPropWithScene);
+
+  const createPropMutation = useMutation(api.props.createProp);
+
   const deleteLocationMutation = useMutation(api.locations.deleteLocation);
+
+  const deletePropMutation = useMutation(api.props.deleteProp);
+
+  const updatePropMutation = useMutation(api.props.updateProp);
+
   const { toast } = useToast();
 
-  const createCharacter = async ({
+  const createNewCharacter = async ({
+    name,
+    type,
+    aliases,
+    scriptId,
+  }: {
+    name: string;
+    type: CharacterType;
+    aliases?: string[];
+    scriptId: Id<"scripts">;
+  }) => {
+    setIsLoading(true);
+    try {
+      const characterId = await createCharacterMutation({
+        name,
+        type,
+        aliases,
+        script_id: scriptId,
+      });
+      return characterId;
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const addCharacterInScene = async ({
     name,
     type,
     aliases,
@@ -87,81 +136,6 @@ const useSceneEntities = () => {
           variant: "destructive",
         });
       }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const createLocation = async ({
-    name,
-    type,
-    time_of_day,
-    sceneId,
-    scriptId,
-    notes,
-  }: {
-    name: string;
-    type: LocationType;
-    time_of_day: TimeOfDay;
-    sceneId: Id<"scenes">;
-    scriptId: Id<"scripts">;
-    notes?: string;
-  }) => {
-    setIsLoading(true);
-    try {
-      const locationId = await saveLocationInScene({
-        name,
-        type,
-        time_of_day,
-        script_id: scriptId,
-        scene_id: sceneId,
-        notes,
-      });
-      return locationId;
-    } catch (error) {
-      if (error instanceof ConvexError) {
-        toast({
-          title: error.data.message,
-          variant: "destructive",
-        });
-      }
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const createProp = async ({
-    name,
-    quantity,
-    sceneId,
-    scriptId,
-    notes,
-  }: {
-    name: string;
-    quantity: number;
-    sceneId: Id<"scenes">;
-    scriptId: Id<"scripts">;
-    notes?: string;
-  }) => {
-    setIsLoading(true);
-    try {
-      const propId = await savePropInScene({
-        name,
-        quantity,
-        script_id: scriptId,
-        scene_id: sceneId,
-        notes,
-      });
-      return propId;
-    } catch (error) {
-      if (error instanceof ConvexError) {
-        toast({
-          title: error.data.message,
-          variant: "destructive",
-        });
-      }
-      return null;
     } finally {
       setIsLoading(false);
     }
@@ -226,6 +200,78 @@ const useSceneEntities = () => {
     }
   };
 
+  const addLocationInScene = async ({
+    name,
+    type,
+    time_of_day,
+    sceneId,
+    scriptId,
+    notes,
+  }: {
+    name: string;
+    type: LocationType;
+    time_of_day: TimeOfDay;
+    sceneId: Id<"scenes">;
+    scriptId: Id<"scripts">;
+    notes?: string;
+  }) => {
+    setIsLoading(true);
+    try {
+      const locationId = await saveLocationInScene({
+        name,
+        type,
+        time_of_day,
+        script_id: scriptId,
+        scene_id: sceneId,
+        notes,
+      });
+      return locationId;
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createNewLocation = async ({
+    name,
+    type,
+    time_of_day,
+    scriptId,
+  }: {
+    name: string;
+    type: LocationType;
+    time_of_day: TimeOfDay;
+    scriptId: Id<"scripts">;
+  }) => {
+    setIsLoading(true);
+    try {
+      const locationId = await createLocationMutation({
+        name,
+        type,
+        time_of_day,
+        script_id: scriptId,
+      });
+      return locationId;
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const deleteLocation = async ({
     locationId,
   }: {
@@ -285,15 +331,136 @@ const useSceneEntities = () => {
     }
   };
 
+  const updateProp = async ({
+    propId,
+    updates,
+  }: {
+    propId: Id<"props">;
+    updates: { name: string; quantity: number };
+  }) => {
+    setIsLoading(true);
+    try {
+      await updatePropMutation({
+        prop_id: propId,
+        name: updates.name,
+        quantity: updates.quantity,
+      });
+      toast({
+        title: "Prop updated",
+      });
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const addPropInScene = async ({
+    name,
+    quantity,
+    sceneId,
+    scriptId,
+    notes,
+  }: {
+    name: string;
+    quantity: number;
+    sceneId: Id<"scenes">;
+    scriptId: Id<"scripts">;
+    notes?: string;
+  }) => {
+    setIsLoading(true);
+    try {
+      const propId = await savePropInScene({
+        name,
+        quantity,
+        script_id: scriptId,
+        scene_id: sceneId,
+        notes,
+      });
+      return propId;
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createNewProp = async ({
+    name,
+    quantity,
+    scriptId,
+  }: {
+    name: string;
+    quantity: number;
+    scriptId: Id<"scripts">;
+  }) => {
+    setIsLoading(true);
+    try {
+      const propId = await createPropMutation({
+        name,
+        quantity,
+        script_id: scriptId,
+      });
+      return propId;
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteProp = async ({ propId }: { propId: Id<"props"> }) => {
+    setIsLoading(true);
+    try {
+      await deletePropMutation({
+        prop_id: propId,
+      });
+      toast({
+        title: "Prop deleted",
+      });
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
-    createCharacter,
-    createLocation,
-    createProp,
+    createNewCharacter,
+    addCharacterInScene,
+    addLocationInScene,
+    addPropInScene,
     deduplicateCharacter,
     deleteCharacter,
     updateCharacter,
     deleteLocation,
+    createNewLocation,
     updateLocation,
+    deleteProp,
+    updateProp,
+    createNewProp,
     isLoading,
   };
 };

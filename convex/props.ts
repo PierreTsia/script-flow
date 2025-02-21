@@ -2,9 +2,15 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { ConvexError } from "convex/values";
 import { Doc } from "./_generated/dataModel";
+import { FunctionReturnType } from "convex/server";
+import { api } from "./_generated/api";
 
 export type PropDocument = Doc<"props">;
 export type PropSceneDocument = Doc<"prop_scenes">;
+
+export type PropsWithScenes = FunctionReturnType<
+  typeof api.props.getPropsByScriptId
+>;
 
 const createPropValidator = v.object({
   script_id: v.id("scripts"),
@@ -124,5 +130,49 @@ export const getPropsByScriptId = query({
         };
       })
     );
+  },
+});
+
+export const updateProp = mutation({
+  args: { prop_id: v.id("props"), name: v.string(), quantity: v.number() },
+  handler: async (ctx, { prop_id, name, quantity }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("Unauthorized");
+    }
+
+    const prop = await ctx.db.get(prop_id);
+    if (!prop) {
+      throw new ConvexError("Prop not found");
+    }
+
+    await ctx.db.patch(prop_id, { name, quantity });
+  },
+});
+
+export const deleteProp = mutation({
+  args: { prop_id: v.id("props") },
+  handler: async (ctx, { prop_id }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("Unauthorized");
+    }
+
+    const prop = await ctx.db.get(prop_id);
+    if (!prop) {
+      throw new ConvexError("Prop not found");
+    }
+
+    const propScenes = await ctx.db
+      .query("prop_scenes")
+      .withIndex("by_prop", (q) => q.eq("prop_id", prop_id))
+      .collect();
+
+    const mutations = [
+      ctx.db.delete(prop_id),
+      ...propScenes.map((ps) => ctx.db.delete(ps._id)),
+    ];
+
+    await Promise.all(mutations);
   },
 });
