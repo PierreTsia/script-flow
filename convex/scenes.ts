@@ -377,13 +377,15 @@ export const updateScene = mutation({
           notes: "",
         })
       ),
-      ...(args.propsIdsToAdd ?? []).map((id) =>
-        ctx.db.insert("prop_scenes", {
+      ...(args.propsIdsToAdd ?? []).map(async (id) => {
+        const prop = await requireExists(await ctx.db.get(id), "prop");
+        return ctx.db.insert("prop_scenes", {
           prop_id: id,
           scene_id: scene._id,
           notes: "",
-        })
-      ),
+          type: prop.type,
+        });
+      }),
 
       // Update scene details
       ctx.db.patch(scene._id, {

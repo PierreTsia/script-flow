@@ -21,10 +21,18 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { EntitiesFormProps } from "../scene-analysis-confirm-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const EMPTY_PROP = {
   name: "",
   quantity: 1,
+  type: "ACTIVE" as const,
   notes: "",
 } as const;
 
@@ -44,6 +52,7 @@ const PropsForm = ({
   const propFormSchema = z.object({
     name: z.string().min(2).max(50),
     quantity: z.number().min(1),
+    type: z.enum(["ACTIVE", "SET", "TRANSFORMING"]),
     notes: z.string().optional(),
   });
 
@@ -82,6 +91,7 @@ const PropsForm = ({
             sceneId,
             name: prop.name,
             quantity: prop.quantity,
+            type: prop.type,
             notes: prop.notes,
           });
           return propId;
@@ -146,13 +156,55 @@ const PropsForm = ({
                         <FormItem>
                           <FormLabel>{t("prop.quantity")}</FormLabel>
                           <FormControl>
-                            <Input type="number" {...field} />
+                            <Input
+                              type="number"
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(parseInt(e.target.value))
+                              }
+                            />
                           </FormControl>
                         </FormItem>
                       )}
                     />
                   </div>
+                  <div className="w-1/4">
+                    <FormField
+                      control={form.control}
+                      name={`props.${index}.type`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("prop.type")}</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue
+                                  placeholder={t("prop.selectType")}
+                                />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="ACTIVE">
+                                {t("prop.types.active")}
+                              </SelectItem>
+                              <SelectItem value="SET">
+                                {t("prop.types.set")}
+                              </SelectItem>
+                              <SelectItem value="TRANSFORMING">
+                                {t("prop.types.transforming")}
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
+
                 <FormField
                   control={form.control}
                   name={`props.${index}.notes`}

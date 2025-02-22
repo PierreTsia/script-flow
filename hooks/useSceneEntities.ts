@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ConvexError } from "convex/values";
 import { LocationType, TimeOfDay } from "@/convex/helpers";
 import { useState } from "react";
+import { PropType } from "@/convex/props";
 
 const useSceneEntities = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -336,7 +337,7 @@ const useSceneEntities = () => {
     updates,
   }: {
     propId: Id<"props">;
-    updates: { name: string; quantity: number };
+    updates: { name: string; quantity: number; type: PropType };
   }) => {
     setIsLoading(true);
     try {
@@ -344,6 +345,7 @@ const useSceneEntities = () => {
         prop_id: propId,
         name: updates.name,
         quantity: updates.quantity,
+        type: updates.type,
       });
       toast({
         title: "Prop updated",
@@ -363,12 +365,14 @@ const useSceneEntities = () => {
   const addPropInScene = async ({
     name,
     quantity,
+    type,
     sceneId,
     scriptId,
     notes,
   }: {
     name: string;
     quantity: number;
+    type: PropType;
     sceneId: Id<"scenes">;
     scriptId: Id<"scripts">;
     notes?: string;
@@ -381,6 +385,7 @@ const useSceneEntities = () => {
         script_id: scriptId,
         scene_id: sceneId,
         notes,
+        type,
       });
       return propId;
     } catch (error) {
@@ -400,10 +405,12 @@ const useSceneEntities = () => {
     name,
     quantity,
     scriptId,
+    type,
   }: {
     name: string;
     quantity: number;
     scriptId: Id<"scripts">;
+    type: PropType;
   }) => {
     setIsLoading(true);
     try {
@@ -411,6 +418,7 @@ const useSceneEntities = () => {
         name,
         quantity,
         script_id: scriptId,
+        type,
       });
       return propId;
     } catch (error) {

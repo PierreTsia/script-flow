@@ -70,6 +70,7 @@ const formSchema = z.object({
     z.object({
       _id: z.custom<Id<"props">>(),
       name: z.string(),
+      type: z.enum(["ACTIVE", "SET", "TRANSFORMING"]),
       markedForDeletion: z.boolean(),
     })
   ),
@@ -369,6 +370,7 @@ const EditSceneDialog = ({
                                 key={prop._id}
                                 id={prop._id}
                                 name={prop.name}
+                                type={prop.type}
                                 markedForDeletion={!!prop.markedForDeletion}
                                 onToggleDelete={(id) =>
                                   togglePropDeletion(id as Id<"props">)

@@ -108,12 +108,18 @@
       "type": "Type",
       "notes": "Notes"
     },
-
     "removeProp": "Supprimer",
     "prop": {
       "quantity": "Quantité",
       "notes": "Notes",
-      "name": "Nom"
+      "name": "Nom",
+      "type": "Type",
+      "selectType": "Sélectionner le type",
+      "types": {
+        "active": "Actif",
+        "set": "Décor",
+        "transforming": "Transformable"
+      }
     },
     "addProp": "Ajouter un accessoire",
     "timeOfDay": {
@@ -129,7 +135,9 @@
     "propsTitle": "Accessoires",
     "locationsTitle": "Lieux",
     "charactersTitle": "Personnages",
-
+    "noProps": "Aucun accessoire trouvé",
+    "noLocations": "Aucun lieu trouvé",
+    "noCharacters": "Aucun personnage trouvé",
     "scenes": "Scènes",
     "characters": "Personnages",
     "locations": "Lieux",
@@ -169,7 +177,6 @@
       "mergeButton": "Fusionner les personnages"
     },
     "scenesCount": "{count, plural, one {# scène} other {# scènes}}",
-
     "props": "Accessoires",
     "propsDetails": {
       "recurring": "Accessoires Récurrents",
@@ -177,7 +184,6 @@
       "unassigned": "Accessoires Non Affectés",
       "quantity": "{count, plural, one {# unité} other {# unités}}"
     },
-
     "confirmDeleteDialog": {
       "title": "Êtes-vous sûr ?",
       "description": "Êtes-vous sûr de vouloir supprimer {entityType} {entityName} ?",
@@ -201,7 +207,7 @@
     },
     "editPropDialog": {
       "title": "Modifier l'accessoire",
-      "description": "Modifiez les détails de l'accessoire ci-dessous.",
+      "description": "Modifiez les détails de l'accessoire",
       "form": {
         "name": {
           "label": "Nom",
@@ -210,11 +216,27 @@
         "quantity": {
           "label": "Quantité",
           "placeholder": "Entrez la quantité"
+        },
+        "type": {
+          "label": "Type",
+          "placeholder": "Sélectionnez le type",
+          "options": {
+            "ACTIVE": "Accessoire Actif",
+            "SET": "Élément de Décor",
+            "TRANSFORMING": "Accessoire Transformable"
+          }
         }
       },
+      "cancel": "Annuler",
       "save": "Enregistrer",
       "saving": "Enregistrement...",
-      "cancel": "Annuler"
+      "prop":{
+        "type":{
+          "set":"Décor",
+          "active":"Actif",
+          "transforming":"Devient actif"  
+                  }
+      }
     },
     "editCharacterDialog": {
       "title": "Modifier le personnage",
@@ -294,7 +316,20 @@
     "prop": {
       "name": "Nom",
       "quantity": "Quantité",
-      "notes": "Notes"
+      "notes": "Notes",
+      "type": {
+        "active": "Actif",
+        "set": "Décor",
+        "transforming": "Transformable",
+        "secondary": "Secondaire",
+        "options": {
+          "ACTIVE": "Actif",
+          "SET": "Décor",
+          "TRANSFORMING": "Transformable"
+        },
+        "label": "Type d'accessoire",
+        "placeholder": "Sélectionner un type"
+      }
     }
   },
   "EditSceneDialog": {

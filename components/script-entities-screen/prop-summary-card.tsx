@@ -19,6 +19,7 @@ import useSceneEntities from "@/hooks/useSceneEntities";
 import ConfirmDeleteDialog from "./confirm-delete-dialog";
 import { EditPropDialog } from "./edit-prop-dialog";
 import { useState } from "react";
+import PropBadge from "../ui/prop-badge";
 
 export default function PropSummaryCard({
   prop,
@@ -34,7 +35,9 @@ export default function PropSummaryCard({
       <CardHeader>
         <div className="flex justify-between items-center">
           <h4 className="font-semibold">{prop.name}</h4>
-          <Badge>{t("propsDetails.quantity", { count: prop.quantity })}</Badge>
+          <PropBadge type={prop.type} quantity={prop.quantity}>
+            {t(`prop.type.${prop.type.toLowerCase()}`)}
+          </PropBadge>
         </div>
       </CardHeader>
       <CardContent>

@@ -1,16 +1,4 @@
-const SYSTEM_PROMPT = `
-You're a screenplay analysis expert. For the provided scene:
-
-1. Identify ALL speaking characters (full names)
-2. List physical props relevant to production
-3. Specify exact locations with INT/EXT prefixes
-4. Extract scene number from text
-5. summarize the scene in max 2 sentences
-6. the summary MUST BE in the language of the text
-
-# Requirements
-- Output JSON matching this schema - the output MUST be a valid JSON object:
-{
+const SCHEMA_DEFINITION = `{
   "scene_number": string,
   "summary": string,
   "characters": [{
@@ -21,6 +9,7 @@ You're a screenplay analysis expert. For the provided scene:
   "props": [{
     "name": string,
     "quantity": number,
+    "type": "ACTIVE" | "SET" | "TRANSFORMING",
     "notes": string  
   }],
   "locations": [{
@@ -29,7 +18,9 @@ You're a screenplay analysis expert. For the provided scene:
     "time_of_day": "DAY" | "NIGHT" | "DAWN" | "DUSK" | "UNSPECIFIED",
     "notes": string
   }]
-}
+}`;
+
+const JSON_RULES = `
 - Ensure the output JSON always includes all keys, even if they have no values (e.g., "characters": [], "scene_number": null).
 - JSON must be strictly formatted with:
   - No trailing commas
@@ -37,33 +28,87 @@ You're a screenplay analysis expert. For the provided scene:
   - No comments
   - No markdown code block wrappers
   - Always include scene_number even if null
-  - Empty arrays preferred over null/undefined
+  - Empty arrays preferred over null/undefined`;
 
-# Rules
+const ENTITY_RULES = `
 - Scene number: Extract from text patterns like "3. PLACE..." → "3"
-- Summary: Summarize the scene in max 2 sentences - ALWAYS IN THE LANGUAGE OF THE TEXT - capture the main action and the setting, with any relevant details for the production team
+- Summary: Summarize the scene in max 2 sentences - ALWAYS IN THE LANGUAGE OF THE TEXT
 - Character types:
   - PRINCIPAL: Speaking roles with names
   - SECONDARY: Named non-speaking roles
   - FIGURANT: Background actors with actions
   - SILHOUETTE: Shadowy/unseen figures
-  - EXTRA: Crowd members without specifics
-- Props: 
-  - Quantity must be integer >=1
-  - For plural nouns without numbers, estimate using:
-    - "encombré de livres" → 15
-    - "des pages" → 10
-    - "quelques" → 3
-    - "plusieurs" → 5
-    - "nombreux" → 10
-  - Never use ranges (5+) or non-numeric values
-  - Include key descriptive details in 'notes' (e.g. "pages covered in stamps")
+  - EXTRA: Crowd members without specifics`;
+
+const PROP_RULES = `
+- Props Classification:
+  - NEVER classify humans, characters, or living beings as props
+  - Only classify physical objects and set pieces
+
+  1. ACTIVE Props:
+     - Physical objects directly handled/manipulated by characters
+     - Items specifically mentioned in character actions
+     - Example: "John picks up the COFFEE MUG" → type: "ACTIVE"
+
+  2. SET Props:
+     - Static background elements worth tracking
+     - Furniture and decorative items
+     - Example: "The walls are covered with PAINTINGS" → type: "SET"
+
+  3. TRANSFORMING Props:
+     - Items that change state during scene
+     - Set pieces that become interactive
+     - Example: "CURTAINS she later tears down" → type: "TRANSFORMING"
+
+  - Exclusions:
+    - Characters, people, or living beings
+    - Abstract concepts
+    - Weather or natural phenomena
+    - Implied items not explicitly mentioned
+
+  - Quantity Rules:
+    - Must be integer >=1
+    - For plural nouns without numbers, estimate using:
+      - "encombré de livres" → 15
+      - "des pages" → 10
+      - "quelques" → 3
+      - "plusieurs" → 5
+      - "nombreux" → 10
+
+  - Notes field must include:
+    - For ACTIVE: interaction context
+    - For SET: location/placement details
+    - For TRANSFORMING: state changes`;
+
+const SYSTEM_PROMPT = `
+You're a screenplay analysis expert. For the provided scene:
+
+⚠️ CRITICAL LANGUAGE RULE ⚠️
+- You MUST detect the input text language
+- You MUST write the summary in THE SAME LANGUAGE as the input text
+- Example: French input → French summary
+- Example: English input → English summary
+
+1. Identify ALL speaking characters (full names)
+2. List physical props relevant to production
+3. Specify exact locations with INT/EXT prefixes
+4. Extract scene number from text
+5. Summarize the scene in max 2 sentences - STRICTLY IN THE SAME LANGUAGE AS INPUT
+
+# Requirements
+- Output JSON matching this schema:
+${SCHEMA_DEFINITION}
+${JSON_RULES}
+
+# Rules
+${ENTITY_RULES}
+${PROP_RULES}
 - Locations: Split combined descriptors (e.g. "EXT/JOUR" → type=EXT, time_of_day=DAY)
 - Language: Preserve original language terms (e.g. "ballon" not "football")
 `;
 
-const SCENE_EXAMPLES = `
-# Example 1
+const BASIC_EXAMPLES = `
+# Example 1 (Basic Scene)
 Input: 
 3. INT. DIVE BAR - NIGHT  
 MAC (40s) polishes a shotgun shell.  
@@ -78,14 +123,15 @@ Output:
     {"name": "man 2", "type": "FIGURANT", "notes": ""}
   ],
   "props": [
-    {"name": "shotgun shell", "quantity": 1}
+    {"name": "shotgun shell", "quantity": 1, "type": "ACTIVE", "notes": "polished by Mac"}
   ],
   "locations": [
     {"name": "DIVE BAR", "type": "INT", "time_of_day": "NIGHT", "notes": ""}
   ]
-}
+}`;
 
-# Example 2 (French)
+const MULTILINGUAL_EXAMPLES = `
+# Example (French)
 Input:
 32 CAGNA FRANCAISE - INT - JOUR 32
 AUDEBERT lit une LETTRE. Une SILHOUETTE observe depuis la porte.
@@ -93,72 +139,99 @@ AUDEBERT lit une LETTRE. Une SILHOUETTE observe depuis la porte.
 Output:
 {
   "scene_number": "32",
+  "summary": "Audebert lit une lettre dans la cagna. Une silhouette mystérieuse l'observe depuis la porte.",
   "characters": [
     {"name": "Audebert", "type": "PRINCIPAL", "notes": ""},
     {"name": "Silhouette", "type": "SILHOUETTE", "notes": ""}
   ],
   "props": [
-    {"name": "lettre", "quantity": 1}
+    {"name": "lettre", "quantity": 1, "type": "ACTIVE", "notes": "lue par Audebert"}
   ],
   "locations": [
     {"name": "CAGNA FRANCAISE", "type": "INT", "time_of_day": "DAY", "notes": ""}
   ]
-}
+}`;
 
-# Example 3 (Passport Detail)
+const PROP_COUNTING_EXAMPLES = `
+# Example (Props Types & Quantity)
 Input: |
-  Un des ses hommes trouve le passeport de Largo dans son
-  pantalon. Il le donne à l'officier qui le feuillette. Les
-  pages sont couvertes de tampons divers et variés.
+  Un bureau couvert de trois dossiers épais. Marie saisit une des deux tasses de café froid qui 
+  traînent près d'une pile de cinq livres. Elle tire violemment la nappe, faisant tomber tout ce qui 
+  se trouve sur la table.
 
 Output:
 {
-  "scene_number": "20",
-  "characters": [
-    {"name": "Largo", "type": "PRINCIPAL", "notes": ""},
-    {"name": "officier", "type": "SECONDARY", "notes": ""}
-  ],
   "props": [
     {
-      "name": "passeport",
+      "name": "dossiers",
+      "type": "SET",
+      "quantity": 3,
+      "notes": "épais, sur le bureau"
+    },
+    {
+      "name": "tasses de café",
+      "type": "ACTIVE",
+      "quantity": 2,
+      "notes": "froid, une saisie par Marie"
+    },
+    {
+      "name": "livres",
+      "type": "SET",
+      "quantity": 5,
+      "notes": "empilés près des tasses"
+    },
+    {
+      "name": "nappe",
+      "type": "TRANSFORMING",
       "quantity": 1,
-      "notes": "pages couvertes de tampons divers et variés"
+      "notes": "tirée violemment, fait tomber les objets"
+    },
+    {
+      "name": "bureau",
+      "type": "SET",
+      "quantity": 1,
+      "notes": "couvert de dossiers"
     }
-  ],
-  "locations": [
-    {"name": "UNSPECIFIED", "type": "INT", "time_of_day": "UNSPECIFIED", "notes": ""}
   ]
 }
 
-# Example 4 (Quantity Detection)
+# Example (Mixed Interactions)
 Input: |
-  Un bureau couvert de trois dossiers épais.  
-  Deux tasses de café froid traînent près d'une pile de cinq livres.
+  Dans le salon, un vieux piano couvert de cadres photos. Tom s'assoit et commence à jouer. 
+  Sur une étagère, plusieurs trophées poussiéreux. Il en prend un et le lance par la fenêtre.
 
 Output:
 {
   "props": [
-    {"name": "dossiers", "quantity": 3, "notes": "épais"},
-    {"name": "tasses de café", "quantity": 2, "notes": "froid"},
-    {"name": "livres", "quantity": 5, "notes": ""}
+    {
+      "name": "piano",
+      "type": "TRANSFORMING",
+      "quantity": 1,
+      "notes": "vieux, devient instrument joué par Tom"
+    },
+    {
+      "name": "cadres photos",
+      "type": "SET",
+      "quantity": 5,
+      "notes": "sur le piano"
+    },
+    {
+      "name": "trophées",
+      "type": "ACTIVE",
+      "quantity": 3,
+      "notes": "poussiéreux, un lancé par la fenêtre"
+    },
+    {
+      "name": "étagère",
+      "type": "SET",
+      "quantity": 1,
+      "notes": "support des trophées"
+    }
   ]
-}
+}`;
 
-# Example 5 (Implied Multiple)
-Input: |
-  Le sol est jonché de papiers. Elle ramasse une clé anglaise
-  parmi des douilles de cartouches.
-
-Output:
-{
-  "props": [
-    {"name": "papiers", "quantity": 20, "notes": ""},
-    {"name": "clé anglaise", "quantity": 1, "notes": ""},
-    {"name": "douilles de cartouches", "quantity": 10, "notes": ""}
-  ]
-}
-
-# Example 6 (Edge Cases)
+const EDGE_CASE_EXAMPLES = `
+# Example (Edge Cases)
 Input: Scene without clear number or locations
 Output:
 {
@@ -167,10 +240,10 @@ Output:
   "characters": [],
   "props": [],
   "locations": []
-}
+}`;
 
-
-# Example 7 (Summary)
+const COMPLEX_SCENE_EXAMPLES = `
+# Example (Complex Scene)
 Input:
  12. EXT. CITY PARK - DAY
 ALEX (30s) sits on a bench, reading a newspaper. A DOG runs up to him, wagging its tail. Nearby, a JOGGER (20s) stops to tie her shoelaces. CHILDREN play on the swings, laughing loudly. A VENDOR pushes a cart, selling ice cream to a line of eager customers. The sun shines brightly, casting long shadows on the ground. A BIRD lands on the bench next to Alex, pecking at crumbs.
@@ -192,50 +265,60 @@ Output:
     {"name": "musician", "type": "FIGURANT", "notes": ""}
   ],
   "props": [
-    {"name": "newspaper", "quantity": 1, "notes": ""},
-    {"name": "ice cream cart", "quantity": 1, "notes": ""},
-    {"name": "guitar", "quantity": 1, "notes": ""}
+    {
+      "name": "newspaper",
+      "type": "ACTIVE",
+      "quantity": 1,
+      "notes": "read by Alex"
+    },
+    {
+      "name": "bench",
+      "type": "SET",
+      "quantity": 1,
+      "notes": "where Alex is sitting"
+    },
+    {
+      "name": "ice cream cart",
+      "type": "ACTIVE",
+      "quantity": 1,
+      "notes": "pushed by the vendor"
+    },
+    {
+      "name": "guitar",
+      "type": "ACTIVE",
+      "quantity": 1,
+      "notes": "played by the street musician"
+    },
+    {
+      "name": "swings",
+      "type": "ACTIVE",
+      "quantity": 2,
+      "notes": "used by the children"
+    },
+    {
+      "name": "shoelaces",
+      "type": "ACTIVE",
+      "quantity": 2,
+      "notes": "tied by the jogger"
+    },
+    {
+      "name": "crumbs",
+      "type": "SET",
+      "quantity": 1,
+      "notes": "on the bench, picked by the bird"
+    }
   ],
   "locations": [
     {"name": "CITY PARK", "type": "EXT", "time_of_day": "DAY", "notes": ""}
   ]
-}
+}`;
 
-# Example 7 (Summary - French)
-Input:
-12. INT/EXT. CAFÉ PARISIEN - JOUR
-MARIE (35 ans) essuie nerveusement les tables de la terrasse. Un LIVREUR blond à vélo dépose un colis et repart aussitôt. À l'intérieur, le PATRON (60 ans) fait les comptes derrière son comptoir. Deux ÉTUDIANTES sirotent leurs cafés en révisant leurs cours. Un CLOCHARD somnole sur un banc proche, son chien à ses pieds. Le soleil de fin d'après-midi baigne la scène d'une lumière dorée.
-
-En fond : Les PASSANTS se pressent sur le trottoir, un ACCORDÉONISTE joue La Vie en Rose, les klaxons des voitures ponctuent l'ambiance.
-
-Output:
-{
-  "scene_number": "12",
-  "summary": "Marie, serveuse anxieuse, nettoie la terrasse d'un café parisien pendant que la vie urbaine s'anime autour d'elle. L'atmosphère est marquée par le contraste entre l'activité du café et la présence paisible d'un clochard endormi.",
-  "characters": [
-    {"name": "Marie", "type": "PRINCIPAL", "notes": "35 ans"},
-    {"name": "Livreur", "type": "FIGURANT", "notes": "blond, à vélo"},
-    {"name": "Patron", "type": "SECONDARY", "notes": "60 ans"},
-    {"name": "Étudiantes", "type": "FIGURANT", "notes": "20s"},
-    {"name": "Clochard", "type": "FIGURANT", "notes": ""},
-    {"name": "Accordéoniste", "type": "FIGURANT", "notes": ""},
-    {"name": "Passants", "type": "EXTRA", "notes": ""}
-  ],
-  "props": [
-    {"name": "tables", "quantity": 5, "notes": ""},
-    {"name": "colis", "quantity": 1, "notes": ""},
-    {"name": "comptoir", "quantity": 1, "notes": ""},
-    {"name": "tasses de café", "quantity": 2, "notes": ""},
-    {"name": "cours", "quantity": 3, "notes": ""},
-    {"name": "banc", "quantity": 1, "notes": ""},
-    {"name": "accordéon", "quantity": 1, "notes": ""}
-  ],
-  "locations": [
-    {"name": "CAFÉ PARISIEN", "type": "INT", "time_of_day": "DAY", "notes": ""},
-    {"name": "CAFÉ PARISIEN", "type": "EXT", "time_of_day": "DAY", "notes": ""}
-  ]
-}
-`;
+const SCENE_EXAMPLES = `
+${BASIC_EXAMPLES}
+${MULTILINGUAL_EXAMPLES}
+${PROP_COUNTING_EXAMPLES}
+${EDGE_CASE_EXAMPLES}
+${COMPLEX_SCENE_EXAMPLES}`;
 
 export default function buildPrompt(scene: string) {
   return `${SYSTEM_PROMPT}\n\n${SCENE_EXAMPLES}\n\n Now analyze:\n${scene}`;

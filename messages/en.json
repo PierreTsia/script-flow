@@ -63,13 +63,7 @@
     "noAnalysisSelected": "No analysis selected",
     "locations": "Locations",
     "addLocation": "Add Location",
-    "timeOfDay": {
-      "DAY": "Day",
-      "NIGHT": "Night",
-      "DAWN": "Dawn",
-      "DUSK": "Dusk",
-      "UNSPECIFIED": "Unspecified"
-    },
+    
     "removeLocation": "Remove",
     "locationType": {
       "INT": "Interior",
@@ -88,7 +82,14 @@
     "prop": {
       "name": "Name",
       "quantity": "Quantity",
-      "notes": "Notes"
+      "notes": "Notes",
+      "type": "Type",
+      "selectType": "Select type",
+      "types": {
+        "active": "Active",
+        "set": "Set",
+        "transforming": "Turns to Active"
+      }
     },
     "noLocations": "No locations found",
     "noCharacters": "No characters found",
@@ -119,6 +120,13 @@
       "type": "Type",
       "notes": "Notes"
     },
+    "timeOfDay": {
+      "day": "Jour",
+      "night": "Nuit",
+      "dawn": "Aube",
+      "dusk": "Crépuscule",
+      "unspecified": "Unspecified"
+    },
     "addProp": "Add Prop"
   },
   "ScriptEntitiesScreen": {
@@ -129,6 +137,9 @@
     "scenes": "Scenes",
     "characters": "Characters",
     "locations": "Locations",
+    "noProps": "No props found",
+    "noLocations": "No locations found",
+    "noCharacters": "No characters found",
 
     "edit": "Edit",
     "delete": "Delete",
@@ -167,6 +178,7 @@
     "scenesCount": "{count, plural, one {# scene} other {# scenes}}",
 
     "props": "Props",
+
     "propsDetails": {
       "recurring": "Recurring Props",
       "oneOff": "Single Scene Props",
@@ -197,7 +209,7 @@
     },
     "editPropDialog": {
       "title": "Edit Prop",
-      "description": "Update the prop's details",
+      "description": "Edit the prop details below",
       "form": {
         "name": {
           "label": "Name",
@@ -206,11 +218,20 @@
         "quantity": {
           "label": "Quantity",
           "placeholder": "Enter quantity"
+        },
+        "type": {
+          "label": "Type",
+          "placeholder": "Select prop type",
+          "options": {
+            "ACTIVE": "Active Prop",
+            "SET": "Set Dressing",
+            "TRANSFORMING": "Transforming Prop"
+          }
         }
       },
-      "save": "Save",
-      "saving": "Saving...",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "save": "Save changes",
+      "saving": "Saving..."
     },
     "editCharacterDialog": {
       "title": "Edit Character",
@@ -290,7 +311,19 @@
     "prop": {
       "name": "Name",
       "quantity": "Quantity",
-      "notes": "Notes"
+      "notes": "Notes",
+      "type": {
+        "label": "Type",
+        "placeholder": "Select type",
+        "active": "Active Prop",
+        "set": "Set Dressing",
+        "transforming": "Transforming Prop",
+        "options": {
+          "ACTIVE": "Active Prop",
+          "SET": "Set Dressing",
+          "TRANSFORMING": "Transforming Prop"
+        }
+      }
     }
   },
   "EditSceneDialog": {

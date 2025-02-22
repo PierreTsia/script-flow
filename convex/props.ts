@@ -1,5 +1,5 @@
 import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import { Infer, v } from "convex/values";
 import { ConvexError } from "convex/values";
 import { Doc } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
@@ -16,10 +16,27 @@ export type PropsWithScenes = FunctionReturnType<
   typeof api.props.getPropsByScriptId
 >;
 
+/**
+ * Prop Type System
+ *
+ * Props can change their type based on scene context:
+ * - ACTIVE: Used/manipulated by characters
+ * - SET: Static background elements
+ * - TRANSFORMING: Changes state during scene
+ */
+export const propTypeValidator = v.union(
+  v.literal("ACTIVE"),
+  v.literal("SET"),
+  v.literal("TRANSFORMING")
+);
+
+export type PropType = Infer<typeof propTypeValidator>;
+
 const createPropValidator = v.object({
   script_id: v.id("scripts"),
   name: v.string(),
   quantity: v.optional(v.number()),
+  type: propTypeValidator,
   notes: v.optional(v.string()),
 });
 
@@ -28,6 +45,7 @@ const createPropWithSceneValidator = v.object({
   name: v.string(),
   quantity: v.optional(v.number()),
   notes: v.optional(v.string()),
+  type: propTypeValidator,
   scene_id: v.id("scenes"),
 });
 
@@ -55,6 +73,8 @@ export const createProp = mutation({
       script_id: args.script_id,
       name: args.name,
       quantity,
+      type: args.type,
+      searchText: [args.name, args.type].join(" ").toLowerCase(),
     });
 
     return propId;
@@ -66,7 +86,6 @@ export const createPropWithScene = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    // Check if the prop already exists
     let propId;
     const existingProp = await ctx.db
       .query("props")
@@ -78,18 +97,24 @@ export const createPropWithScene = mutation({
     if (existingProp) {
       propId = existingProp._id;
     } else {
-      // Insert new prop
-      const quantity = args.quantity ?? 1; // Default quantity to 1 if not provided
-      const { scene_id, notes, ...propData } = args; // Extract notes
+      // Create new prop with base type
+      const { scene_id, type, name, quantity } = args;
       await requireExists(await ctx.db.get(scene_id), "scene");
-      propId = await ctx.db.insert("props", { ...propData, quantity });
+      propId = await ctx.db.insert("props", {
+        script_id: args.script_id,
+        name,
+        quantity: quantity ?? 1,
+        type, // Base/default type
+        searchText: [name, type].join(" ").toLowerCase(),
+      });
     }
 
-    // Create the junction with notes
+    // Create scene junction with potentially different type
     await ctx.db.insert("prop_scenes", {
       prop_id: propId,
       scene_id: args.scene_id,
-      notes: args.notes, // Put notes here
+      notes: args.notes,
+      type: args.type, // Scene-specific type, may differ from base type
     });
 
     return propId;
@@ -140,8 +165,13 @@ export const getPropsByScriptId = query({
 });
 
 export const updateProp = mutation({
-  args: { prop_id: v.id("props"), name: v.string(), quantity: v.number() },
-  handler: async (ctx, { prop_id, name, quantity }) => {
+  args: {
+    prop_id: v.id("props"),
+    name: v.string(),
+    quantity: v.number(),
+    type: propTypeValidator,
+  },
+  handler: async (ctx, { prop_id, name, quantity, type }) => {
     await requireAuth(ctx);
 
     const prop = await requireExists(await ctx.db.get(prop_id), "prop");
@@ -151,7 +181,7 @@ export const updateProp = mutation({
       await ctx.db.get(prop.script_id),
       "script"
     );
-    await ctx.db.patch(prop_id, { name, quantity });
+    await ctx.db.patch(prop_id, { name, quantity, type });
   },
 });
 

@@ -9,6 +9,20 @@ import {
   timeOfDayValidator,
   locationTypeValidator,
 } from "./helpers";
+import { propTypeValidator } from "./props";
+
+/**
+ * Props Classification System
+ *
+ * Props can be classified as:
+ * - ACTIVE: Objects directly handled/manipulated by characters
+ * - SET: Static background elements worth tracking
+ * - TRANSFORMING: Items that change state during scene
+ *
+ * A prop's type can vary between scenes, managed through the relationship:
+ * - props.type: Default/most common type, used for general classification
+ * - prop_scenes.type: Scene-specific type, overrides default when needed
+ */
 export default defineSchema({
   tasks: defineTable({
     userId: v.string(),
@@ -93,18 +107,33 @@ export default defineSchema({
     script_id: v.id("scripts"),
     name: v.string(),
     quantity: v.number(),
+    /** Base type for general classification and search. Can be overridden per scene */
+    type: propTypeValidator,
+    /** Searchable text combining name and type for filtered queries */
+    searchText: v.string(),
   })
     .index("by_script", ["script_id"])
-    .index("by_name", ["name"])
-    .index("unique_prop_per_script", ["script_id", "name"]),
+    .index("by_type", ["type"]) // For type-based queries
+    .index("unique_prop_per_script", ["script_id", "name"])
+    .searchIndex("search_props", {
+      searchField: "searchText",
+      filterFields: ["script_id", "type"],
+    }),
   prop_scenes: defineTable({
     prop_id: v.id("props"),
     scene_id: v.id("scenes"),
     notes: v.optional(v.string()),
+    quantity: v.optional(v.number()),
+    /**
+     * Scene-specific type that can override the base prop type
+     * Example: A chair (SET) becomes ACTIVE when used as a weapon
+     */
+    type: propTypeValidator,
   })
     .index("by_prop_scene", ["prop_id", "scene_id"])
     .index("by_prop", ["prop_id"])
-    .index("by_scene", ["scene_id"]),
+    .index("by_scene", ["scene_id"])
+    .index("by_type", ["type"]),
 
   /* 
   use like so: 

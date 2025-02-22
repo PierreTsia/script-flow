@@ -53,6 +53,9 @@ export const draftPropsValidator = v.array(
     name: v.string(),
     quantity: v.number(),
     notes: v.optional(v.string()),
+    type: v.optional(
+      v.union(v.literal("ACTIVE"), v.literal("SET"), v.literal("TRANSFORMING"))
+    ),
   })
 );
 
