@@ -175,6 +175,7 @@
     "scenesCount": "{count, plural, one {# scene} other {# scenes}}",
 
     "props": "Props",
+
     "propsDetails": {
       "recurring": "Recurring Props",
       "oneOff": "Single Scene Props",
@@ -298,7 +299,12 @@
     "prop": {
       "name": "Name",
       "quantity": "Quantity",
-      "notes": "Notes"
+      "notes": "Notes",
+      "type": {
+        "active": "Active",
+        "set": "Set",
+        "transforming": "Turns to Active"
+      }
     }
   },
   "EditSceneDialog": {

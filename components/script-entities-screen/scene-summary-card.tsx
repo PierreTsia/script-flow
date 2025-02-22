@@ -46,6 +46,7 @@ import { useState } from "react";
 import EditSceneDialog from "./edit-scene-dialog";
 import { Id } from "@/convex/_generated/dataModel";
 import Link from "next/link";
+import SceneSummaryCardProps from "./scene-summary-card-props";
 
 export type SceneWithEntities = ScriptEntitiesResult["scenes"][number];
 
@@ -203,21 +204,8 @@ const SceneSummaryCard = ({
             </div>
 
             {/* Props */}
-            <div>
-              <h4 className="text-sm font-medium mb-2">
-                {t("entityLabels.props")}
-              </h4>
-              <div className="flex flex-wrap gap-1">
-                {scene?.props.filter(Boolean).map((prop, index) => (
-                  <Badge
-                    key={`prop-scene-${prop?._id}-${scene._id}-${index}`}
-                    variant="secondary"
-                  >
-                    {prop?.name} ({prop?.quantity})
-                  </Badge>
-                ))}
-              </div>
-            </div>
+
+            <SceneSummaryCardProps props={scene?.props} />
           </div>
         </div>
       </CardContent>

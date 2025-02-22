@@ -301,7 +301,12 @@
     "prop": {
       "name": "Nom",
       "quantity": "Quantité",
-      "notes": "Notes"
+      "notes": "Notes",
+      "type": {
+        "active": "Actif",
+        "set": "Décor",
+        "transforming": "Devient Actif"
+      }
     }
   },
   "EditSceneDialog": {
