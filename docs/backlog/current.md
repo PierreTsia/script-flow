@@ -74,9 +74,9 @@
      - [ ] Scenes listing
      - [ ] Characters listing
      - [ ] Character-scene relationships
-   - [ ] Create auth helpers:
-     - [ ] Move common auth checks to `convex/model/auth.ts`
-     - [ ] Implement `requireAuth` utility function
+   - [x] Create auth helpers:
+     - [x] Move common auth checks to `convex/model/auth.ts`
+     - [x] Implement `requireAuth` utility function
    - [x] Schema improvements for scene-specific notes:
      - [x] Remove notes field from characters, locations, and props tables
      - [x] Add notes field to all junction tables (character_scenes, location_scenes, prop_scenes)
@@ -91,9 +91,9 @@
    - [ ] Add size limits to `.collect()` operations:
      - [ ] Add default limits where pagination isn't implemented
      - [ ] Add warning comments for potentially large queries
-   - [ ] Error handling improvements:
-     - [ ] Standardize error messages
-     - [ ] Implement proper ConvexError usage
+   - [x] Error handling improvements:
+     - [x] Standardize error messages
+     - [x] Implement proper ConvexError usage
 
 
 
