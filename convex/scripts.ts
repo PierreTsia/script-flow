@@ -50,8 +50,13 @@ export const deleteScript = mutation({
     scriptId: v.id("scripts"),
   },
   handler: async (ctx, args) => {
-    const script = await ctx.db.get(args.scriptId);
-    const myScript = await requireScriptOwnership(ctx, script, "script");
+    await requireAuth(ctx);
+
+    const myScript = await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(args.scriptId),
+      "script"
+    );
 
     await ctx.db.delete(myScript._id);
     await ctx.storage.delete(myScript.fileId);
@@ -63,13 +68,16 @@ export const getScript = query({
 
   handler: async (ctx, { scriptId }) => {
     const auth = await getAuthState(ctx);
-    const script = await ctx.db.get(scriptId);
-    const myScript = await requireScriptOwnership(ctx, script, "script");
+    const myScript = await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(scriptId),
+      "script"
+    );
 
     const fileUrl = await ctx.storage.getUrl(myScript.fileId);
 
     return {
-      data: auth?.userId === myScript.userId ? script : null,
+      data: auth?.userId === myScript.userId ? myScript : null,
       accessLevel: auth?.userId === myScript.userId ? "owner" : "viewer",
       authStatus: auth ? "authenticated" : "unauthenticated",
       fileUrl: auth?.userId === myScript.userId ? fileUrl : null,
@@ -82,12 +90,15 @@ export const getScriptEntities = query({
   handler: async (ctx, { scriptId }) => {
     await requireAuth(ctx);
 
-    const script = await ctx.db.get(scriptId);
-    await requireScriptOwnership(ctx, script, "script");
+    const myScript = await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(scriptId),
+      "script"
+    );
 
     const scenes = await ctx.db
       .query("scenes")
-      .withIndex("by_script", (q) => q.eq("script_id", scriptId))
+      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
       .order("desc")
       .collect();
 
@@ -158,6 +169,6 @@ export const getScriptEntities = query({
         .map((link) => props.find((prop) => prop._id === link.prop_id)),
     }));
 
-    return { ...script, scenes: scenesWithEntities };
+    return { ...myScript, scenes: scenesWithEntities };
   },
 });

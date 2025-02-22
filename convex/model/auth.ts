@@ -38,6 +38,7 @@ export async function requireExists<T extends Doc<TableNames>>(
   resource: T | null,
   resourceType: string = "resource"
 ): Promise<NonNullable<T>> {
+  console.log("resource", resource);
   if (!resource) {
     throw new ConvexError({
       message: `Not Found: ${resourceType} does not exist`,
