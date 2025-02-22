@@ -2,7 +2,6 @@ import { ConvexError } from "convex/values";
 import { MutationCtx, QueryCtx } from "../_generated/server";
 import { Doc, TableNames } from "../_generated/dataModel";
 
-// Types for better DX
 export type AuthUser = {
   subject: string;
   email?: string;
