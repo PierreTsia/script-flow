@@ -101,19 +101,19 @@
    - [x] Script entities screen
    - [x] Script entities screen layout
    - [x] Tabs for Locations, Characters, Props
-   - [-] finish crud
+   - [x] finish crud
    - [-] finish dedup
-   - [-] dynamic button in save draft analysis stepper
-   - [ ] replace buttons in save analysis tabs + review form layout (name + quqntity in one line)
+   - [x] dynamic button in save draft analysis stepper
+   - [x] replace buttons in save analysis tabs + review form layout (name + quqntity in one line)
 
    **Files:** `src/app/[scriptId]/page.tsx`
 
 
 ### UI improvements
 
-- [ ] script upload with form to save name and description (and then upload)
+- [x] script upload with form to save name and description (and then upload)
 - [ ] replace selected text with a editable text area (mardown editor?)
-- [ ] hunt missing trads in the app
+- [x] hunt missing trads in the app
 
 
 ## Error Handling (3h)

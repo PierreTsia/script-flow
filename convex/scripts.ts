@@ -1,10 +1,16 @@
 import { mutation, query } from "./_generated/server";
-import { v, ConvexError } from "convex/values";
+import { v } from "convex/values";
 import { compareStrings } from "../lib/string-sort";
+import {
+  requireAuth,
+  getAuthState,
+  requireScriptOwnership,
+} from "./model/auth";
 
 export const getUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
+    await requireAuth(ctx);
     const url = await ctx.storage.generateUploadUrl();
     return url;
   },
@@ -16,11 +22,7 @@ export const createNewScriptFromStorageId = mutation({
     name: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthorized");
-    }
-    const userId = identity.subject;
+    const { userId } = await requireAuth(ctx);
     await ctx.db.insert("scripts", {
       userId,
       fileId: args.fileId,
@@ -33,12 +35,11 @@ export const createNewScriptFromStorageId = mutation({
 export const getAll = query({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    const userId = identity?.subject;
-    return userId
+    const auth = await getAuthState(ctx);
+    return auth?.userId
       ? await ctx.db
           .query("scripts")
-          .withIndex("by_user", (q) => q.eq("userId", userId))
+          .withIndex("by_user", (q) => q.eq("userId", auth.userId))
           .collect()
       : [];
   },
@@ -49,19 +50,11 @@ export const deleteScript = mutation({
     scriptId: v.id("scripts"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    const userId = identity?.subject;
     const script = await ctx.db.get(args.scriptId);
-    if (!script) {
-      throw new ConvexError("Script not found");
-    }
-    if (script.userId !== userId) {
-      throw new ConvexError("Unauthorized");
-    }
+    const myScript = await requireScriptOwnership(ctx, script, "script");
 
-    await ctx.db.delete(args.scriptId);
-    await ctx.storage.delete(script.fileId);
+    await ctx.db.delete(myScript._id);
+    await ctx.storage.delete(myScript.fileId);
   },
 });
 
@@ -69,18 +62,17 @@ export const getScript = query({
   args: { scriptId: v.id("scripts") },
 
   handler: async (ctx, { scriptId }) => {
-    const identity = await ctx.auth.getUserIdentity();
+    const auth = await getAuthState(ctx);
     const script = await ctx.db.get(scriptId);
+    const myScript = await requireScriptOwnership(ctx, script, "script");
 
-    if (!script) return null;
-
-    const fileUrl = await ctx.storage.getUrl(script.fileId);
+    const fileUrl = await ctx.storage.getUrl(myScript.fileId);
 
     return {
-      data: identity?.subject === script.userId ? script : null,
-      accessLevel: identity?.subject === script.userId ? "owner" : "viewer",
-      authStatus: identity ? "authenticated" : "unauthenticated",
-      fileUrl: identity?.subject === script.userId ? fileUrl : null,
+      data: auth?.userId === myScript.userId ? script : null,
+      accessLevel: auth?.userId === myScript.userId ? "owner" : "viewer",
+      authStatus: auth ? "authenticated" : "unauthenticated",
+      fileUrl: auth?.userId === myScript.userId ? fileUrl : null,
     };
   },
 });
@@ -88,19 +80,11 @@ export const getScript = query({
 export const getScriptEntities = query({
   args: { scriptId: v.id("scripts") },
   handler: async (ctx, { scriptId }) => {
-    const identity = await ctx.auth.getUserIdentity();
-    const userId = identity?.subject;
-    console.log("scriptId", scriptId);
-    console.log("userId", userId);
-    const script = await ctx.db.get(scriptId);
-    if (!script) {
-      throw new ConvexError("Script not found");
-    }
-    if (script.userId !== userId) {
-      throw new ConvexError("Unauthorized");
-    }
+    await requireAuth(ctx);
 
-    // Fetch scenes
+    const script = await ctx.db.get(scriptId);
+    await requireScriptOwnership(ctx, script, "script");
+
     const scenes = await ctx.db
       .query("scenes")
       .withIndex("by_script", (q) => q.eq("script_id", scriptId))
