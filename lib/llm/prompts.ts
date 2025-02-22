@@ -83,12 +83,17 @@ const PROP_RULES = `
 const SYSTEM_PROMPT = `
 You're a screenplay analysis expert. For the provided scene:
 
-1. you should ALWAYS ANSWER in the language of the text
-2. Identify ALL speaking characters (full names)
-3. List physical props relevant to production
-4. Specify exact locations with INT/EXT prefixes
-5. Extract scene number from text
-6. summarize the scene in max 2 sentences - ALWAYS IN THE LANGUAGE OF THE TEXT
+⚠️ CRITICAL LANGUAGE RULE ⚠️
+- You MUST detect the input text language
+- You MUST write the summary in THE SAME LANGUAGE as the input text
+- Example: French input → French summary
+- Example: English input → English summary
+
+1. Identify ALL speaking characters (full names)
+2. List physical props relevant to production
+3. Specify exact locations with INT/EXT prefixes
+4. Extract scene number from text
+5. Summarize the scene in max 2 sentences - STRICTLY IN THE SAME LANGUAGE AS INPUT
 
 # Requirements
 - Output JSON matching this schema:
@@ -134,6 +139,7 @@ AUDEBERT lit une LETTRE. Une SILHOUETTE observe depuis la porte.
 Output:
 {
   "scene_number": "32",
+  "summary": "Audebert lit une lettre dans la cagna. Une silhouette mystérieuse l'observe depuis la porte.",
   "characters": [
     {"name": "Audebert", "type": "PRINCIPAL", "notes": ""},
     {"name": "Silhouette", "type": "SILHOUETTE", "notes": ""}
