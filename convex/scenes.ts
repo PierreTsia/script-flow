@@ -8,6 +8,12 @@ import { ConvexError, v } from "convex/values";
 import { Doc } from "@/convex/_generated/dataModel";
 import { api } from "./_generated/api";
 import { filter } from "convex-helpers/server/filter";
+import {
+  requireAuth,
+  requireScriptOwnership,
+  requireExists,
+} from "./model/auth";
+
 export type SceneDocument = Doc<"scenes">;
 
 export type SceneWithEntities = FunctionReturnType<
@@ -77,10 +83,17 @@ export const saveDraft = mutation({
     pageNumber: v.number(),
   },
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
+    const myScript = await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(args.scriptId),
+      "script"
+    );
+
     const analysis: SceneAnalysis = JSON.parse(args.analysis);
 
     const draftId = await ctx.db.insert("draftScenesAnalysis", {
-      script_id: args.scriptId,
+      script_id: myScript._id,
       scene_number: args.sceneNumber,
       locations: analysis.locations,
       characters: analysis.characters,
@@ -100,9 +113,17 @@ export const getDrafts = query({
     scriptId: v.id("scripts"),
   },
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
+    const myScript = await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(args.scriptId),
+      "script"
+    );
+
     return await ctx.db
       .query("draftScenesAnalysis")
-      .withIndex("by_script", (q) => q.eq("script_id", args.scriptId))
+      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
       .collect();
   },
 });
@@ -125,20 +146,18 @@ export const saveScene = mutation({
     summary: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthorized");
-    }
+    await requireAuth(ctx);
 
-    const script = await ctx.db.get(args.script_id);
-    if (!script) {
-      throw new Error("Script not found");
-    }
+    const myScript = await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(args.script_id),
+      "script"
+    );
 
     const existing = await ctx.db
       .query("scenes")
       .withIndex("unique_scene_constraint", (q) =>
-        q.eq("script_id", args.script_id).eq("scene_number", args.scene_number)
+        q.eq("script_id", myScript._id).eq("scene_number", args.scene_number)
       )
       .unique();
 
@@ -150,7 +169,7 @@ export const saveScene = mutation({
     }
 
     const sceneId = await ctx.db.insert("scenes", {
-      script_id: args.script_id,
+      script_id: myScript._id,
       scene_number: args.scene_number,
       page_number: args.page_number,
       text: args.text,
@@ -167,16 +186,23 @@ export const getSceneAndEntitiesByNumber = query({
     sceneNumber: v.string(),
   },
   handler: async (ctx, { scriptId, sceneNumber }) => {
-    const scene = await ctx.db
-      .query("scenes")
-      .withIndex("unique_scene_constraint", (q) =>
-        q.eq("script_id", scriptId).eq("scene_number", sceneNumber)
-      )
-      .unique();
+    await requireAuth(ctx);
 
-    if (!scene) {
-      return null;
-    }
+    const myScript = await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(scriptId),
+      "script"
+    );
+
+    const scene = await requireExists(
+      await ctx.db
+        .query("scenes")
+        .withIndex("unique_scene_constraint", (q) =>
+          q.eq("script_id", myScript._id).eq("scene_number", sceneNumber)
+        )
+        .unique(),
+      "scene"
+    );
 
     // Fetch characters with their scene-specific notes
     const characterScenes = await ctx.db
@@ -215,29 +241,15 @@ export const deleteScene = mutation({
     sceneId: v.id("scenes"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new ConvexError({
-        message: "Unauthorized",
-        code: "UNAUTHORIZED",
-      });
-    }
+    await requireAuth(ctx);
 
-    const scene = await ctx.db.get(args.sceneId);
-    if (!scene) {
-      throw new ConvexError({
-        message: "Scene not found",
-        code: "SCENE_NOT_FOUND",
-      });
-    }
+    const scene = await requireExists(await ctx.db.get(args.sceneId), "scene");
 
-    const script = await ctx.db.get(scene.script_id);
-    if (script?.userId !== identity.subject) {
-      throw new ConvexError({
-        message: "Unauthorized: Cannot delete another user's scene",
-        code: "UNAUTHORIZED",
-      });
-    }
+    await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(scene.script_id),
+      "script"
+    );
 
     // Collect all records to delete
     const characterScenes = await ctx.db

@@ -4,7 +4,11 @@ import { ConvexError } from "convex/values";
 import { Doc } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { api } from "./_generated/api";
-
+import {
+  requireAuth,
+  requireExists,
+  requireScriptOwnership,
+} from "./model/auth";
 export type PropDocument = Doc<"props">;
 export type PropSceneDocument = Doc<"prop_scenes">;
 
@@ -30,10 +34,7 @@ const createPropWithSceneValidator = v.object({
 export const createProp = mutation({
   args: createPropValidator,
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthorized");
-    }
+    await requireAuth(ctx);
 
     const existingProp = await ctx.db
       .query("props")
@@ -63,10 +64,7 @@ export const createProp = mutation({
 export const createPropWithScene = mutation({
   args: createPropWithSceneValidator,
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new ConvexError("Unauthorized");
-    }
+    await requireAuth(ctx);
 
     // Check if the prop already exists
     let propId;
@@ -83,6 +81,7 @@ export const createPropWithScene = mutation({
       // Insert new prop
       const quantity = args.quantity ?? 1; // Default quantity to 1 if not provided
       const { scene_id, notes, ...propData } = args; // Extract notes
+      await requireExists(await ctx.db.get(scene_id), "scene");
       propId = await ctx.db.insert("props", { ...propData, quantity });
     }
 
@@ -100,10 +99,17 @@ export const createPropWithScene = mutation({
 export const getPropsByScriptId = query({
   args: { script_id: v.id("scripts") },
   handler: async (ctx, { script_id }) => {
+    await requireAuth(ctx);
+
+    const myScript = await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(script_id),
+      "script"
+    );
     // Get all props for this script
     const props = await ctx.db
       .query("props")
-      .withIndex("by_script", (q) => q.eq("script_id", script_id))
+      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
       .collect();
 
     // Fetch scenes for each prop
@@ -136,16 +142,15 @@ export const getPropsByScriptId = query({
 export const updateProp = mutation({
   args: { prop_id: v.id("props"), name: v.string(), quantity: v.number() },
   handler: async (ctx, { prop_id, name, quantity }) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new ConvexError("Unauthorized");
-    }
+    await requireAuth(ctx);
 
-    const prop = await ctx.db.get(prop_id);
-    if (!prop) {
-      throw new ConvexError("Prop not found");
-    }
+    const prop = await requireExists(await ctx.db.get(prop_id), "prop");
 
+    await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(prop.script_id),
+      "script"
+    );
     await ctx.db.patch(prop_id, { name, quantity });
   },
 });
@@ -153,15 +158,15 @@ export const updateProp = mutation({
 export const deleteProp = mutation({
   args: { prop_id: v.id("props") },
   handler: async (ctx, { prop_id }) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new ConvexError("Unauthorized");
-    }
+    await requireAuth(ctx);
 
-    const prop = await ctx.db.get(prop_id);
-    if (!prop) {
-      throw new ConvexError("Prop not found");
-    }
+    const prop = await requireExists(await ctx.db.get(prop_id), "prop");
+
+    await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(prop.script_id),
+      "script"
+    );
 
     const propScenes = await ctx.db
       .query("prop_scenes")

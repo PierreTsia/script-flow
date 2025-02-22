@@ -4,7 +4,11 @@ import { characterTypeValidator } from "./helpers";
 import { Doc } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { api } from "./_generated/api";
-
+import {
+  requireAuth,
+  requireScriptOwnership,
+  requireExists,
+} from "./model/auth";
 export type CharacterDocument = Doc<"characters">;
 export type CharacterSceneDocument = Doc<"character_scenes">;
 export type CharacterSceneWithNotes = CharacterSceneDocument & {
@@ -33,11 +37,7 @@ export const createCharacter = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthorized");
-    }
-
+    await requireAuth(ctx);
     const existingCharacter = await ctx.db
       .query("characters")
       .withIndex("unique_character_per_script", (q) =>
@@ -52,8 +52,14 @@ export const createCharacter = mutation({
       throw new ConvexError(`Character ${args.name} already exists`);
     }
 
+    const myScript = await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(args.script_id),
+      "script"
+    );
+
     const characterId = await ctx.db.insert("characters", {
-      script_id: args.script_id,
+      script_id: myScript._id,
       name: args.name,
       type: args.type,
       aliases: args.aliases,
@@ -69,10 +75,13 @@ export const createCharacter = mutation({
 export const createCharacterWithScene = mutation({
   args: createCharacterWithSceneValidator,
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new ConvexError("Unauthorized");
-    }
+    await requireAuth(ctx);
+
+    const myScript = await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(args.script_id),
+      "script"
+    );
 
     // Check if the character already exists
     let characterId;
@@ -80,7 +89,7 @@ export const createCharacterWithScene = mutation({
       .query("characters")
       .withIndex("unique_character_per_script", (q) =>
         q
-          .eq("script_id", args.script_id)
+          .eq("script_id", myScript._id)
           .eq("name", args.name)
           .eq("type", args.type)
       )
@@ -94,7 +103,7 @@ export const createCharacterWithScene = mutation({
         [name, ...(aliases || [])].join(" ").toLowerCase() + ` ${type}`;
 
       characterId = await ctx.db.insert("characters", {
-        script_id: args.script_id,
+        script_id: myScript._id,
         name,
         type,
         aliases,
@@ -118,9 +127,15 @@ export const getCharactersByScriptId = query({
     script_id: v.id("scripts"),
   },
   handler: async (ctx, { script_id }) => {
+    const myScript = await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(script_id),
+      "script"
+    );
+
     const characters = await ctx.db
       .query("characters")
-      .withIndex("by_script", (q) => q.eq("script_id", script_id))
+      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
       .collect();
 
     // Fetch character-scene relationships with notes
@@ -156,18 +171,17 @@ export const deduplicateCharacter = mutation({
     target_character_id: v.id("characters"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new ConvexError("Unauthorized");
-    }
+    await requireAuth(ctx);
 
     // Check if the characters exist
-    const duplicatedCharacter = await ctx.db.get(args.duplicated_character_id);
-    const targetCharacter = await ctx.db.get(args.target_character_id);
-
-    if (!duplicatedCharacter || !targetCharacter) {
-      throw new ConvexError("Character not found");
-    }
+    const duplicatedCharacter = await requireExists(
+      await ctx.db.get(args.duplicated_character_id),
+      "character"
+    );
+    const targetCharacter = await requireExists(
+      await ctx.db.get(args.target_character_id),
+      "character"
+    );
 
     // Update target character with merged data
     await ctx.db.patch(args.target_character_id, {
@@ -241,25 +255,24 @@ export const deleteCharacter = mutation({
     character_id: v.id("characters"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new ConvexError("Unauthorized");
-    }
+    await requireAuth(ctx);
 
-    const characterToDelete = await ctx.db.get(args.character_id);
-    if (!characterToDelete) {
-      throw new ConvexError("Character not found");
-    }
+    const characterToDelete = await requireExists(
+      await ctx.db.get(args.character_id),
+      "character"
+    );
 
     // delete join tables rows
     const characterScenes = await ctx.db
       .query("character_scenes")
-      .withIndex("by_character", (q) => q.eq("character_id", args.character_id))
+      .withIndex("by_character", (q) =>
+        q.eq("character_id", characterToDelete._id)
+      )
       .collect();
 
     // Batch delete all related records in a single transaction
     const mutations = [
-      ctx.db.delete(args.character_id),
+      ctx.db.delete(characterToDelete._id),
       ...characterScenes.map((cs) => ctx.db.delete(cs._id)),
     ];
 
@@ -275,12 +288,14 @@ export const updateCharacter = mutation({
     aliases: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new ConvexError("Unauthorized");
-    }
+    await requireAuth(ctx);
 
-    await ctx.db.patch(args.character_id, {
+    const characterToUpdate = await requireExists(
+      await ctx.db.get(args.character_id),
+      "character"
+    );
+
+    await ctx.db.patch(characterToUpdate._id, {
       name: args.name,
       type: args.type,
       aliases: args.aliases,

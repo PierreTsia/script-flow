@@ -74,9 +74,9 @@
      - [ ] Scenes listing
      - [ ] Characters listing
      - [ ] Character-scene relationships
-   - [ ] Create auth helpers:
-     - [ ] Move common auth checks to `convex/model/auth.ts`
-     - [ ] Implement `requireAuth` utility function
+   - [x] Create auth helpers:
+     - [x] Move common auth checks to `convex/model/auth.ts`
+     - [x] Implement `requireAuth` utility function
    - [x] Schema improvements for scene-specific notes:
      - [x] Remove notes field from characters, locations, and props tables
      - [x] Add notes field to all junction tables (character_scenes, location_scenes, prop_scenes)
@@ -91,9 +91,9 @@
    - [ ] Add size limits to `.collect()` operations:
      - [ ] Add default limits where pagination isn't implemented
      - [ ] Add warning comments for potentially large queries
-   - [ ] Error handling improvements:
-     - [ ] Standardize error messages
-     - [ ] Implement proper ConvexError usage
+   - [x] Error handling improvements:
+     - [x] Standardize error messages
+     - [x] Implement proper ConvexError usage
 
 
 
@@ -101,19 +101,19 @@
    - [x] Script entities screen
    - [x] Script entities screen layout
    - [x] Tabs for Locations, Characters, Props
-   - [-] finish crud
+   - [x] finish crud
    - [-] finish dedup
-   - [-] dynamic button in save draft analysis stepper
-   - [ ] replace buttons in save analysis tabs + review form layout (name + quqntity in one line)
+   - [x] dynamic button in save draft analysis stepper
+   - [x] replace buttons in save analysis tabs + review form layout (name + quqntity in one line)
 
    **Files:** `src/app/[scriptId]/page.tsx`
 
 
 ### UI improvements
 
-- [ ] script upload with form to save name and description (and then upload)
+- [x] script upload with form to save name and description (and then upload)
 - [ ] replace selected text with a editable text area (mardown editor?)
-- [ ] hunt missing trads in the app
+- [x] hunt missing trads in the app
 
 
 ## Error Handling (3h)

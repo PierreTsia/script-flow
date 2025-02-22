@@ -9,19 +9,25 @@ import { useTranslations } from "next-intl";
 
 interface FileDropZoneProps {
   onFileAccepted: (file: File) => Promise<void>;
+  onFileSelected?: (file: File) => void;
 }
 
-export function FileDropZone({ onFileAccepted }: FileDropZoneProps) {
+export function FileDropZone({
+  onFileAccepted,
+  onFileSelected,
+}: FileDropZoneProps) {
   const t = useTranslations("Scripts");
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+
   const onDrop = useCallback(
     (droppedFiles: File[]) => {
       if (droppedFiles.length > 0) {
         setFile(droppedFiles[0]);
+        onFileSelected?.(droppedFiles[0]);
       }
     },
-    [setFile]
+    [onFileSelected]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -64,9 +70,7 @@ export function FileDropZone({ onFileAccepted }: FileDropZoneProps) {
         <div
           {...getRootProps()}
           className={`h-full w-full p-4 flex flex-col items-center justify-center cursor-pointer transition-colors ${
-            isDragActive
-              ? "  bg-primary/10"
-              : "hover:border-muted-foreground/50"
+            isDragActive ? "bg-primary/10" : "hover:border-muted-foreground/50"
           }`}
         >
           <input {...getInputProps()} />
