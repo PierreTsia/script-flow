@@ -63,13 +63,7 @@
     "noAnalysisSelected": "No analysis selected",
     "locations": "Locations",
     "addLocation": "Add Location",
-    "timeOfDay": {
-      "DAY": "Day",
-      "NIGHT": "Night",
-      "DAWN": "Dawn",
-      "DUSK": "Dusk",
-      "UNSPECIFIED": "Unspecified"
-    },
+    
     "removeLocation": "Remove",
     "locationType": {
       "INT": "Interior",
@@ -118,6 +112,13 @@
       "name": "Name",
       "type": "Type",
       "notes": "Notes"
+    },
+    "timeOfDay": {
+      "day": "Jour",
+      "night": "Nuit",
+      "dawn": "Aube",
+      "dusk": "Crépuscule",
+      "unspecified": "Unspecified"
     },
     "addProp": "Add Prop"
   },
