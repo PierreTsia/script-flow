@@ -26,6 +26,7 @@ const CreateNewPropDialog = ({
       scriptId,
       name: values.name,
       quantity: values.quantity ? parseInt(values.quantity) : 1,
+      type: values.type,
     });
     onClose();
   };

@@ -405,10 +405,12 @@ const useSceneEntities = () => {
     name,
     quantity,
     scriptId,
+    type,
   }: {
     name: string;
     quantity: number;
     scriptId: Id<"scripts">;
+    type: PropType;
   }) => {
     setIsLoading(true);
     try {
@@ -416,6 +418,7 @@ const useSceneEntities = () => {
         name,
         quantity,
         script_id: scriptId,
+        type,
       });
       return propId;
     } catch (error) {

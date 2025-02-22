@@ -114,12 +114,17 @@
       "quantity": "Quantité",
       "notes": "Notes",
       "name": "Nom",
-      "type": "Type",
-      "selectType": "Sélectionner le type",
-      "types": {
-        "active": "Actif",
-        "set": "Décor",
-        "transforming": "Devient Actif"
+      "type": {
+        "label": "Type",
+        "placeholder": "Sélectionner le type",
+        "active": "Accessoire Actif",
+        "set": "Élément de Décor",
+        "transforming": "Accessoire Transformable",
+        "options": {
+          "ACTIVE": "Accessoire Actif",
+          "SET": "Élément de Décor",
+          "TRANSFORMING": "Accessoire Transformable"
+        }
       }
     },
     "addProp": "Ajouter un accessoire",
@@ -312,9 +317,16 @@
       "quantity": "Quantité",
       "notes": "Notes",
       "type": {
-        "active": "Actif",
-        "set": "Décor",
-        "transforming": "Devient Actif"
+        "label": "Type",
+        "placeholder": "Sélectionner le type",
+        "active": "Accessoire Actif",
+        "set": "Élément de Décor",
+        "transforming": "Accessoire Transformable",
+        "options": {
+          "ACTIVE": "Accessoire Actif",
+          "SET": "Élément de Décor",
+          "TRANSFORMING": "Accessoire Transformable"
+        }
       }
     }
   },

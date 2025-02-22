@@ -310,9 +310,16 @@
       "quantity": "Quantity",
       "notes": "Notes",
       "type": {
-        "active": "Active",
-        "set": "Set",
-        "transforming": "Turns to Active"
+        "label": "Type",
+        "placeholder": "Select type",
+        "active": "Active Prop",
+        "set": "Set Dressing",
+        "transforming": "Transforming Prop",
+        "options": {
+          "ACTIVE": "Active Prop",
+          "SET": "Set Dressing",
+          "TRANSFORMING": "Transforming Prop"
+        }
       }
     }
   },
