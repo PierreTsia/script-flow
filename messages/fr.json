@@ -113,7 +113,14 @@
     "prop": {
       "quantity": "Quantité",
       "notes": "Notes",
-      "name": "Nom"
+      "name": "Nom",
+      "type": "Type",
+      "selectType": "Sélectionner le type",
+      "types": {
+        "active": "Actif",
+        "set": "Décor",
+        "transforming": "Devient Actif"
+      }
     },
     "addProp": "Ajouter un accessoire",
     "timeOfDay": {

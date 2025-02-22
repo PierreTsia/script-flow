@@ -9,6 +9,7 @@ const SCHEMA_DEFINITION = `{
   "props": [{
     "name": string,
     "quantity": number,
+    "type": "ACTIVE" | "SET" | "TRANSFORMING",
     "notes": string  
   }],
   "locations": [{
@@ -40,27 +41,46 @@ const ENTITY_RULES = `
   - EXTRA: Crowd members without specifics`;
 
 const PROP_RULES = `
-- Props: 
+- Props Classification:
 
-  - Quantity must be integer >=1
-  - For plural nouns without numbers, estimate using:
-    - "encombré de livres" → 15
-    - "des pages" → 10
-    - "quelques" → 3
-    - "plusieurs" → 5
-    - "nombreux" → 10
-  - Never use ranges (5+) or non-numeric values
-  - Include key descriptive details in 'notes'`;
+  1. ACTIVE Props:
+     - Objects directly handled/manipulated by characters
+     - Items specifically mentioned in character actions
+     - Example: "John picks up the COFFEE MUG" → type: "ACTIVE"
+
+  2. SET Props:
+     - Static background elements worth tracking
+     - Furniture and decorative items
+     - Example: "The walls are covered with PAINTINGS" → type: "SET"
+
+  3. TRANSFORMING Props:
+     - Items that change state during scene
+     - Set pieces that become interactive
+     - Example: "CURTAINS she later tears down" → type: "TRANSFORMING"
+
+  - Quantity Rules:
+    - Must be integer >=1
+    - For plural nouns without numbers, estimate using:
+      - "encombré de livres" → 15
+      - "des pages" → 10
+      - "quelques" → 3
+      - "plusieurs" → 5
+      - "nombreux" → 10
+
+  - Notes field must include:
+    - For ACTIVE: interaction context
+    - For SET: location/placement details
+    - For TRANSFORMING: state changes`;
 
 const SYSTEM_PROMPT = `
 You're a screenplay analysis expert. For the provided scene:
 
-1. Identify ALL speaking characters (full names)
-2. List physical props relevant to production
-3. Specify exact locations with INT/EXT prefixes
-4. Extract scene number from text
-5. summarize the scene in max 2 sentences
-6. the summary MUST BE in the language of the text
+1. you should ALWAYS ANSWER in the language of the text
+2. Identify ALL speaking characters (full names)
+3. List physical props relevant to production
+4. Specify exact locations with INT/EXT prefixes
+5. Extract scene number from text
+6. summarize the scene in max 2 sentences
 
 # Requirements
 - Output JSON matching this schema:
@@ -90,7 +110,7 @@ Output:
     {"name": "man 2", "type": "FIGURANT", "notes": ""}
   ],
   "props": [
-    {"name": "shotgun shell", "quantity": 1}
+    {"name": "shotgun shell", "quantity": 1, "type": "ACTIVE", "notes": "polished by Mac"}
   ],
   "locations": [
     {"name": "DIVE BAR", "type": "INT", "time_of_day": "NIGHT", "notes": ""}
@@ -111,7 +131,7 @@ Output:
     {"name": "Silhouette", "type": "SILHOUETTE", "notes": ""}
   ],
   "props": [
-    {"name": "lettre", "quantity": 1}
+    {"name": "lettre", "quantity": 1, "type": "ACTIVE", "notes": "lue par Audebert"}
   ],
   "locations": [
     {"name": "CAGNA FRANCAISE", "type": "INT", "time_of_day": "DAY", "notes": ""}
@@ -119,17 +139,80 @@ Output:
 }`;
 
 const PROP_COUNTING_EXAMPLES = `
-# Example (Quantity Detection)
+# Example (Props Types & Quantity)
 Input: |
-  Un bureau couvert de trois dossiers épais.  
-  Deux tasses de café froid traînent près d'une pile de cinq livres.
+  Un bureau couvert de trois dossiers épais. Marie saisit une des deux tasses de café froid qui 
+  traînent près d'une pile de cinq livres. Elle tire violemment la nappe, faisant tomber tout ce qui 
+  se trouve sur la table.
 
 Output:
 {
   "props": [
-    {"name": "dossiers", "quantity": 3, "notes": "épais"},
-    {"name": "tasses de café", "quantity": 2, "notes": "froid"},
-    {"name": "livres", "quantity": 5, "notes": ""}
+    {
+      "name": "dossiers",
+      "type": "SET",
+      "quantity": 3,
+      "notes": "épais, sur le bureau"
+    },
+    {
+      "name": "tasses de café",
+      "type": "ACTIVE",
+      "quantity": 2,
+      "notes": "froid, une saisie par Marie"
+    },
+    {
+      "name": "livres",
+      "type": "SET",
+      "quantity": 5,
+      "notes": "empilés près des tasses"
+    },
+    {
+      "name": "nappe",
+      "type": "TRANSFORMING",
+      "quantity": 1,
+      "notes": "tirée violemment, fait tomber les objets"
+    },
+    {
+      "name": "bureau",
+      "type": "SET",
+      "quantity": 1,
+      "notes": "couvert de dossiers"
+    }
+  ]
+}
+
+# Example (Mixed Interactions)
+Input: |
+  Dans le salon, un vieux piano couvert de cadres photos. Tom s'assoit et commence à jouer. 
+  Sur une étagère, plusieurs trophées poussiéreux. Il en prend un et le lance par la fenêtre.
+
+Output:
+{
+  "props": [
+    {
+      "name": "piano",
+      "type": "TRANSFORMING",
+      "quantity": 1,
+      "notes": "vieux, devient instrument joué par Tom"
+    },
+    {
+      "name": "cadres photos",
+      "type": "SET",
+      "quantity": 5,
+      "notes": "sur le piano"
+    },
+    {
+      "name": "trophées",
+      "type": "ACTIVE",
+      "quantity": 3,
+      "notes": "poussiéreux, un lancé par la fenêtre"
+    },
+    {
+      "name": "étagère",
+      "type": "SET",
+      "quantity": 1,
+      "notes": "support des trophées"
+    }
   ]
 }`;
 
@@ -168,9 +251,48 @@ Output:
     {"name": "musician", "type": "FIGURANT", "notes": ""}
   ],
   "props": [
-    {"name": "newspaper", "quantity": 1, "notes": ""},
-    {"name": "ice cream cart", "quantity": 1, "notes": ""},
-    {"name": "guitar", "quantity": 1, "notes": ""}
+    {
+      "name": "newspaper",
+      "type": "ACTIVE",
+      "quantity": 1,
+      "notes": "read by Alex"
+    },
+    {
+      "name": "bench",
+      "type": "SET",
+      "quantity": 1,
+      "notes": "where Alex is sitting"
+    },
+    {
+      "name": "ice cream cart",
+      "type": "ACTIVE",
+      "quantity": 1,
+      "notes": "pushed by the vendor"
+    },
+    {
+      "name": "guitar",
+      "type": "ACTIVE",
+      "quantity": 1,
+      "notes": "played by the street musician"
+    },
+    {
+      "name": "swings",
+      "type": "ACTIVE",
+      "quantity": 2,
+      "notes": "used by the children"
+    },
+    {
+      "name": "shoelaces",
+      "type": "ACTIVE",
+      "quantity": 2,
+      "notes": "tied by the jogger"
+    },
+    {
+      "name": "crumbs",
+      "type": "SET",
+      "quantity": 1,
+      "notes": "on the bench, picked by the bird"
+    }
   ],
   "locations": [
     {"name": "CITY PARK", "type": "EXT", "time_of_day": "DAY", "notes": ""}

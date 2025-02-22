@@ -82,7 +82,14 @@
     "prop": {
       "name": "Name",
       "quantity": "Quantity",
-      "notes": "Notes"
+      "notes": "Notes",
+      "type": "Type",
+      "selectType": "Select type",
+      "types": {
+        "active": "Active",
+        "set": "Set",
+        "transforming": "Turns to Active"
+      }
     },
     "noLocations": "No locations found",
     "noCharacters": "No characters found",
