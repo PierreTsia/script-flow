@@ -208,7 +208,7 @@
     },
     "editPropDialog": {
       "title": "Modifier l'accessoire",
-      "description": "Modifiez les détails de l'accessoire ci-dessous.",
+      "description": "Modifiez les détails de l'accessoire",
       "form": {
         "name": {
           "label": "Nom",
@@ -217,11 +217,20 @@
         "quantity": {
           "label": "Quantité",
           "placeholder": "Entrez la quantité"
+        },
+        "type": {
+          "label": "Type",
+          "placeholder": "Sélectionnez le type",
+          "options": {
+            "ACTIVE": "Accessoire Actif",
+            "SET": "Élément de Décor",
+            "TRANSFORMING": "Accessoire Transformable"
+          }
         }
       },
+      "cancel": "Annuler",
       "save": "Enregistrer",
-      "saving": "Enregistrement...",
-      "cancel": "Annuler"
+      "saving": "Enregistrement..."
     },
     "editCharacterDialog": {
       "title": "Modifier le personnage",

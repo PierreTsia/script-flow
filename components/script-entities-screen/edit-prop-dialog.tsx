@@ -22,10 +22,18 @@ import { Input } from "@/components/ui/input";
 import useSceneEntities from "@/hooks/useSceneEntities";
 import { useTranslations } from "next-intl";
 import { PropsWithScenes } from "@/convex/props";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   quantity: z.number().min(1, "Quantity must be at least 1"),
+  type: z.enum(["ACTIVE", "SET", "TRANSFORMING"]),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -47,6 +55,7 @@ export function EditPropDialog({
     defaultValues: {
       name: prop.name,
       quantity: prop.quantity || 1,
+      type: prop.type,
     },
   });
 
@@ -56,6 +65,7 @@ export function EditPropDialog({
       updates: {
         name: values.name,
         quantity: values.quantity,
+        type: values.type,
       },
     });
     onClose();
@@ -92,6 +102,43 @@ export function EditPropDialog({
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("form.type.label")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={t("form.type.placeholder")}
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+                      <FormControl>
+                        <SelectContent>
+                          <SelectItem value="ACTIVE">
+                            {t("form.type.options.ACTIVE")}
+                          </SelectItem>
+                          <SelectItem value="SET">
+                            {t("form.type.options.SET")}
+                          </SelectItem>
+                          <SelectItem value="TRANSFORMING">
+                            {t("form.type.options.TRANSFORMING")}
+                          </SelectItem>
+                        </SelectContent>
+                      </FormControl>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="quantity"

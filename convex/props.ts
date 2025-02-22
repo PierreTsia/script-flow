@@ -165,8 +165,13 @@ export const getPropsByScriptId = query({
 });
 
 export const updateProp = mutation({
-  args: { prop_id: v.id("props"), name: v.string(), quantity: v.number() },
-  handler: async (ctx, { prop_id, name, quantity }) => {
+  args: {
+    prop_id: v.id("props"),
+    name: v.string(),
+    quantity: v.number(),
+    type: propTypeValidator,
+  },
+  handler: async (ctx, { prop_id, name, quantity, type }) => {
     await requireAuth(ctx);
 
     const prop = await requireExists(await ctx.db.get(prop_id), "prop");
@@ -176,7 +181,7 @@ export const updateProp = mutation({
       await ctx.db.get(prop.script_id),
       "script"
     );
-    await ctx.db.patch(prop_id, { name, quantity });
+    await ctx.db.patch(prop_id, { name, quantity, type });
   },
 });
 

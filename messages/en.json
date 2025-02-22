@@ -206,7 +206,7 @@
     },
     "editPropDialog": {
       "title": "Edit Prop",
-      "description": "Update the prop's details",
+      "description": "Edit the prop details below",
       "form": {
         "name": {
           "label": "Name",
@@ -215,11 +215,20 @@
         "quantity": {
           "label": "Quantity",
           "placeholder": "Enter quantity"
+        },
+        "type": {
+          "label": "Type",
+          "placeholder": "Select prop type",
+          "options": {
+            "ACTIVE": "Active Prop",
+            "SET": "Set Dressing",
+            "TRANSFORMING": "Transforming Prop"
+          }
         }
       },
-      "save": "Save",
-      "saving": "Saving...",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "save": "Save changes",
+      "saving": "Saving..."
     },
     "editCharacterDialog": {
       "title": "Edit Character",

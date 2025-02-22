@@ -52,7 +52,7 @@ const PropsForm = ({
   const propFormSchema = z.object({
     name: z.string().min(2).max(50),
     quantity: z.number().min(1),
-    type: z.enum(["ACTIVE", "SET", "TRANSFORMING"]).optional(),
+    type: z.enum(["ACTIVE", "SET", "TRANSFORMING"]),
     notes: z.string().optional(),
   });
 

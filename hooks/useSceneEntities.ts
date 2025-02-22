@@ -337,7 +337,7 @@ const useSceneEntities = () => {
     updates,
   }: {
     propId: Id<"props">;
-    updates: { name: string; quantity: number };
+    updates: { name: string; quantity: number; type: PropType };
   }) => {
     setIsLoading(true);
     try {
@@ -345,6 +345,7 @@ const useSceneEntities = () => {
         prop_id: propId,
         name: updates.name,
         quantity: updates.quantity,
+        type: updates.type,
       });
       toast({
         title: "Prop updated",
