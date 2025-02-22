@@ -137,6 +137,9 @@
     "scenes": "Scenes",
     "characters": "Characters",
     "locations": "Locations",
+    "noProps": "No props found",
+    "noLocations": "No locations found",
+    "noCharacters": "No characters found",
 
     "edit": "Edit",
     "delete": "Delete",

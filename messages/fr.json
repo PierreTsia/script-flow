@@ -108,23 +108,17 @@
       "type": "Type",
       "notes": "Notes"
     },
-
     "removeProp": "Supprimer",
     "prop": {
       "quantity": "Quantité",
       "notes": "Notes",
       "name": "Nom",
-      "type": {
-        "label": "Type",
-        "placeholder": "Sélectionner le type",
-        "active": "Accessoire Actif",
-        "set": "Élément de Décor",
-        "transforming": "Accessoire Transformable",
-        "options": {
-          "ACTIVE": "Accessoire Actif",
-          "SET": "Élément de Décor",
-          "TRANSFORMING": "Accessoire Transformable"
-        }
+      "type": "Type",
+      "selectType": "Sélectionner le type",
+      "types": {
+        "active": "Actif",
+        "set": "Décor",
+        "transforming": "Transformable"
       }
     },
     "addProp": "Ajouter un accessoire",
@@ -141,7 +135,9 @@
     "propsTitle": "Accessoires",
     "locationsTitle": "Lieux",
     "charactersTitle": "Personnages",
-
+    "noProps": "Aucun accessoire trouvé",
+    "noLocations": "Aucun lieu trouvé",
+    "noCharacters": "Aucun personnage trouvé",
     "scenes": "Scènes",
     "characters": "Personnages",
     "locations": "Lieux",
@@ -181,7 +177,6 @@
       "mergeButton": "Fusionner les personnages"
     },
     "scenesCount": "{count, plural, one {# scène} other {# scènes}}",
-
     "props": "Accessoires",
     "propsDetails": {
       "recurring": "Accessoires Récurrents",
@@ -189,7 +184,6 @@
       "unassigned": "Accessoires Non Affectés",
       "quantity": "{count, plural, one {# unité} other {# unités}}"
     },
-
     "confirmDeleteDialog": {
       "title": "Êtes-vous sûr ?",
       "description": "Êtes-vous sûr de vouloir supprimer {entityType} {entityName} ?",
@@ -235,7 +229,14 @@
       },
       "cancel": "Annuler",
       "save": "Enregistrer",
-      "saving": "Enregistrement..."
+      "saving": "Enregistrement...",
+      "prop":{
+        "type":{
+          "set":"Décor",
+          "active":"Actif",
+          "transforming":"Devient actif"  
+                  }
+      }
     },
     "editCharacterDialog": {
       "title": "Modifier le personnage",
@@ -317,16 +318,17 @@
       "quantity": "Quantité",
       "notes": "Notes",
       "type": {
-        "label": "Type",
-        "placeholder": "Sélectionner le type",
-        "active": "Accessoire Actif",
-        "set": "Élément de Décor",
-        "transforming": "Accessoire Transformable",
+        "active": "Actif",
+        "set": "Décor",
+        "transforming": "Transformable",
+        "secondary": "Secondaire",
         "options": {
-          "ACTIVE": "Accessoire Actif",
-          "SET": "Élément de Décor",
-          "TRANSFORMING": "Accessoire Transformable"
-        }
+          "ACTIVE": "Actif",
+          "SET": "Décor",
+          "TRANSFORMING": "Transformable"
+        },
+        "label": "Type d'accessoire",
+        "placeholder": "Sélectionner un type"
       }
     }
   },

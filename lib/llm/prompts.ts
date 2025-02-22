@@ -42,9 +42,11 @@ const ENTITY_RULES = `
 
 const PROP_RULES = `
 - Props Classification:
+  - NEVER classify humans, characters, or living beings as props
+  - Only classify physical objects and set pieces
 
   1. ACTIVE Props:
-     - Objects directly handled/manipulated by characters
+     - Physical objects directly handled/manipulated by characters
      - Items specifically mentioned in character actions
      - Example: "John picks up the COFFEE MUG" → type: "ACTIVE"
 
@@ -57,6 +59,12 @@ const PROP_RULES = `
      - Items that change state during scene
      - Set pieces that become interactive
      - Example: "CURTAINS she later tears down" → type: "TRANSFORMING"
+
+  - Exclusions:
+    - Characters, people, or living beings
+    - Abstract concepts
+    - Weather or natural phenomena
+    - Implied items not explicitly mentioned
 
   - Quantity Rules:
     - Must be integer >=1
@@ -80,7 +88,7 @@ You're a screenplay analysis expert. For the provided scene:
 3. List physical props relevant to production
 4. Specify exact locations with INT/EXT prefixes
 5. Extract scene number from text
-6. summarize the scene in max 2 sentences
+6. summarize the scene in max 2 sentences - ALWAYS IN THE LANGUAGE OF THE TEXT
 
 # Requirements
 - Output JSON matching this schema:
