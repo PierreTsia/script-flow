@@ -331,22 +331,29 @@ export const updateCharacter = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const characterToUpdate = await requireExists(
+    const oldCharacter = await requireExists(
       await ctx.db.get(args.character_id),
       "character"
     );
 
-    await ctx.db.patch(characterToUpdate._id, {
+    await ctx.db.patch(oldCharacter._id, {
       name: args.name,
       type: args.type,
       aliases: args.aliases,
     });
-    const newCharacter = await requireExists(
-      await ctx.db.get(characterToUpdate._id),
+
+    const updatedCharacter = await requireExists(
+      await ctx.db.get(oldCharacter._id),
       "character"
     );
 
-    await charactersAggregate.replace(ctx, characterToUpdate, newCharacter);
+    await charactersAggregate.replaceOrInsert(
+      ctx,
+      oldCharacter,
+      updatedCharacter
+    );
+
+    return updatedCharacter;
   },
 });
 

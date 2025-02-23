@@ -31,9 +31,15 @@ export const useScene = () => {
     });
   };
 
-  const useGetLocationsByScriptId = (scriptId: Id<"scripts">) => {
-    return useQuery(api.locations.getLocationsByScriptId, {
+  const useGetLocationsByScriptId = (
+    scriptId: Id<"scripts">,
+    limit = 25,
+    cursor?: string
+  ) => {
+    return useStableQuery(api.locations.getLocationsByScriptId, {
       script_id: scriptId,
+      limit,
+      cursor,
     });
   };
 

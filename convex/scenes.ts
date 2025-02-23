@@ -50,11 +50,9 @@ export const analyzeScene = httpAction(async (ctx, request) => {
 
   const allowedOrigins = [clientOrigin, "http://localhost:3000"];
   const requestOrigin = request.headers.get("Origin")!;
-  console.log("requestOrigin", requestOrigin);
   const isValidOrigin = allowedOrigins.some(
     (origin) => origin.trim() === requestOrigin
   );
-  console.log("isValidOrigin", isValidOrigin);
   const corsHeaders = {
     "Access-Control-Allow-Origin": isValidOrigin ? requestOrigin! : "",
     "Access-Control-Allow-Methods": "POST",
@@ -423,7 +421,7 @@ export const updateScene = mutation({
 
     const newScene = await ctx.db.get(args.sceneId);
 
-    await scenesAggregate.replace(ctx, scene!, newScene!);
+    await scenesAggregate.replaceOrInsert(ctx, scene!, newScene!);
 
     return scene._id;
   },
