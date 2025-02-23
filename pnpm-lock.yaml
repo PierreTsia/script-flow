@@ -8,6 +8,9 @@ dependencies:
   '@clerk/nextjs':
     specifier: ^6.11.1
     version: 6.11.3(next@15.1.6)(react-dom@19.0.0)(react@19.0.0)
+  '@convex-dev/aggregate':
+    specifier: ^0.1.20
+    version: 0.1.20(convex@1.19.2)
   '@helicone/helpers':
     specifier: ^1.0.0
     version: 1.0.0
@@ -250,6 +253,14 @@ packages:
     engines: {node: '>=18.17.0'}
     dependencies:
       csstype: 3.1.3
+    dev: false
+
+  /@convex-dev/aggregate@0.1.20(convex@1.19.2):
+    resolution: {integrity: sha512-9Y39K9U3pSR8QoskaQrUknz4Iln9Oh53o/MMM+sbsNeTMu8Oqc1c7lFlp9Gxj/aJoyGe0UuT37RdpG9fm6Wn9w==, tarball: https://registry.npmjs.org/@convex-dev/aggregate/-/aggregate-0.1.20.tgz}
+    peerDependencies:
+      convex: ~1.16.5 || >=1.17.0 <1.25.0
+    dependencies:
+      convex: 1.19.2(react-dom@19.0.0)(react@19.0.0)
     dev: false
 
   /@emnapi/runtime@1.3.1:

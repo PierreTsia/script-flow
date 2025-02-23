@@ -74,6 +74,8 @@
      - [ ] Scenes listing
      - [ ] Characters listing
      - [ ] Character-scene relationships
+     - [ ] Props listing
+     - [ ] Locations listing
    - [x] Create auth helpers:
      - [x] Move common auth checks to `convex/model/auth.ts`
      - [x] Implement `requireAuth` utility function
@@ -218,7 +220,7 @@ Technical Notes:
      - [ ] Vehicles (with types: land, air, water, futuristic)
      - [ ] Animals (with categories: pets, wildlife, mythical)
      - [ ] Costumes/Wardrobe (with period, style attributes)
-   - [ ] Revise character types based on industry standards
+   - [x] Revise character types based on industry standards
    - [x] Update props categorization system
    - [ ] Enhance location type taxonomy
 

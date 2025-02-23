@@ -24,7 +24,7 @@ import PropBadge from "../ui/prop-badge";
 export default function PropSummaryCard({
   prop,
 }: {
-  prop: PropsWithScenes[number];
+  prop: PropsWithScenes["props"][number];
 }) {
   const t = useTranslations("ScriptEntitiesScreen");
   const { deleteProp, isLoading } = useSceneEntities();

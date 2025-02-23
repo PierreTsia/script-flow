@@ -12,7 +12,7 @@ export default function ScriptLayout({
 }) {
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1">
         {children}
         <Toaster />
       </div>

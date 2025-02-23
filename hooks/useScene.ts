@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { ConvexError } from "convex/values";
 const API_URL = "https://animated-mole-731.convex.site";
+import { useStableQuery } from "@/hooks/useStablePaginatedQuery";
 
 export type DraftSceneAnalysis = Doc<"draftScenesAnalysis">;
 
@@ -42,8 +43,16 @@ export const useScene = () => {
     });
   };
 
-  const useGetPropsByScriptId = (scriptId: Id<"scripts">) => {
-    return useQuery(api.props.getPropsByScriptId, { script_id: scriptId });
+  const useGetPropsByScriptId = (
+    scriptId: Id<"scripts">,
+    limit = 25,
+    cursor?: string
+  ) => {
+    return useStableQuery(api.props.getPropsByScriptId, {
+      script_id: scriptId,
+      limit,
+      cursor,
+    });
   };
 
   const analyze = async (

@@ -43,7 +43,7 @@ export function EditPropDialog({
   isOpen,
   onClose,
 }: {
-  prop: PropsWithScenes[number];
+  prop: PropsWithScenes["props"][number];
   isOpen: boolean;
   onClose: () => void;
 }) {

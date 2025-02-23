@@ -31,7 +31,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
 import { useTranslations } from "next-intl";
 import { EntitySelect } from "./entity-select";
 
@@ -95,7 +94,31 @@ const EditSceneDialog = ({
 
   const allCharacters = useGetCharactersByScriptId(scriptId);
   const allLocations = useGetLocationsByScriptId(scriptId);
-  const allProps = useGetPropsByScriptId(scriptId);
+  const result = useGetPropsByScriptId(scriptId, 25);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      scene_number: scene.scene_number,
+      characters: characters.map((char) => ({
+        ...char,
+        markedForDeletion: false,
+      })),
+      summary,
+      locations: locations.map((loc) => ({
+        ...loc,
+        markedForDeletion: false,
+      })),
+      props: props.map((prop) => ({
+        ...prop,
+        markedForDeletion: false,
+      })),
+    },
+  });
+
+  if (!result) return null;
+
+  const { props: allProps } = result;
 
   const availableCharacters = allCharacters
     ?.filter((char) => !characters.some((c) => c?._id === char?._id))
@@ -164,26 +187,6 @@ const EditSceneDialog = ({
       onClose();
     }
   };
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      scene_number: scene.scene_number,
-      characters: characters.map((char) => ({
-        ...char,
-        markedForDeletion: false,
-      })),
-      summary,
-      locations: locations.map((loc) => ({
-        ...loc,
-        markedForDeletion: false,
-      })),
-      props: props.map((prop) => ({
-        ...prop,
-        markedForDeletion: false,
-      })),
-    },
-  });
 
   const toggleCharacterDeletion = (id: Id<"characters">) => {
     form.setValue(

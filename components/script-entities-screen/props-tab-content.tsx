@@ -12,21 +12,37 @@ import { useState } from "react";
 import CreateNewPropDialog from "./create-new-prop-dialog";
 import { PropsWithScenes } from "@/convex/props";
 
+import { CursorPagination } from "@/components/ui/cursor-pagination/cursor-pagination";
+
+const ITEMS_PER_PAGE = 12;
+
+type Prop = PropsWithScenes["props"][number];
+
 type GroupedProps = {
-  recurring: PropsWithScenes;
-  oneOff: PropsWithScenes;
-  unassigned: PropsWithScenes;
+  recurring: Prop[];
+  oneOff: Prop[];
+  unassigned: Prop[];
 };
 
 const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const t = useTranslations("ScriptEntitiesScreen");
+  const [page, setPage] = useState(1);
+  const [cursors, setCursors] = useState<string[]>([]);
   const { useGetPropsByScriptId } = useScene();
-  const props = useGetPropsByScriptId(scriptId);
+  const result = useGetPropsByScriptId(
+    scriptId,
+    ITEMS_PER_PAGE,
+    page === 1 ? undefined : cursors[page - 2]
+  );
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  if (!props) return <EntityScreenSkeleton />;
+  if (!result) return <EntityScreenSkeleton />;
 
-  const groupedProps = props.reduce<GroupedProps>(
+  const { props: propsList, nextCursor, total } = result;
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+
+  const groupedProps = propsList?.reduce<GroupedProps>(
     (acc, prop) => {
       const scenesCount = prop.scenes?.length || 0;
       if (scenesCount > 1) {
@@ -61,7 +77,7 @@ const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
         onClose={() => setIsCreateModalOpen(false)}
       />
 
-      <ScrollArea className="h-[calc(100vh-220px)]">
+      <ScrollArea className="flex-1">
         {Object.entries(groupedProps).map(
           ([group, items]) =>
             items.length > 0 && (
@@ -80,6 +96,19 @@ const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
             )
         )}
       </ScrollArea>
+
+      <CursorPagination
+        state={{
+          page,
+          cursors,
+          totalPages,
+          nextCursor,
+        }}
+        onPageChange={(newPage, newCursors) => {
+          setPage(newPage);
+          setCursors(newCursors);
+        }}
+      />
     </div>
   );
 };
