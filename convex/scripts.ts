@@ -1,6 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { compareStrings } from "../lib/string-sort";
+import { scenesAggregate } from "./scenes";
 import {
   requireAuth,
   getAuthState,
@@ -86,8 +86,12 @@ export const getScript = query({
 });
 
 export const getScriptEntities = query({
-  args: { scriptId: v.id("scripts") },
-  handler: async (ctx, { scriptId }) => {
+  args: {
+    scriptId: v.id("scripts"),
+    limit: v.optional(v.number()),
+    cursor: v.optional(v.string()),
+  },
+  handler: async (ctx, { scriptId, limit, cursor }) => {
     await requireAuth(ctx);
 
     const myScript = await requireScriptOwnership(
@@ -96,17 +100,19 @@ export const getScriptEntities = query({
       "script"
     );
 
-    const scenes = await ctx.db
+    // Paginate scenes query
+    const paginatedScenes = await ctx.db
       .query("scenes")
-      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
-      .order("desc")
-      .collect();
+      .withIndex("by_script_and_sort", (q) => q.eq("script_id", myScript._id))
+      .order("asc")
+      .paginate({
+        numItems: limit ?? 10,
+        cursor: cursor ?? null,
+      });
 
-    const sortedScenes = scenes.sort((a, b) =>
-      compareStrings(a.scene_number, b.scene_number)
-    );
+    const scenes = paginatedScenes.page;
 
-    // Fetch all characters linked to scenes
+    // Fetch all entities for these scenes only
     const characterLinks = await Promise.all(
       scenes.map((scene) =>
         ctx.db
@@ -121,7 +127,6 @@ export const getScriptEntities = query({
       .withIndex("by_script", (q) => q.eq("script_id", scriptId))
       .collect();
 
-    // Fetch all locations linked to scenes
     const locationLinks = await Promise.all(
       scenes.map((scene) =>
         ctx.db
@@ -136,7 +141,6 @@ export const getScriptEntities = query({
       .withIndex("by_script", (q) => q.eq("script_id", scriptId))
       .collect();
 
-    // Fetch all props linked to scenes
     const propLinks = await Promise.all(
       scenes.map((scene) =>
         ctx.db
@@ -151,8 +155,8 @@ export const getScriptEntities = query({
       .withIndex("by_script", (q) => q.eq("script_id", scriptId))
       .collect();
 
-    // Construct the nested structure
-    const scenesWithEntities = sortedScenes.map((scene) => ({
+    // Construct the nested structure for paginated scenes
+    const scenesWithEntities = scenes.map((scene) => ({
       ...scene,
       characters: characterLinks
         .filter((link) => link.scene_id === scene._id)
@@ -169,6 +173,14 @@ export const getScriptEntities = query({
         .map((link) => props.find((prop) => prop._id === link.prop_id)),
     }));
 
-    return { ...myScript, scenes: scenesWithEntities };
+    // Get total count using aggregate (you'll need to create this)
+    const totalScenes = await scenesAggregate.count(ctx);
+
+    return {
+      script: myScript,
+      scenes: scenesWithEntities,
+      nextCursor: paginatedScenes.continueCursor,
+      total: totalScenes,
+    };
   },
 });

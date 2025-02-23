@@ -1,3 +1,5 @@
+import PagePaginationItem from "../page-pagination-item";
+
 import { PaginationEllipsis } from "@/components/ui/pagination";
 
 import { PaginationNumbersProps } from "@/components/ui/pagination-numbers";

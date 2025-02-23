@@ -1,4 +1,5 @@
-// hooks/useStableQuery.ts
+// useful for paginated queries
+// prevents micro-loading flashes when the query is re-run with new pagination params
 
 import { useRef } from "react";
 import { useQuery } from "convex/react";

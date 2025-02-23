@@ -13,12 +13,31 @@ import {
   requireScriptOwnership,
   requireExists,
 } from "./model/auth";
+import { TableAggregate } from "@convex-dev/aggregate";
+import { DataModel } from "./_generated/dataModel";
+import { components } from "./_generated/api";
+
+export const scenesAggregate = new TableAggregate<{
+  Key: null;
+  DataModel: DataModel;
+  TableName: "scenes";
+}>(components.aggregate, {
+  sortKey: () => null,
+});
 
 export type SceneDocument = Doc<"scenes">;
 
 export type SceneWithEntities = FunctionReturnType<
   typeof api.scenes.getSceneAndEntitiesByNumber
 >;
+
+export const sceneNumberToSortKey = (sceneNumber: string): string => {
+  const match = sceneNumber.match(/(\d+)([A-Za-z]*)/);
+  if (!match) return sceneNumber.padStart(5, "0");
+
+  const [_, num, suffix] = match;
+  return num.padStart(5, "0") + (suffix || "");
+};
 
 export const analyzeScene = httpAction(async (ctx, request) => {
   const { text, pageNumber } = await request.json();
@@ -174,7 +193,12 @@ export const saveScene = mutation({
       page_number: args.page_number,
       text: args.text,
       summary: args.summary,
+      sortKey: sceneNumberToSortKey(args.scene_number),
     });
+
+    const scene = await requireExists(await ctx.db.get(sceneId), "scene");
+
+    await scenesAggregate.insertIfDoesNotExist(ctx, scene);
 
     return sceneId;
   },
@@ -274,6 +298,8 @@ export const deleteScene = mutation({
       ...locationScenes.map((ls) => ctx.db.delete(ls._id)),
       ...propScenes.map((ps) => ctx.db.delete(ps._id)),
     ]);
+
+    await scenesAggregate.delete(ctx, scene!);
   },
 });
 
@@ -391,9 +417,75 @@ export const updateScene = mutation({
       ctx.db.patch(scene._id, {
         summary: args.summary,
         scene_number: args.sceneNumber,
+        sortKey: sceneNumberToSortKey(args.sceneNumber),
       }),
     ]);
 
+    const newScene = await ctx.db.get(args.sceneId);
+
+    await scenesAggregate.replace(ctx, scene!, newScene!);
+
     return scene._id;
+  },
+});
+
+export const backfillSceneSortKeys = mutation({
+  handler: async (ctx) => {
+    const scenes = await ctx.db.query("scenes").collect();
+    let updated = 0;
+    let errors = 0;
+
+    for (const scene of scenes) {
+      try {
+        if (!scene.sortKey) {
+          await ctx.db.patch(scene._id, {
+            sortKey: sceneNumberToSortKey(scene.scene_number),
+          });
+          updated++;
+        }
+      } catch (e) {
+        console.error(`Failed to update scene ${scene._id}:`, e);
+        errors++;
+      }
+    }
+
+    return {
+      processed: scenes.length,
+      updated,
+      errors,
+      skipped: scenes.length - updated - errors,
+    };
+  },
+});
+
+// Mutation to initialize/repair the aggregate
+export const backfillScenesAggregate = mutation({
+  handler: async (ctx) => {
+    // First, get accurate count
+    const scenes = await ctx.db.query("scenes").collect();
+
+    // Rebuild aggregate
+    let updated = 0;
+    let errors = 0;
+
+    for (const scene of scenes) {
+      try {
+        await scenesAggregate.insert(ctx, scene);
+        updated++;
+      } catch (e) {
+        console.error(`Failed to insert scene ${scene._id}:`, e);
+        errors++;
+      }
+    }
+
+    // Verify final count
+    const finalCount = await scenesAggregate.count(ctx);
+
+    return {
+      actualScenes: scenes.length,
+      aggregateCount: finalCount,
+      updated,
+      errors,
+    };
   },
 });
