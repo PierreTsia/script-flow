@@ -15,11 +15,15 @@ import useSceneEntities from "@/hooks/useSceneEntities";
 import { CharacterFormSchema } from "./character-form";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { CharacterType } from "@/convex/helpers";
+import { CursorPagination } from "@/components/ui/cursor-pagination/cursor-pagination";
+
 interface CreateCharacterDialogProps {
   scriptId: Id<"scripts">;
   isOpen: boolean;
   onClose: () => void;
 }
+
+type CharacterWithScenes = CharactersWithScenes["characters"][number];
 
 const CreateCharacterDialog = ({
   scriptId,
@@ -66,17 +70,30 @@ const CreateCharacterDialog = ({
   );
 };
 
+const ITEMS_PER_PAGE = 12;
+
 const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const t = useTranslations("ScriptEntitiesScreen");
+  const [page, setPage] = useState(1);
+  const [cursors, setCursors] = useState<string[]>([]);
   const { useGetCharactersByScriptId } = useScene();
-  const characters = useGetCharactersByScriptId(scriptId);
+
+  const result = useGetCharactersByScriptId(
+    scriptId,
+    ITEMS_PER_PAGE,
+    page === 1 ? undefined : cursors[page - 2]
+  );
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  if (!characters) {
+  if (!result) {
     return <EntityScreenSkeleton />;
   }
 
-  const partitionCharactersByType = (characters: CharactersWithScenes) => {
+  const { characters, nextCursor, total } = result;
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+
+  const partitionCharactersByType = (characters: CharacterWithScenes[]) => {
     return characters.reduce(
       (acc, char) => {
         if (char.type === "PRINCIPAL") {
@@ -98,7 +115,7 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
         FEATURED_EXTRA: [],
         SILENT_KEY: [],
         ATMOSPHERE: [],
-      } as Record<CharacterType, CharactersWithScenes>
+      } as Record<CharacterType, CharacterWithScenes[]>
     );
   };
 
@@ -112,7 +129,7 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
     );
   });
 
-  const getPotentialDuplicates = (character: CharactersWithScenes[number]) => {
+  const getPotentialDuplicates = (character: CharacterWithScenes) => {
     return characters
       .filter((c) => c._id !== character._id)
       .sort((a, b) => {
@@ -163,11 +180,13 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
           {t("createNew")}
         </Button>
       </div>
+
       <CreateCharacterDialog
         scriptId={scriptId}
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
       />
+
       <ScrollArea className="h-[calc(100vh-220px)]">
         {Object.entries(groupedCharacters).map(([group, chars]) => (
           <div key={group} className="mb-8">
@@ -188,6 +207,19 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
           </div>
         ))}
       </ScrollArea>
+
+      <CursorPagination
+        state={{
+          page,
+          cursors,
+          totalPages,
+          nextCursor,
+        }}
+        onPageChange={(newPage, newCursors) => {
+          setPage(newPage);
+          setCursors(newCursors);
+        }}
+      />
     </div>
   );
 };

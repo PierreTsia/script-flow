@@ -9,6 +9,10 @@ import {
   requireScriptOwnership,
   requireExists,
 } from "./model/auth";
+import { components } from "./_generated/api";
+import { TableAggregate } from "@convex-dev/aggregate";
+import { DataModel } from "./_generated/dataModel";
+
 export type CharacterDocument = Doc<"characters">;
 export type CharacterSceneDocument = Doc<"character_scenes">;
 export type CharacterSceneWithNotes = CharacterSceneDocument & {
@@ -18,6 +22,14 @@ export type CharacterSceneWithNotes = CharacterSceneDocument & {
 export type CharactersWithScenes = FunctionReturnType<
   typeof api.characters.getCharactersByScriptId
 >;
+
+const charactersAggregate = new TableAggregate<{
+  Key: null;
+  DataModel: DataModel;
+  TableName: "characters";
+}>(components.aggregate, {
+  sortKey: () => null,
+});
 
 const createCharacterWithSceneValidator = v.object({
   script_id: v.id("scripts"),
@@ -68,6 +80,13 @@ export const createCharacter = mutation({
         ` ${args.type}`,
     });
 
+    const character = await requireExists(
+      await ctx.db.get(characterId),
+      "character"
+    );
+
+    await charactersAggregate.insert(ctx, character);
+
     return characterId;
   },
 });
@@ -109,6 +128,13 @@ export const createCharacterWithScene = mutation({
         aliases,
         searchText,
       });
+
+      const newCharacter = await requireExists(
+        await ctx.db.get(characterId),
+        "character"
+      );
+
+      await charactersAggregate.insert(ctx, newCharacter);
     }
 
     // Create the junction with notes
@@ -125,22 +151,28 @@ export const createCharacterWithScene = mutation({
 export const getCharactersByScriptId = query({
   args: {
     script_id: v.id("scripts"),
+    limit: v.optional(v.number()),
+    cursor: v.optional(v.string()),
   },
-  handler: async (ctx, { script_id }) => {
+  handler: async (ctx, { script_id, limit, cursor }) => {
     const myScript = await requireScriptOwnership(
       ctx,
       await ctx.db.get(script_id),
       "script"
     );
 
-    const characters = await ctx.db
+    const paginatedCharacters = await ctx.db
       .query("characters")
       .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
-      .collect();
+      .order("asc")
+      .paginate({
+        numItems: limit || 25,
+        cursor: cursor || null,
+      });
 
     // Fetch character-scene relationships with notes
     const characterScenes = await Promise.all(
-      characters.map(async (character) => {
+      paginatedCharacters.page.map(async (character) => {
         const scenes = await ctx.db
           .query("character_scenes")
           .withIndex("by_character", (q) => q.eq("character_id", character._id))
@@ -148,6 +180,7 @@ export const getCharactersByScriptId = query({
 
         return {
           ...character,
+
           scenes: await Promise.all(
             scenes.map(async (cs) => {
               const scene = await ctx.db.get(cs.scene_id);
@@ -161,7 +194,13 @@ export const getCharactersByScriptId = query({
       })
     );
 
-    return characterScenes;
+    const total = await charactersAggregate.count(ctx);
+
+    return {
+      characters: characterScenes,
+      nextCursor: paginatedCharacters.continueCursor,
+      total,
+    };
   },
 });
 
@@ -262,6 +301,8 @@ export const deleteCharacter = mutation({
       "character"
     );
 
+    await charactersAggregate.delete(ctx, characterToDelete);
+
     // delete join tables rows
     const characterScenes = await ctx.db
       .query("character_scenes")
@@ -300,5 +341,36 @@ export const updateCharacter = mutation({
       type: args.type,
       aliases: args.aliases,
     });
+    const newCharacter = await requireExists(
+      await ctx.db.get(characterToUpdate._id),
+      "character"
+    );
+
+    await charactersAggregate.replace(ctx, characterToUpdate, newCharacter);
+  },
+});
+
+export const backfillCharactersAggregate = mutation({
+  handler: async (ctx) => {
+    const characters = await ctx.db.query("characters").collect();
+    await Promise.all(
+      characters.map((character) => charactersAggregate.insert(ctx, character))
+    );
+    return {
+      success: true,
+      message: "Characters aggregate backfilled",
+      aggregateCount: await charactersAggregate.count(ctx),
+    };
+  },
+});
+
+export const clearCharactersAggregate = mutation({
+  handler: async (ctx) => {
+    await charactersAggregate.clear(ctx);
+    return {
+      success: true,
+      message: "Characters aggregate cleared",
+      aggregateCount: await charactersAggregate.count(ctx),
+    };
   },
 });

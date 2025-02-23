@@ -37,9 +37,15 @@ export const useScene = () => {
     });
   };
 
-  const useGetCharactersByScriptId = (scriptId: Id<"scripts">) => {
-    return useQuery(api.characters.getCharactersByScriptId, {
+  const useGetCharactersByScriptId = (
+    scriptId: Id<"scripts">,
+    limit = 25,
+    cursor?: string
+  ) => {
+    return useStableQuery(api.characters.getCharactersByScriptId, {
       script_id: scriptId,
+      limit,
+      cursor,
     });
   };
 
