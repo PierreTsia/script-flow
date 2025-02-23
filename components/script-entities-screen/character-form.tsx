@@ -23,10 +23,10 @@ import { CharacterType } from "@/convex/helpers";
 
 const characterTypeOptions = [
   "PRINCIPAL",
-  "SECONDARY",
-  "FIGURANT",
-  "SILHOUETTE",
-  "EXTRA",
+  "SUPPORTING",
+  "FEATURED_EXTRA",
+  "SILENT_KEY",
+  "ATMOSPHERE",
 ] as const;
 
 const charcaterFormSchema = z.object({

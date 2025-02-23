@@ -29,11 +29,30 @@ export const draftLocationsValidator = v.array(
 export type DraftLocations = Infer<typeof draftLocationsValidator>;
 
 export const characterTypeValidator = v.union(
-  v.literal("PRINCIPAL"),
-  v.literal("SECONDARY"),
-  v.literal("FIGURANT"),
-  v.literal("SILHOUETTE"),
-  v.literal("EXTRA")
+  v.literal("PRINCIPAL"), // Characters who:
+  // - Have multiple speaking lines in the scene
+  // - Drive the scene's action/decisions
+  // - Are referred to by name by other characters
+
+  v.literal("SUPPORTING"), // Characters who:
+  // - Have at least one speaking line
+  // - Interact directly with PRINCIPAL characters
+  // - Have character-specific actions in scene
+
+  v.literal("FEATURED_EXTRA"), // Characters who:
+  // - Have 0-1 speaking lines
+  // - Serve a specific function (e.g., "Waitress", "Guard")
+  // - Have described actions but don't influence plot
+
+  v.literal("SILENT_KEY"), // Characters who:
+  // - Have no dialogue
+  // - Are specifically named or described
+  // - Their presence/actions affect the scene
+
+  v.literal("ATMOSPHERE") // Characters who:
+  // - No individual actions described
+  // - Mentioned as part of groups/crowd
+  // - No specific names (e.g., "pedestrians", "customers")
 );
 
 export type CharacterType = Infer<typeof characterTypeValidator>;

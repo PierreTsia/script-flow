@@ -44,8 +44,6 @@ export const SceneAnalysisConfirmDialog = ({
 }) => {
   const t = useTranslations("SceneAnalysis");
 
-  console.log("selectedDraftAnalysis", selectedDraftAnalysis);
-
   const params = useParams();
   const scriptId = params.scriptId as Id<"scripts">;
 

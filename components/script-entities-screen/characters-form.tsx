@@ -48,7 +48,13 @@ const CharactersForm = ({
 
   const characterFormSchema = z.object({
     name: z.string().min(2).max(50),
-    type: z.enum(["PRINCIPAL", "SECONDARY", "FIGURANT", "SILHOUETTE", "EXTRA"]),
+    type: z.enum([
+      "PRINCIPAL",
+      "SUPPORTING",
+      "FEATURED_EXTRA",
+      "SILENT_KEY",
+      "ATMOSPHERE",
+    ]),
     notes: z.string().optional(),
     aliases: z.array(z.string()).optional(),
   });
@@ -104,7 +110,6 @@ const CharactersForm = ({
           title: "Characters saved",
           description: "Characters saved successfully",
         });
-        console.log("setting props tab");
         onNextTab();
       }
     } catch (error) {
@@ -167,10 +172,10 @@ const CharactersForm = ({
                             <SelectContent>
                               {[
                                 "PRINCIPAL",
-                                "SECONDARY",
-                                "FIGURANT",
-                                "SILHOUETTE",
-                                "EXTRA",
+                                "SUPPORTING",
+                                "FEATURED_EXTRA",
+                                "SILENT_KEY",
+                                "ATMOSPHERE",
                               ].map((type) => (
                                 <SelectItem key={type} value={type}>
                                   {t(`characterType.${type}`)}

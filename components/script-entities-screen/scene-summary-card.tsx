@@ -27,9 +27,9 @@ import {
   UserCog,
   UserCircle2,
   User,
-  UserMinus,
   Users,
   Pencil,
+  Star,
 } from "lucide-react";
 import {
   Tooltip,
@@ -247,41 +247,41 @@ const CharacterTypeIcon = ({ type }: { type: CharacterType }) => {
     PRINCIPAL: (
       <Tooltip>
         <TooltipTrigger>
-          <UserCog className="h-4 w-4" />
+          <Star className="h-4 w-4" />
         </TooltipTrigger>
         <TooltipContent>{t("characterTypes.principal")}</TooltipContent>
       </Tooltip>
     ),
-    SECONDARY: (
+    SUPPORTING: (
       <Tooltip>
         <TooltipTrigger>
           <UserCircle2 className="h-4 w-4" />
         </TooltipTrigger>
-        <TooltipContent>{t("characterTypes.secondary")}</TooltipContent>
+        <TooltipContent>{t("characterTypes.supporting")}</TooltipContent>
       </Tooltip>
     ),
-    FIGURANT: (
+    FEATURED_EXTRA: (
+      <Tooltip>
+        <TooltipTrigger>
+          <UserCog className="h-4 w-4" />
+        </TooltipTrigger>
+        <TooltipContent>{t("characterTypes.featured_extra")}</TooltipContent>
+      </Tooltip>
+    ),
+    SILENT_KEY: (
       <Tooltip>
         <TooltipTrigger>
           <User className="h-4 w-4" />
         </TooltipTrigger>
-        <TooltipContent>{t("characterTypes.figurant")}</TooltipContent>
+        <TooltipContent>{t("characterTypes.silent_key")}</TooltipContent>
       </Tooltip>
     ),
-    SILHOUETTE: (
-      <Tooltip>
-        <TooltipTrigger>
-          <UserMinus className="h-4 w-4" />
-        </TooltipTrigger>
-        <TooltipContent>{t("characterTypes.silhouette")}</TooltipContent>
-      </Tooltip>
-    ),
-    EXTRA: (
+    ATMOSPHERE: (
       <Tooltip>
         <TooltipTrigger>
           <Users className="h-4 w-4" />
         </TooltipTrigger>
-        <TooltipContent>{t("characterTypes.extra")}</TooltipContent>
+        <TooltipContent>{t("characterTypes.atmosphere")}</TooltipContent>
       </Tooltip>
     ),
   };

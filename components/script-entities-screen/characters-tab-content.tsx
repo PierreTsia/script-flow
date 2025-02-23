@@ -6,7 +6,7 @@ import EntityScreenSkeleton from "./entity-screen-skeleton";
 import CharacterSummaryCard from "./character-summary-card";
 import { CharactersWithScenes } from "@/convex/characters";
 import { Badge } from "@/components/ui/badge";
-import { Star, Users, User, Plus } from "lucide-react";
+import { Star, Users, User, Plus, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { CreateEntityDialog } from "./create-entity-dialog";
@@ -14,6 +14,7 @@ import CharacterForm from "./character-form";
 import useSceneEntities from "@/hooks/useSceneEntities";
 import { CharacterFormSchema } from "./character-form";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
+import { CharacterType } from "@/convex/helpers";
 interface CreateCharacterDialogProps {
   scriptId: Id<"scripts">;
   isOpen: boolean;
@@ -75,14 +76,34 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
     return <EntityScreenSkeleton />;
   }
 
-  // Group characters by type
-  const groupedCharacters = {
-    PRINCIPAL: characters.filter((char) => char.type === "PRINCIPAL"),
-    SECONDARY: characters.filter((char) => char.type === "SECONDARY"),
-    others: characters.filter(
-      (char) => !["PRINCIPAL", "SECONDARY"].includes(char.type)
-    ),
+  const partitionCharactersByType = (characters: CharactersWithScenes) => {
+    return characters.reduce(
+      (acc, char) => {
+        if (char.type === "PRINCIPAL") {
+          acc.PRINCIPAL.push(char);
+        } else if (char.type === "SUPPORTING") {
+          acc.SUPPORTING.push(char);
+        } else if (char.type === "FEATURED_EXTRA") {
+          acc.FEATURED_EXTRA.push(char);
+        } else if (char.type === "SILENT_KEY") {
+          acc.SILENT_KEY.push(char);
+        } else if (char.type === "ATMOSPHERE") {
+          acc.ATMOSPHERE.push(char);
+        }
+        return acc;
+      },
+      {
+        PRINCIPAL: [],
+        SUPPORTING: [],
+        FEATURED_EXTRA: [],
+        SILENT_KEY: [],
+        ATMOSPHERE: [],
+      } as Record<CharacterType, CharactersWithScenes>
+    );
   };
+
+  // Group characters by type
+  const groupedCharacters = partitionCharactersByType(characters);
 
   // Sort each group by number of scenes
   Object.keys(groupedCharacters).forEach((key) => {
@@ -106,11 +127,15 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const getGroupIcon = (group: string) => {
     switch (group) {
       case "PRINCIPAL":
-        return <Star className="h-5 w-5" />;
-      case "SECONDARY":
-        return <User className="h-5 w-5" />;
-      default:
-        return <Users className="h-5 w-5" />;
+        return <Star className="h-4 w-4" />;
+      case "SUPPORTING":
+        return <Users className="h-4 w-4" />;
+      case "FEATURED_EXTRA":
+        return <UserCog className="h-4 w-4" />;
+      case "SILENT_KEY":
+        return <User className="h-4 w-4" />;
+      case "ATMOSPHERE":
+        return <Users className="h-4 w-4" />;
     }
   };
 
@@ -118,10 +143,14 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
     switch (group) {
       case "PRINCIPAL":
         return t("groupedCharacters.principal");
-      case "SECONDARY":
-        return t("groupedCharacters.secondary");
-      default:
-        return t("groupedCharacters.others");
+      case "SUPPORTING":
+        return t("groupedCharacters.supporting");
+      case "FEATURED_EXTRA":
+        return t("groupedCharacters.featured_extra");
+      case "SILENT_KEY":
+        return t("groupedCharacters.silent_key");
+      case "ATMOSPHERE":
+        return t("groupedCharacters.atmosphere");
     }
   };
 

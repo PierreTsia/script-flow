@@ -3,7 +3,7 @@ const SCHEMA_DEFINITION = `{
   "summary": string,
   "characters": [{
     "name": string,
-    "type": "PRINCIPAL" | "SECONDARY" | "FIGURANT" | "SILHOUETTE" | "EXTRA",
+    "type": "PRINCIPAL" | "SUPPORTING" | "FEATURED_EXTRA" | "SILENT_KEY" | "ATMOSPHERE",
     "notes": string
   }],
   "props": [{
@@ -30,15 +30,40 @@ const JSON_RULES = `
   - Always include scene_number even if null
   - Empty arrays preferred over null/undefined`;
 
+const CHARACTER_CLASSIFICATION_RULES = `
+- Character Classification Rules:
+  - ALWAYS classify characters in the same language as the input text
+  - PRINCIPAL: 
+    • Multiple speaking lines in the scene
+    • Drives scene's action/decisions
+    • Referred to by name by other characters
+    
+  - SUPPORTING: 
+    • Has at least one speaking line
+    • Interacts directly with PRINCIPAL characters
+    • Has character-specific actions
+    
+  - FEATURED_EXTRA: 
+    • 0-1 speaking lines
+    • Serves specific function (e.g., "Waitress")
+    • Has described actions but minimal plot impact
+    
+  - SILENT_KEY: 
+    • No dialogue
+    • Specifically named or described
+    • Presence/actions affect the scene
+    
+  - ATMOSPHERE: 
+    • No individual actions
+    • Part of groups/crowd descriptions
+    • Generic references (e.g., "pedestrians", "customers")`;
+
 const ENTITY_RULES = `
 - Scene number: Extract from text patterns like "3. PLACE..." → "3"
 - Summary: Summarize the scene in max 2 sentences - ALWAYS IN THE LANGUAGE OF THE TEXT
-- Character types:
-  - PRINCIPAL: Speaking roles with names
-  - SECONDARY: Named non-speaking roles
-  - FIGURANT: Background actors with actions
-  - SILHOUETTE: Shadowy/unseen figures
-  - EXTRA: Crowd members without specifics`;
+- Locations: Split combined descriptors (e.g. "EXT/JOUR" → type=EXT, time_of_day=DAY)
+- Language: Preserve original language terms (e.g. "ballon" not "football")
+`;
 
 const PROP_RULES = `
 - Props Classification:
@@ -103,8 +128,8 @@ ${JSON_RULES}
 # Rules
 ${ENTITY_RULES}
 ${PROP_RULES}
-- Locations: Split combined descriptors (e.g. "EXT/JOUR" → type=EXT, time_of_day=DAY)
-- Language: Preserve original language terms (e.g. "ballon" not "football")
+${CHARACTER_CLASSIFICATION_RULES}
+
 `;
 
 const BASIC_EXAMPLES = `
@@ -118,9 +143,9 @@ Output:
 {
   "scene_number": "3",
   "characters": [
-    {"name": "Mac", "type": "PRINCIPAL", "notes": "40s"},
-    {"name": "man 1", "type": "FIGURANT", "notes": ""},
-    {"name": "man 2", "type": "FIGURANT", "notes": ""}
+    {"name": "Mac", "type": "PRINCIPAL", "notes": "40s, focused action with prop"},
+    {"name": "Pool Player 1", "type": "ATMOSPHERE", "notes": "background activity"},
+    {"name": "Pool Player 2", "type": "ATMOSPHERE", "notes": "background activity"}
   ],
   "props": [
     {"name": "shotgun shell", "quantity": 1, "type": "ACTIVE", "notes": "polished by Mac"}
@@ -141,8 +166,8 @@ Output:
   "scene_number": "32",
   "summary": "Audebert lit une lettre dans la cagna. Une silhouette mystérieuse l'observe depuis la porte.",
   "characters": [
-    {"name": "Audebert", "type": "PRINCIPAL", "notes": ""},
-    {"name": "Silhouette", "type": "SILHOUETTE", "notes": ""}
+    {"name": "Audebert", "type": "PRINCIPAL", "notes": "action centrale avec la lettre"},
+    {"name": "Silhouette", "type": "SILENT_KEY", "notes": "présence mystérieuse, pas de dialogue mais impact sur la scène"}
   ],
   "props": [
     {"name": "lettre", "quantity": 1, "type": "ACTIVE", "notes": "lue par Audebert"}
@@ -245,68 +270,60 @@ Output:
 const COMPLEX_SCENE_EXAMPLES = `
 # Example (Complex Scene)
 Input:
- 12. EXT. CITY PARK - DAY
-ALEX (30s) sits on a bench, reading a newspaper. A DOG runs up to him, wagging its tail. Nearby, a JOGGER (20s) stops to tie her shoelaces. CHILDREN play on the swings, laughing loudly. A VENDOR pushes a cart, selling ice cream to a line of eager customers. The sun shines brightly, casting long shadows on the ground. A BIRD lands on the bench next to Alex, pecking at crumbs.
-
-Background: A couple walks hand in hand, a cyclist zooms past, and a street musician plays a cheerful tune on his guitar.
+12. EXT. CITY PARK - DAY
+ALEX (30s) sits on a bench, reading a newspaper. "Beautiful day," he says to no one in particular. 
+A JOGGER (20s, female) stops nearby. "Hey Alex, haven't seen you in ages!" She sits next to him.
+A HOT DOG VENDOR calls out "Get your hot dogs!" while serving customers. 
+A SECURITY GUARD stands silently by the park entrance, watching the scene.
+Background: CHILDREN play on swings, a COUPLE walks hand in hand, and an OLD MUSICIAN plays guitar.
 
 Output:
 {
   "scene_number": "12",
-  "summary": "Alex reads on a park bench as a dog approaches. The park is lively with children playing, a vendor selling ice cream, and a musician playing guitar.",
+  "summary": "Alex meets a jogger in the park while various people go about their activities. A security guard maintains watch.",
   "characters": [
-    {"name": "Alex", "type": "PRINCIPAL", "notes": "30s"},
-    {"name": "dog", "type": "FIGURANT", "notes": ""},
-    {"name": "jogger", "type": "FIGURANT", "notes": "20s"},
-    {"name": "vendor", "type": "FIGURANT", "notes": ""},
-    {"name": "children", "type": "EXTRA", "notes": ""},
-    {"name": "couple", "type": "EXTRA", "notes": ""},
-    {"name": "cyclist", "type": "EXTRA", "notes": ""},
-    {"name": "musician", "type": "FIGURANT", "notes": ""}
+    {
+      "name": "Alex", 
+      "type": "PRINCIPAL", 
+      "notes": "30s, has multiple lines, drives the scene"
+    },
+    {
+      "name": "Jogger", 
+      "type": "SUPPORTING", 
+      "notes": "20s, female, interacts with Alex directly"
+    },
+    {
+      "name": "Hot Dog Vendor", 
+      "type": "FEATURED_EXTRA", 
+      "notes": "has one line, specific function"
+    },
+    {
+      "name": "Security Guard", 
+      "type": "SILENT_KEY", 
+      "notes": "no dialogue but specifically placed and watching"
+    },
+    {
+      "name": "Children", 
+      "type": "ATMOSPHERE", 
+      "notes": "background activity"
+    },
+    {
+      "name": "Couple", 
+      "type": "ATMOSPHERE", 
+      "notes": "background presence"
+    },
+    {
+      "name": "Old Musician", 
+      "type": "ATMOSPHERE", 
+      "notes": "background activity"
+    }
   ],
   "props": [
-    {
-      "name": "newspaper",
-      "type": "ACTIVE",
-      "quantity": 1,
-      "notes": "read by Alex"
-    },
-    {
-      "name": "bench",
-      "type": "SET",
-      "quantity": 1,
-      "notes": "where Alex is sitting"
-    },
-    {
-      "name": "ice cream cart",
-      "type": "ACTIVE",
-      "quantity": 1,
-      "notes": "pushed by the vendor"
-    },
-    {
-      "name": "guitar",
-      "type": "ACTIVE",
-      "quantity": 1,
-      "notes": "played by the street musician"
-    },
-    {
-      "name": "swings",
-      "type": "ACTIVE",
-      "quantity": 2,
-      "notes": "used by the children"
-    },
-    {
-      "name": "shoelaces",
-      "type": "ACTIVE",
-      "quantity": 2,
-      "notes": "tied by the jogger"
-    },
-    {
-      "name": "crumbs",
-      "type": "SET",
-      "quantity": 1,
-      "notes": "on the bench, picked by the bird"
-    }
+    {"name": "newspaper", "type": "ACTIVE", "quantity": 1, "notes": "read by Alex"},
+    {"name": "bench", "type": "SET", "quantity": 1, "notes": "where Alex sits"},
+    {"name": "hot dog cart", "type": "ACTIVE", "quantity": 1, "notes": "used by vendor"},
+    {"name": "guitar", "type": "ACTIVE", "quantity": 1, "notes": "played by musician"},
+    {"name": "swings", "type": "SET", "quantity": 2, "notes": "used by children"}
   ],
   "locations": [
     {"name": "CITY PARK", "type": "EXT", "time_of_day": "DAY", "notes": ""}

@@ -208,10 +208,10 @@ Technical Notes:
 ## Prompt Engineering & Entity Taxonomy (5h)
 
 1. **Research & Standards Analysis** (2h)
-   - [ ] Compile industry sources for screenplay entity categorization
-   - [ ] Analyze major screenplay software categorization systems
-   - [ ] Review film production breakdown sheets standards
-   - [ ] Document findings in `docs/entity-standards.md`
+   - [x] Compile industry sources for screenplay entity categorization
+   - [x] Analyze major screenplay software categorization systems
+   - [x] Review film production breakdown sheets standards
+   - [x] Document findings in `docs/entity-standards.md`
 
 2. **Entity Schema Enhancement** (1.5h)
    - [ ] Add new entity types:
@@ -219,7 +219,7 @@ Technical Notes:
      - [ ] Animals (with categories: pets, wildlife, mythical)
      - [ ] Costumes/Wardrobe (with period, style attributes)
    - [ ] Revise character types based on industry standards
-   - [ ] Update props categorization system
+   - [x] Update props categorization system
    - [ ] Enhance location type taxonomy
 
 3. **Prompt Optimization** (1.5h)
