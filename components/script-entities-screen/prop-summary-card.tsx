@@ -21,7 +21,11 @@ import { EditPropDialog } from "./edit-prop-dialog";
 import { useState } from "react";
 import PropBadge from "../ui/prop-badge";
 
-export default function PropSummaryCard({ prop }: { prop: any }) {
+export default function PropSummaryCard({
+  prop,
+}: {
+  prop: PropsWithScenes["props"][number];
+}) {
   const t = useTranslations("ScriptEntitiesScreen");
   const { deleteProp, isLoading } = useSceneEntities();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);

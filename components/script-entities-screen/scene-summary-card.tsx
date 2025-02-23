@@ -210,12 +210,12 @@ const SceneSummaryCard = ({
         </div>
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
-        {/*  <EditSceneDialog
+        <EditSceneDialog
           scene={scene}
           isOpen={isEditDialogOpen}
           onClose={() => setIsEditDialogOpen(false)}
           scriptId={scriptId}
-        /> */}
+        />
         <Button
           variant="ghost"
           size="icon"

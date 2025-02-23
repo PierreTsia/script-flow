@@ -46,7 +46,7 @@ export const useScene = () => {
   const useGetPropsByScriptId = (
     scriptId: Id<"scripts">,
     limit = 25,
-    cursor: string | undefined
+    cursor?: string
   ) => {
     return useStableQuery(api.props.getPropsByScriptId, {
       script_id: scriptId,
