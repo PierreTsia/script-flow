@@ -51,10 +51,10 @@ const formSchema = z.object({
       name: z.string(),
       type: z.enum([
         "PRINCIPAL",
-        "SECONDARY",
-        "FIGURANT",
-        "SILHOUETTE",
-        "EXTRA",
+        "SUPPORTING",
+        "FEATURED_EXTRA",
+        "SILENT_KEY",
+        "ATMOSPHERE",
       ]),
       markedForDeletion: z.boolean(),
     })

@@ -98,10 +98,10 @@
     "text": "Texte",
     "characterType": {
       "PRINCIPAL": "Principal",
-      "SECONDARY": "Secondaire",
-      "FIGURANT": "Figurant",
-      "SILHOUETTE": "Silhouette",
-      "EXTRA": "Extra"
+      "SUPPORTING": "Secondaire",
+      "FEATURED_EXTRA": "Figurant",
+      "SILENT_KEY": "Silhouette",
+      "ATMOSPHERE": "Extra"
     },
     "character": {
       "name": "Nom",
@@ -157,17 +157,19 @@
       "props": "Accessoires"
     },
     "characterTypes": {
-      "principal": "Personnages Principaux",
-      "secondary": "Personnages Secondaires",
-      "others": "Personnages de Soutien",
-      "figurant": "Figurant",
-      "silhouette": "Silhouette",
-      "extra": "Extra"
+      "principal": "Principal",
+      "supporting": "Secondaire",
+      "featured_extra": "Figurant",
+      "silent_key": "Silhouette",
+      "atmosphere": "Extra"
+
     },
     "groupedCharacters": {
       "principal": "Personnages Principaux",
-      "secondary": "Personnages Secondaires",
-      "others": "Personnages de Soutien"
+      "supporting": "Personnages Secondaires",
+      "featured_extra": "Figurants",
+      "silent_key": "Silhouettes",
+      "atmosphere": "Extras"
     },
     "characterMerge": {
       "buttonTitle": "Fusionner avec un autre personnage",
@@ -243,11 +245,10 @@
       "description": "Modifiez les détails du personnage ci-dessous.",
       "characterType": {
         "PRINCIPAL": "Personnage Principal",
-        "SECONDARY": "Personnage Secondaire",
-        "OTHERS": "Personnage de Soutien",
-        "FIGURANT": "Figurant",
-        "SILHOUETTE": "Silhouette",
-        "EXTRA": "Extra"
+        "SUPPORTING": "Personnage Secondaire",
+        "FEATURED_EXTRA": "Figurant",
+        "SILENT_KEY": "Silhouette",
+        "ATMOSPHERE": "Extra"
       },
       "form": {
         "name": {

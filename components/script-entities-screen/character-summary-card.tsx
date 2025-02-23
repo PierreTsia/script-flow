@@ -47,7 +47,7 @@ const CharacterSummaryCard = ({
           <Badge
             variant={character.type === "PRINCIPAL" ? "default" : "secondary"}
           >
-            {character.type.toLowerCase()}
+            {t(`characterTypes.${character.type.toLowerCase()}`)}
           </Badge>
         </div>
       </CardHeader>

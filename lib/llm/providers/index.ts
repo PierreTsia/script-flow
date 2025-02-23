@@ -1,3 +1,5 @@
+import { CharacterType } from "@/convex/helpers";
+
 export type LLMOptions = {
   apiKey: string;
   baseURL?: string;
@@ -19,12 +21,7 @@ export interface SceneAnalysis {
 
 // You'll also need to define the CharacterType and Location types.
 // You can do this in the same file or in separate files.
-export type CharacterType =
-  | "PRINCIPAL"
-  | "SECONDARY"
-  | "FIGURANT"
-  | "SILHOUETTE"
-  | "EXTRA";
+
 export type LocationType = "INT" | "EXT";
 
 export type TimeOfDay = "DAY" | "NIGHT" | "DAWN" | "DUSK" | "UNSPECIFIED";

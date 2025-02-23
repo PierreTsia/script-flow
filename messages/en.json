@@ -110,10 +110,10 @@
     "removeCharacter": "Remove",
     "characterType": {
       "PRINCIPAL": "Principal",
-      "SECONDARY": "Secondary",
-      "FIGURANT": "Figurant",
-      "SILHOUETTE": "Silhouette",
-      "EXTRA": "Extra"
+      "SUPPORTING": "Supporting",
+      "FEATURED_EXTRA": "Featured Extra",
+      "SILENT_KEY": "Silent Key",
+      "ATMOSPHERE": "Atmosphere"
     },
     "character": {
       "name": "Name",
@@ -157,16 +157,18 @@
       "props": "Props"
     },
     "characterTypes": {
-      "principal": "Principal Character",
-      "secondary": "Secondary Character",
-      "figurant": "Figurant",
-      "silhouette": "Silhouette",
-      "extra": "Extra"
+      "principal": "Principal",
+      "supporting": "Supporting",
+      "featured_extra": "Featured Extra",
+      "silent_key": "Silent Key",
+      "atmosphere": "Atmosphere"
     },
     "groupedCharacters": {
       "principal": "Principal Characters",
-      "secondary": "Secondary Characters",
-      "others": "Supporting Characters"
+      "supporting": "Supporting Characters",
+      "featured_extra": "Featured Extra Characters",
+      "silent_key": "Silent Key Characters",
+      "atmosphere": "Atmosphere Characters"
     },
     "characterMerge": {
       "buttonTitle": "Merge with another character",
@@ -238,11 +240,10 @@
       "description": "Edit the character details below.",
       "characterType": {
         "PRINCIPAL": "Principal Character",
-        "SECONDARY": "Secondary Character",
-        "OTHERS": "Supporting Character",
-        "FIGURANT": "Figurant",
-        "SILHOUETTE": "Silhouette",
-        "EXTRA": "Extra"
+        "SUPPORTING": "Supporting Character",
+        "FEATURED_EXTRA": "Featured Extra",
+        "SILENT_KEY": "Silent Key",
+        "ATMOSPHERE": "Atmosphere"
       },
       "form": {
         "name": {

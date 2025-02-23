@@ -71,10 +71,6 @@ const LocationsForm = ({
 
   useEffect(() => {
     if (selectedDraftAnalysis?.locations) {
-      console.log(
-        "selectedDraftAnalysis.locations",
-        selectedDraftAnalysis.locations
-      );
       reset({ locations: selectedDraftAnalysis.locations });
     }
   }, [selectedDraftAnalysis, reset]);

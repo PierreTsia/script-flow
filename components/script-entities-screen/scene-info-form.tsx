@@ -93,7 +93,6 @@ const SceneInfoForm = ({
     text,
     summary,
   }: z.infer<typeof sceneInfoFormSchema>) => {
-    console.log("text", text);
     await onCreateScene({
       script_id: scriptId,
       scene_number,
