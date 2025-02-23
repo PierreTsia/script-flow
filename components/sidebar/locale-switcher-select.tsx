@@ -32,14 +32,28 @@ export function LocaleSwitcherSelect({
   };
 
   return (
-    <Select defaultValue={defaultValue} onValueChange={onValueChange}>
-      <SelectTrigger className="min-w-[140px] w-full">
+    <Select
+      defaultValue={defaultValue}
+      onValueChange={onValueChange}
+      onOpenChange={() => {
+        const event = window.event;
+        event?.stopPropagation();
+      }}
+    >
+      <SelectTrigger
+        className="min-w-[140px] w-full"
+        onClick={(e) => e.stopPropagation()}
+      >
         <Globe className="mr-2 h-[1.2rem] w-[1.2rem]" />
         <SelectValue placeholder={label} />
       </SelectTrigger>
       <SelectContent>
         {items.map((locale) => (
-          <SelectItem key={locale.value} value={locale.value}>
+          <SelectItem
+            key={locale.value}
+            value={locale.value}
+            onClick={(e) => e.stopPropagation()}
+          >
             {locale.label.toUpperCase()}
           </SelectItem>
         ))}
