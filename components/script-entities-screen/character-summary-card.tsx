@@ -25,8 +25,8 @@ const CharacterSummaryCard = ({
   character,
   potentialDuplicates,
 }: {
-  character: CharactersWithScenes[number];
-  potentialDuplicates?: CharactersWithScenes[number][];
+  character: CharactersWithScenes["characters"][number];
+  potentialDuplicates?: CharactersWithScenes["characters"][number][];
 }) => {
   const t = useTranslations("ScriptEntitiesScreen");
   const { deleteCharacter, isLoading } = useSceneEntities();
