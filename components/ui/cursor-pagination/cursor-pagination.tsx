@@ -4,8 +4,9 @@ import {
   PaginationItem,
   PaginationNext,
   PaginationPrevious,
+  PaginationLink,
 } from "../pagination";
-import PaginationNumbers from "../pagination-numbers";
+
 import { CursorPaginationProps } from "./types";
 
 export function CursorPagination({
@@ -13,7 +14,7 @@ export function CursorPagination({
   onPageChange,
 }: CursorPaginationProps) {
   const handlePageClick = (targetPage: number) => {
-    if (targetPage > totalPages) {
+    if (targetPage > totalPages || targetPage < 1) {
       return;
     }
 
@@ -22,15 +23,12 @@ export function CursorPagination({
       return;
     }
 
-    // For any forward navigation when we have nextCursor
-    if (targetPage > page && nextCursor) {
-      const newCursors = [...cursors, nextCursor];
-      onPageChange(targetPage, newCursors);
+    if (targetPage === page + 1 && nextCursor) {
+      onPageChange(targetPage, [...cursors, nextCursor]);
       return;
     }
 
-    // For backward navigation
-    if (targetPage <= cursors.length + 1) {
+    if (targetPage === page - 1) {
       onPageChange(targetPage, cursors);
     }
   };
@@ -40,28 +38,20 @@ export function CursorPagination({
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
-            onClick={() => {
-              if (page > 1) {
-                handlePageClick(page - 1);
-              }
-            }}
+            onClick={() => handlePageClick(page - 1)}
             isActive={page !== 1}
           />
         </PaginationItem>
 
-        <PaginationNumbers
-          currentPage={page}
-          totalPages={totalPages}
-          onPageClick={handlePageClick}
-        />
+        <PaginationItem>
+          <PaginationLink isActive>
+            {page} / {totalPages}
+          </PaginationLink>
+        </PaginationItem>
 
         <PaginationItem>
           <PaginationNext
-            onClick={() => {
-              if (nextCursor) {
-                handlePageClick(page + 1);
-              }
-            }}
+            onClick={() => handlePageClick(page + 1)}
             isActive={!!nextCursor}
           />
         </PaginationItem>

@@ -6,7 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { ConvexError } from "convex/values";
 const API_URL = "https://animated-mole-731.convex.site";
-import { useStableQuery } from "@/hooks/useStablePaginatedQuery";
+import { useStableQuery } from "@/hooks/useStableQuery";
 
 export type DraftSceneAnalysis = Doc<"draftScenesAnalysis">;
 

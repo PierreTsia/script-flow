@@ -1,21 +1,20 @@
+import PagePaginationItem from "../page-pagination-item";
+
 import { PaginationEllipsis } from "@/components/ui/pagination";
-import PagePaginationItem from "./page-pagination-item";
 
-export interface PaginationNumbersProps {
-  currentPage: number;
-  totalPages: number;
-  onPageClick: (page: number) => void;
-}
-
-const PaginationNumbers = ({
+import { PaginationNumbersProps } from "@/components/ui/pagination-numbers";
+export function PaginationNumbers({
   currentPage,
   totalPages,
   onPageClick,
-}: PaginationNumbersProps) => {
+}: PaginationNumbersProps) {
+  // Only show pages we can actually reach
+  const reachablePages = Math.min(currentPage + 1, totalPages);
+
   if (totalPages <= 5) {
     return (
       <>
-        {Array.from({ length: totalPages }, (_, i) => (
+        {Array.from({ length: reachablePages }, (_, i) => (
           <PagePaginationItem
             key={i + 1}
             pageNumber={i + 1}
@@ -45,7 +44,7 @@ const PaginationNumbers = ({
         />
       )}
 
-      {currentPage < totalPages && (
+      {currentPage < reachablePages && (
         <PagePaginationItem
           pageNumber={currentPage + 1}
           currentPage={currentPage}
@@ -54,6 +53,4 @@ const PaginationNumbers = ({
       )}
     </>
   );
-};
-
-export default PaginationNumbers;
+}

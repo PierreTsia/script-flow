@@ -19,7 +19,7 @@ const ScriptSceneEntitiesScreen = ({
 }) => {
   const { isLoaded: authLoaded } = useAuth();
   const { useGetScriptEntities } = useScripts();
-  const entities = useGetScriptEntities(scriptId);
+  const entities = useGetScriptEntities(scriptId, 6);
 
   const [currentTab, setCurrentTab] = useState<
     "scenes" | "characters" | "locations" | "props"
@@ -34,8 +34,8 @@ const ScriptSceneEntitiesScreen = ({
       <div className="sticky top-0 z-10 bg-background border-b">
         <ScriptTopBar
           scriptId={scriptId}
-          name={entities.name}
-          creationTime={entities._creationTime}
+          name={entities.script.name}
+          creationTime={entities.script._creationTime}
         />
       </div>
       <div className="flex-1 p-6 gap-6">

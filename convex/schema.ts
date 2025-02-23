@@ -58,9 +58,11 @@ export default defineSchema({
     page_number: v.number(),
     text: v.string(),
     summary: v.optional(v.string()),
+    sortKey: v.string(),
   })
     .index("unique_scene_constraint", ["script_id", "scene_number"])
-    .index("by_script", ["script_id"]),
+    .index("by_script", ["script_id"])
+    .index("by_script_and_sort", ["script_id", "sortKey"]),
 
   characters: defineTable({
     script_id: v.id("scripts"),
