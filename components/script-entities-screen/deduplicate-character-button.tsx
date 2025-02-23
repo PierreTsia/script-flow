@@ -25,8 +25,8 @@ const DeduplicateCharacterButton = ({
   character,
   allCharacters,
 }: {
-  character: CharactersWithScenes[number];
-  allCharacters: CharactersWithScenes[number][];
+  character: CharactersWithScenes["characters"][number];
+  allCharacters: CharactersWithScenes["characters"];
 }) => {
   const { deduplicateCharacter } = useSceneEntities();
   const [selectedTargetId, setSelectedTargetId] = useState<string | null>(null);

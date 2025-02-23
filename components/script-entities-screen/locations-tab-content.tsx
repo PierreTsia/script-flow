@@ -5,20 +5,33 @@ import { Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-
 import { useScene } from "@/hooks/useScene";
 import { Id } from "@/convex/_generated/dataModel";
-import EntityScreenSkeleton from "@/components/script-entities-screen/entity-screen-skeleton";
+import EntityScreenSkeleton from "./entity-screen-skeleton";
 import LocationSummaryCard from "./location-summary-card";
 import CreateNewLocationDialog from "./create-new-location-dialog";
+import { CursorPagination } from "@/components/ui/cursor-pagination/cursor-pagination";
+
+const ITEMS_PER_PAGE = 12;
 
 const LocationsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const t = useTranslations("ScriptEntitiesScreen");
+  const [page, setPage] = useState(1);
+  const [cursors, setCursors] = useState<string[]>([]);
   const { useGetLocationsByScriptId } = useScene();
-  const locations = useGetLocationsByScriptId(scriptId);
+
+  const result = useGetLocationsByScriptId(
+    scriptId,
+    ITEMS_PER_PAGE,
+    page === 1 ? undefined : cursors[page - 2]
+  );
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  if (!locations) return <EntityScreenSkeleton />;
+  if (!result) return <EntityScreenSkeleton />;
+
+  const { locations, nextCursor, total } = result;
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   // Group by INT/EXT
   const groupedLocations = {
@@ -60,6 +73,19 @@ const LocationsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
           </div>
         ))}
       </ScrollArea>
+
+      <CursorPagination
+        state={{
+          page,
+          cursors,
+          totalPages,
+          nextCursor,
+        }}
+        onPageChange={(newPage, newCursors) => {
+          setPage(newPage);
+          setCursors(newCursors);
+        }}
+      />
     </div>
   );
 };

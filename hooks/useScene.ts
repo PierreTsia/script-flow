@@ -31,15 +31,27 @@ export const useScene = () => {
     });
   };
 
-  const useGetLocationsByScriptId = (scriptId: Id<"scripts">) => {
-    return useQuery(api.locations.getLocationsByScriptId, {
+  const useGetLocationsByScriptId = (
+    scriptId: Id<"scripts">,
+    limit = 25,
+    cursor?: string
+  ) => {
+    return useStableQuery(api.locations.getLocationsByScriptId, {
       script_id: scriptId,
+      limit,
+      cursor,
     });
   };
 
-  const useGetCharactersByScriptId = (scriptId: Id<"scripts">) => {
-    return useQuery(api.characters.getCharactersByScriptId, {
+  const useGetCharactersByScriptId = (
+    scriptId: Id<"scripts">,
+    limit = 25,
+    cursor?: string
+  ) => {
+    return useStableQuery(api.characters.getCharactersByScriptId, {
       script_id: scriptId,
+      limit,
+      cursor,
     });
   };
 

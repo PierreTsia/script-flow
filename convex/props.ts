@@ -217,7 +217,7 @@ export const updateProp = mutation({
 
     const newProp = await requireExists(await ctx.db.get(prop_id), "prop");
 
-    await propsAggregate.replace(ctx, oldProp, newProp);
+    await propsAggregate.replaceOrInsert(ctx, oldProp, newProp);
   },
 });
 

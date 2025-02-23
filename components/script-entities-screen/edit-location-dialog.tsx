@@ -19,7 +19,7 @@ export const EditLocationDialog = ({
   isOpen,
   onClose,
 }: {
-  location: LocationsWithScenes[number];
+  location: LocationsWithScenes["locations"][number];
   isOpen: boolean;
   onClose: () => void;
 }) => {

@@ -92,10 +92,9 @@ const EditSceneDialog = ({
     useGetPropsByScriptId,
   } = useScene();
 
-  const allCharacters = useGetCharactersByScriptId(scriptId);
-  const allLocations = useGetLocationsByScriptId(scriptId);
-  const result = useGetPropsByScriptId(scriptId, 25);
-
+  const characterResult = useGetCharactersByScriptId(scriptId, 25);
+  const locationResult = useGetLocationsByScriptId(scriptId);
+  const propsResult = useGetPropsByScriptId(scriptId, 25);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -116,9 +115,13 @@ const EditSceneDialog = ({
     },
   });
 
-  if (!result) return null;
+  if (!characterResult || !locationResult || !propsResult) {
+    return null;
+  }
 
-  const { props: allProps } = result;
+  const { characters: allCharacters } = characterResult;
+  const { locations: allLocations } = locationResult;
+  const { props: allProps } = propsResult;
 
   const availableCharacters = allCharacters
     ?.filter((char) => !characters.some((c) => c?._id === char?._id))

@@ -1,14 +1,15 @@
 import { mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { locationTypeValidator, timeOfDayValidator } from "./helpers";
-import { Doc } from "./_generated/dataModel";
+import { DataModel, Doc } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
-import { api } from "./_generated/api";
+import { api, components } from "./_generated/api";
 import {
   requireAuth,
   requireScriptOwnership,
   requireExists,
 } from "./model/auth";
+import { TableAggregate } from "@convex-dev/aggregate";
 export type LocationDocument = Doc<"locations">;
 export type LocationSceneDocument = Doc<"location_scenes">;
 
@@ -22,6 +23,14 @@ const createLocationWithSceneValidator = v.object({
   time_of_day: timeOfDayValidator,
   scene_id: v.id("scenes"),
   notes: v.optional(v.string()),
+});
+
+export const locationsAggregate = new TableAggregate<{
+  Key: null;
+  DataModel: DataModel;
+  TableName: "locations";
+}>(components.aggregate, {
+  sortKey: () => null,
 });
 
 export const createLocation = mutation({
@@ -119,8 +128,12 @@ export const createLocationWithScene = mutation({
 });
 
 export const getLocationsByScriptId = query({
-  args: { script_id: v.id("scripts") },
-  handler: async (ctx, { script_id }) => {
+  args: {
+    script_id: v.id("scripts"),
+    limit: v.optional(v.number()),
+    cursor: v.optional(v.string()),
+  },
+  handler: async (ctx, { script_id, limit, cursor }) => {
     await requireAuth(ctx);
 
     const myScript = await requireScriptOwnership(
@@ -128,13 +141,16 @@ export const getLocationsByScriptId = query({
       await ctx.db.get(script_id),
       "script"
     );
-    const locations = await ctx.db
+    const paginatedLocations = await ctx.db
       .query("locations")
       .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
-      .collect();
+      .paginate({
+        numItems: limit || 25,
+        cursor: cursor || null,
+      });
 
-    return await Promise.all(
-      locations.map(async (location) => {
+    const locationsWithScenes = await Promise.all(
+      paginatedLocations.page.map(async (location) => {
         const locationScenes = await ctx.db
           .query("location_scenes")
           .withIndex("by_location", (q) => q.eq("location_id", location._id))
@@ -153,6 +169,14 @@ export const getLocationsByScriptId = query({
         };
       })
     );
+
+    const total = await locationsAggregate.count(ctx);
+
+    return {
+      locations: locationsWithScenes,
+      nextCursor: paginatedLocations.continueCursor,
+      total,
+    };
   },
 });
 
@@ -165,6 +189,8 @@ export const deleteLocation = mutation({
       await ctx.db.get(location_id),
       "location"
     );
+
+    await locationsAggregate.delete(ctx, location);
 
     const locationScenes = await ctx.db
       .query("location_scenes")
@@ -188,17 +214,44 @@ export const updateLocation = mutation({
   handler: async (ctx, { location_id, name, type, time_of_day }) => {
     await requireAuth(ctx);
 
-    const location = await requireExists(
+    const oldLocation = await requireExists(
       await ctx.db.get(location_id),
       "location"
     );
 
     await requireScriptOwnership(
       ctx,
-      await ctx.db.get(location.script_id),
+      await ctx.db.get(oldLocation.script_id),
       "script"
     );
 
-    await ctx.db.patch(location._id, { name, type, time_of_day });
+    await ctx.db.patch(location_id, { name, type, time_of_day });
+
+    const newLocation = await requireExists(
+      await ctx.db.get(location_id),
+      "location"
+    );
+
+    await locationsAggregate.replace(ctx, oldLocation, newLocation);
+  },
+});
+
+export const backfillLocationsAggregate = mutation({
+  handler: async (ctx) => {
+    const locations = await ctx.db.query("locations").collect();
+    await Promise.all(
+      locations.map((location) => locationsAggregate.insert(ctx, location))
+    );
+    return {
+      success: true,
+      message: "Locations aggregate backfilled",
+      aggregateCount: await locationsAggregate.count(ctx),
+    };
+  },
+});
+
+export const clearLocationsAggregate = mutation({
+  handler: async (ctx) => {
+    await locationsAggregate.clear(ctx);
   },
 });

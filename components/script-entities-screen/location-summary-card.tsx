@@ -47,7 +47,7 @@ const TimeOfDayIcon = ({ timeOfDay }: { timeOfDay: TimeOfDay }) => {
 const LocationSummaryCard = ({
   location,
 }: {
-  location: LocationsWithScenes[number];
+  location: LocationsWithScenes["locations"][number];
 }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { deleteLocation, isLoading } = useSceneEntities();
