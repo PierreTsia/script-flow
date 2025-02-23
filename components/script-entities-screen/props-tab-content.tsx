@@ -11,16 +11,10 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import CreateNewPropDialog from "./create-new-prop-dialog";
 import { PropsWithScenes } from "@/convex/props";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import PaginationNumbers from "@/components/ui/pagination-numbers";
 
-const ITEMS_PER_PAGE = 5; // Adjust as needed
+import { CursorPagination } from "@/components/ui/cursor-pagination/cursor-pagination";
+
+const ITEMS_PER_PAGE = 12;
 
 type Prop = PropsWithScenes["props"][number];
 
@@ -67,30 +61,6 @@ const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
     }
   );
 
-  const handlePageClick = (targetPage: number) => {
-    if (targetPage > totalPages || targetPage < 1) {
-      return;
-    }
-
-    if (targetPage === 1) {
-      setPage(1);
-      setCursors([]);
-      return;
-    }
-
-    // For any forward navigation when we have nextCursor
-    if (targetPage > page && nextCursor) {
-      setCursors((prev) => [...prev, nextCursor]);
-      setPage(targetPage);
-      return;
-    }
-
-    // For backward navigation
-    if (targetPage <= cursors.length + 1) {
-      setPage(targetPage);
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -127,38 +97,18 @@ const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
         )}
       </ScrollArea>
 
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              onClick={() => {
-                if (page > 1) {
-                  setPage((p) => p - 1);
-                }
-              }}
-              isActive={page !== 1}
-            />
-          </PaginationItem>
-
-          <PaginationNumbers
-            currentPage={page}
-            totalPages={totalPages}
-            onPageClick={handlePageClick}
-          />
-
-          <PaginationItem>
-            <PaginationNext
-              onClick={() => {
-                if (nextCursor) {
-                  setCursors((prev) => [...prev, nextCursor]);
-                  setPage((p) => p + 1);
-                }
-              }}
-              isActive={!!nextCursor}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <CursorPagination
+        state={{
+          page,
+          cursors,
+          totalPages,
+          nextCursor,
+        }}
+        onPageChange={(newPage, newCursors) => {
+          setPage(newPage);
+          setCursors(newCursors);
+        }}
+      />
     </div>
   );
 };
