@@ -11,22 +11,44 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import CreateNewPropDialog from "./create-new-prop-dialog";
 import { PropsWithScenes } from "@/convex/props";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import PaginationNumbers from "@/components/ui/pagination-numbers";
+
+const ITEMS_PER_PAGE = 5; // Adjust as needed
+
+type Prop = PropsWithScenes["props"][number];
 
 type GroupedProps = {
-  recurring: PropsWithScenes;
-  oneOff: PropsWithScenes;
-  unassigned: PropsWithScenes;
+  recurring: Prop[];
+  oneOff: Prop[];
+  unassigned: Prop[];
 };
 
 const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const t = useTranslations("ScriptEntitiesScreen");
+  const [page, setPage] = useState(1);
+  const [cursors, setCursors] = useState<string[]>([]);
   const { useGetPropsByScriptId } = useScene();
-  const props = useGetPropsByScriptId(scriptId);
+  const result = useGetPropsByScriptId(
+    scriptId,
+    ITEMS_PER_PAGE,
+    page === 1 ? undefined : cursors[page - 2]
+  );
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  if (!props) return <EntityScreenSkeleton />;
+  if (!result) return <EntityScreenSkeleton />;
 
-  const groupedProps = props.reduce<GroupedProps>(
+  const { props: propsList, nextCursor, total } = result;
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+
+  const groupedProps = propsList?.reduce<GroupedProps>(
     (acc, prop) => {
       const scenesCount = prop.scenes?.length || 0;
       if (scenesCount > 1) {
@@ -45,6 +67,30 @@ const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
     }
   );
 
+  const handlePageClick = (targetPage: number) => {
+    if (targetPage > totalPages || targetPage < 1) {
+      return;
+    }
+
+    if (targetPage === 1) {
+      setPage(1);
+      setCursors([]);
+      return;
+    }
+
+    // For any forward navigation when we have nextCursor
+    if (targetPage > page && nextCursor) {
+      setCursors((prev) => [...prev, nextCursor]);
+      setPage(targetPage);
+      return;
+    }
+
+    // For backward navigation
+    if (targetPage <= cursors.length + 1) {
+      setPage(targetPage);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -61,7 +107,7 @@ const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
         onClose={() => setIsCreateModalOpen(false)}
       />
 
-      <ScrollArea className="h-[calc(100vh-220px)]">
+      <ScrollArea className="flex-1">
         {Object.entries(groupedProps).map(
           ([group, items]) =>
             items.length > 0 && (
@@ -80,6 +126,39 @@ const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
             )
         )}
       </ScrollArea>
+
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => {
+                if (page > 1) {
+                  setPage((p) => p - 1);
+                }
+              }}
+              isActive={page !== 1}
+            />
+          </PaginationItem>
+
+          <PaginationNumbers
+            currentPage={page}
+            totalPages={totalPages}
+            onPageClick={handlePageClick}
+          />
+
+          <PaginationItem>
+            <PaginationNext
+              onClick={() => {
+                if (nextCursor) {
+                  setCursors((prev) => [...prev, nextCursor]);
+                  setPage((p) => p + 1);
+                }
+              }}
+              isActive={!!nextCursor}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 };
