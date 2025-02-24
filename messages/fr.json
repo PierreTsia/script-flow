@@ -377,5 +377,39 @@
       "analyze": "Analyser"
     },
     "cancel": "Annuler"
+  },
+  "SceneDetail": {
+    "title": "Détails de la Scène",
+    "loading": "Chargement...",
+    "pageNumber": "Page {number}",
+    "locations": {
+      "title": "Lieux",
+      "interior": "Lieu Intérieur",
+      "exterior": "Lieu Extérieur"
+    },
+    "characters": {
+      "title": "Personnages"
+    },
+    "props": {
+      "title": "Accessoires",
+      "quantity": "Qté: {number}"
+    },
+    "details": {
+      "title": "Détails",
+      "duration": "Durée",
+      "timeOfDay": "Moment de la journée",
+      "notSpecified": "Non spécifié"
+    },
+    "timeOfDay": {
+      "day": "Jour",
+      "night": "Nuit",
+      "dawn": "Aube",
+      "dusk": "Crépuscule",
+      "unspecified": "Non spécifié"
+    },
+    "notes": {
+      "title": "Notes & Références",
+      "noNotes": "Aucune note"
+    }
   }
 }

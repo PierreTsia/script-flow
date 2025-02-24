@@ -371,5 +371,39 @@
       "analyze": "Analyze"
     },
     "cancel": "Cancel"
+  },
+  "SceneDetail": {
+    "title": "Scene Details",
+    "loading": "Loading...",
+    "pageNumber": "Page {number}",
+    "locations": {
+      "title": "Locations",
+      "interior": "Interior Location",
+      "exterior": "Exterior Location"
+    },
+    "characters": {
+      "title": "Characters"
+    },
+    "props": {
+      "title": "Props",
+      "quantity": "Qty: {number}"
+    },
+    "details": {
+      "title": "Details",
+      "duration": "Duration",
+      "timeOfDay": "Time of Day",
+      "notSpecified": "Not specified"
+    },
+    "timeOfDay": {
+      "day": "Day",
+      "night": "Night",
+      "dawn": "Dawn",
+      "dusk": "Dusk",
+      "unspecified": "Unspecified"
+    },
+    "notes": {
+      "title": "Notes & References",
+      "noNotes": "No additional notes"
+    }
   }
 }

@@ -33,7 +33,7 @@ interface SceneDetailProps {
 }
 
 export const TimeOfDayIcon = ({ timeOfDay }: { timeOfDay: TimeOfDay }) => {
-  const t = useTranslations("SceneDetail");
+  const t = useTranslations("SceneAnalysis");
   const iconMap: Record<TimeOfDay, React.ReactNode> = {
     DAY: <Sun className="h-6 w-6" />,
     NIGHT: <Moon className="h-6 w-6" />,
@@ -80,9 +80,10 @@ const LocationTypeIcon = ({ type }: { type: string }) => {
 
 export function SceneDetail({ sceneId }: SceneDetailProps) {
   const { useGetSceneById } = useScene();
+  const t = useTranslations("SceneDetail");
   const scene = useGetSceneById(sceneId);
 
-  if (!scene) return <div>Loading...</div>;
+  if (!scene) return <div>{t("loading")}</div>;
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -96,7 +97,7 @@ export function SceneDetail({ sceneId }: SceneDetailProps) {
             </h1>
             <div className="flex items-center gap-2 text-muted-foreground">
               <Clock className="h-4 w-4" />
-              <span>Page {scene.page_number}</span>
+              <span>{t("pageNumber", { number: scene.page_number })}</span>
             </div>
           </div>
         </div>
@@ -111,15 +112,38 @@ export function SceneDetail({ sceneId }: SceneDetailProps) {
         )}
       </div>
 
+      {/* Scene Details - Mobile View */}
+      <Card className="md:hidden">
+        <CardHeader>
+          <CardTitle className="text-base font-medium">
+            {t("details.title")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">
+              {t("details.duration")}
+            </span>
+            <span>{t("details.notSpecified")}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">
+              {t("details.timeOfDay")}
+            </span>
+            <span>{t("details.notSpecified")}</span>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-6 md:grid-cols-[2fr,1fr]">
         {/* Main Content */}
         <div className="space-y-6">
           {/* Locations Card */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base text-xl font-bold">
+              <CardTitle className="flex items-center gap-2 text-base font-medium">
                 <MapPin className="h-4 w-4 text-primary" />
-                Locations
+                {t("locations.title")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -150,9 +174,9 @@ export function SceneDetail({ sceneId }: SceneDetailProps) {
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base text-xl font-bold">
-                <User className="h-6 w-6 text-primary" />
-                Characters
+              <CardTitle className="flex items-center gap-2 text-base font-medium">
+                <User className="h-4 w-4 text-primary" />
+                {t("characters.title")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -176,9 +200,9 @@ export function SceneDetail({ sceneId }: SceneDetailProps) {
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base text-xl font-bold">
+              <CardTitle className="flex items-center gap-2 text-base font-medium">
                 <Package className="h-4 w-4 text-primary" />
-                Props
+                {t("props.title")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -196,7 +220,7 @@ export function SceneDetail({ sceneId }: SceneDetailProps) {
                         </PropBadge>
                         {prop.quantity && (
                           <Badge variant="outline" className="text-xs">
-                            Qty: {prop.quantity}
+                            {t("props.quantity", { number: prop.quantity })}
                           </Badge>
                         )}
                       </div>
@@ -213,21 +237,26 @@ export function SceneDetail({ sceneId }: SceneDetailProps) {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        {/* Sidebar - Desktop View */}
+        <div className="hidden md:block space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base text-xl font-bold">
-                Details
+              <CardTitle className="text-base font-medium">
+                {t("details.title")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Duration</span>
-                <span>{"Not specified"}</span>
+                <span className="text-muted-foreground">
+                  {t("details.duration")}
+                </span>
+                <span>{t("details.notSpecified")}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Time of Day</span>
-                {scene.locations[0].time_of_day || "Not specified"}
+                <span className="text-muted-foreground">
+                  {t("details.timeOfDay")}
+                </span>
+                <span>{t("details.notSpecified")}</span>
               </div>
             </CardContent>
           </Card>
