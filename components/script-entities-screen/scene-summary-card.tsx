@@ -241,7 +241,7 @@ const SceneSummaryCard = ({
 
 export default SceneSummaryCard;
 
-const CharacterTypeIcon = ({ type }: { type: CharacterType }) => {
+export const CharacterTypeIcon = ({ type }: { type: CharacterType }) => {
   const t = useTranslations("ScriptEntitiesScreen");
   const CharacterTypeIconMap: Record<CharacterType, React.ReactNode> = {
     PRINCIPAL: (

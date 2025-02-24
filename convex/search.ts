@@ -5,30 +5,51 @@ import { Doc } from "./_generated/dataModel";
 import { api } from "./_generated/api";
 
 import { FunctionReturnType } from "convex/server";
-
 export type GlobalSearchEntitiesResult = FunctionReturnType<
   typeof api.search.searchEntities
 >;
 
-// Type guards
+// Type guards with more specific checks
 export const isCharacter = (
   entity: SearchableEntity
 ): entity is Doc<"characters"> => {
-  return "name" in entity && "type" in entity && "aliases" in entity;
+  console.log("===>", entity);
+
+  return (
+    "name" in entity &&
+    "type" in entity &&
+    [
+      "PRINCIPAL",
+      "SUPPORTING",
+      "FEATURED_EXTRA",
+      "SILENT_KEY",
+      "ATMOSPHERE",
+    ].includes(entity.type)
+  );
 };
 
 export const isProp = (entity: SearchableEntity): entity is Doc<"props"> => {
-  return "name" in entity && "quantity" in entity && !("aliases" in entity);
+  return (
+    "name" in entity &&
+    "quantity" in entity &&
+    !("aliases" in entity) &&
+    !("time_of_day" in entity)
+  );
 };
 
 export const isLocation = (
   entity: SearchableEntity
 ): entity is Doc<"locations"> => {
-  return "name" in entity && "time_of_day" in entity;
+  return (
+    "name" in entity &&
+    "time_of_day" in entity &&
+    "type" in entity &&
+    ["INT", "EXT"].includes(entity.type)
+  );
 };
 
 export const isScene = (entity: SearchableEntity): entity is Doc<"scenes"> => {
-  return "scene_number" in entity && "text" in entity;
+  return "scene_number" in entity && "text" in entity && !("name" in entity);
 };
 
 // Union type for all searchable entities
