@@ -1,7 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { characterTypeValidator } from "./helpers";
-import { Doc } from "./_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { api } from "./_generated/api";
 import {
@@ -23,12 +23,14 @@ export type CharactersWithScenes = FunctionReturnType<
   typeof api.characters.getCharactersByScriptId
 >;
 
-const charactersAggregate = new TableAggregate<{
-  Key: null;
+const charactersByScriptAggregate = new TableAggregate<{
+  Key: Id<"scripts">;
+  Namespace: Id<"scripts">;
   DataModel: DataModel;
   TableName: "characters";
 }>(components.aggregate, {
-  sortKey: () => null,
+  sortKey: (character) => character.script_id,
+  namespace: (doc) => doc.script_id,
 });
 
 const createCharacterWithSceneValidator = v.object({
@@ -85,7 +87,7 @@ export const createCharacter = mutation({
       "character"
     );
 
-    await charactersAggregate.insert(ctx, character);
+    await charactersByScriptAggregate.insert(ctx, character);
 
     return characterId;
   },
@@ -134,7 +136,7 @@ export const createCharacterWithScene = mutation({
         "character"
       );
 
-      await charactersAggregate.insert(ctx, newCharacter);
+      await charactersByScriptAggregate.insert(ctx, newCharacter);
     }
 
     // Create the junction with notes
@@ -194,7 +196,13 @@ export const getCharactersByScriptId = query({
       })
     );
 
-    const total = await charactersAggregate.count(ctx);
+    const total = await charactersByScriptAggregate.count(ctx, {
+      namespace: myScript._id,
+      bounds: {
+        lower: { key: myScript._id, inclusive: true },
+        upper: { key: myScript._id, inclusive: true },
+      },
+    });
 
     return {
       characters: characterScenes,
@@ -301,7 +309,7 @@ export const deleteCharacter = mutation({
       "character"
     );
 
-    await charactersAggregate.delete(ctx, characterToDelete);
+    await charactersByScriptAggregate.delete(ctx, characterToDelete);
 
     // delete join tables rows
     const characterScenes = await ctx.db
@@ -347,7 +355,7 @@ export const updateCharacter = mutation({
       "character"
     );
 
-    await charactersAggregate.replaceOrInsert(
+    await charactersByScriptAggregate.replaceOrInsert(
       ctx,
       oldCharacter,
       updatedCharacter
@@ -361,23 +369,25 @@ export const backfillCharactersAggregate = mutation({
   handler: async (ctx) => {
     const characters = await ctx.db.query("characters").collect();
     await Promise.all(
-      characters.map((character) => charactersAggregate.insert(ctx, character))
+      characters.map((character) =>
+        charactersByScriptAggregate.insert(ctx, character)
+      )
     );
     return {
       success: true,
       message: "Characters aggregate backfilled",
-      aggregateCount: await charactersAggregate.count(ctx),
+      aggregateCount: await charactersByScriptAggregate.count(ctx),
     };
   },
 });
 
 export const clearCharactersAggregate = mutation({
   handler: async (ctx) => {
-    await charactersAggregate.clear(ctx);
+    await charactersByScriptAggregate.clear(ctx);
     return {
       success: true,
       message: "Characters aggregate cleared",
-      aggregateCount: await charactersAggregate.count(ctx),
+      aggregateCount: await charactersByScriptAggregate.count(ctx),
     };
   },
 });

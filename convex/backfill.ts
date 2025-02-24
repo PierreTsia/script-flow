@@ -1,8 +1,8 @@
 import { mutation } from "./_generated/server";
 import { generateSearchText } from "./model/search";
-import { scenesAggregate } from "./scenes";
+import { scenesByScriptAggregate } from "./scenes";
 import { locationsByScriptAggregate } from "./locations";
-import { propsAggregate } from "./props";
+import { propsByScriptAggregate } from "./props";
 
 export const backfillSearchText = mutation({
   args: {},
@@ -59,14 +59,14 @@ export const backfillLocationsAggregate = mutation({
 export const backfillScenesAggregate = mutation({
   args: {},
   handler: async (ctx) => {
-    await scenesAggregate.clear(ctx);
+    await scenesByScriptAggregate.clear(ctx);
   },
 });
 
 export const backfillPropsAggregate = mutation({
   args: {},
   handler: async (ctx) => {
-    await propsAggregate.clear(ctx);
+    await propsByScriptAggregate.clear(ctx);
   },
 });
 
@@ -75,8 +75,8 @@ export const backfillAllAggregates = mutation({
   handler: async (ctx) => {
     // Clear all aggregates
     await locationsByScriptAggregate.clear(ctx);
-    await scenesAggregate.clear(ctx);
-    await propsAggregate.clear(ctx);
+    await scenesByScriptAggregate.clear(ctx);
+    await propsByScriptAggregate.clear(ctx);
 
     // Reinsert with proper script_id sorting
     const locations = await ctx.db.query("locations").collect();
@@ -86,12 +86,12 @@ export const backfillAllAggregates = mutation({
 
     const scenes = await ctx.db.query("scenes").collect();
     for (const scene of scenes) {
-      await scenesAggregate.insert(ctx, scene);
+      await scenesByScriptAggregate.insert(ctx, scene);
     }
 
     const props = await ctx.db.query("props").collect();
     for (const prop of props) {
-      await propsAggregate.insert(ctx, prop);
+      await propsByScriptAggregate.insert(ctx, prop);
     }
 
     return {

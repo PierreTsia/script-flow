@@ -18,12 +18,14 @@ import { DataModel } from "./_generated/dataModel";
 import { components } from "./_generated/api";
 import { generateSearchText } from "./model/search";
 
-export const scenesAggregate = new TableAggregate<{
+export const scenesByScriptAggregate = new TableAggregate<{
   Key: Id<"scripts">;
+  Namespace: Id<"scripts">;
   DataModel: DataModel;
   TableName: "scenes";
 }>(components.aggregate, {
   sortKey: (scene) => scene.script_id,
+  namespace: (doc) => doc.script_id,
 });
 
 export type SceneDocument = Doc<"scenes">;
@@ -203,7 +205,7 @@ export const saveScene = mutation({
 
     const scene = await requireExists(await ctx.db.get(sceneId), "scene");
 
-    await scenesAggregate.insertIfDoesNotExist(ctx, scene);
+    await scenesByScriptAggregate.insertIfDoesNotExist(ctx, scene);
 
     return sceneId;
   },
@@ -304,7 +306,7 @@ export const deleteScene = mutation({
       ...propScenes.map((ps) => ctx.db.delete(ps._id)),
     ]);
 
-    await scenesAggregate.delete(ctx, scene!);
+    await scenesByScriptAggregate.delete(ctx, scene!);
   },
 });
 
@@ -434,7 +436,7 @@ export const updateScene = mutation({
 
     const newScene = await ctx.db.get(args.sceneId);
 
-    await scenesAggregate.replaceOrInsert(ctx, scene!, newScene!);
+    await scenesByScriptAggregate.replaceOrInsert(ctx, scene!, newScene!);
 
     return scene._id;
   },
@@ -478,7 +480,7 @@ export const backfillScenesAggregate = mutation({
     // Clear existing aggregates first
     for (const scene of scenes) {
       try {
-        await scenesAggregate.delete(ctx, scene);
+        await scenesByScriptAggregate.delete(ctx, scene);
       } catch (e) {
         // Ignore delete errors
       }
@@ -487,7 +489,7 @@ export const backfillScenesAggregate = mutation({
     // Insert with proper script_id grouping
     for (const scene of scenes) {
       try {
-        await scenesAggregate.insert(ctx, scene);
+        await scenesByScriptAggregate.insert(ctx, scene);
         updated++;
       } catch (e) {
         console.error(`Failed to update scene ${scene._id}:`, e);
