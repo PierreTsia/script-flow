@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { User } from "lucide-react";
 import { GlobalSearchEntitiesResult } from "@/convex/search";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,10 +11,7 @@ import {
 } from "@/components/ui/command";
 import React from "react";
 
-import { Label } from "@/components/ui/label";
-import { SidebarInput } from "@/components/ui/sidebar";
 import {
-  DialogContent,
   DialogTitle,
   DialogHeader,
   DialogDescription,
@@ -47,7 +44,7 @@ export function SearchForm({
   }, []);
 
   return (
-    <>
+    <div className="relative ml-auto">
       <Button
         variant="outline"
         className="w-full justify-start text-sm text-muted-foreground sm:w-64 sm:pr-12"
@@ -81,7 +78,10 @@ export function SearchForm({
                     {results
                       .filter((r) => r.entityType === "character")
                       .map((result) => (
-                        <CommandItem key={result._id}>
+                        <CommandItem
+                          key={result._id}
+                          className="flex items-center px-4 gap-2 w-full"
+                        >
                           {result.preview}
                         </CommandItem>
                       ))}
@@ -122,6 +122,6 @@ export function SearchForm({
           )}
         </CommandList>
       </CommandDialog>
-    </>
+    </div>
   );
 }
