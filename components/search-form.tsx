@@ -1,4 +1,3 @@
-import { User } from "lucide-react";
 import { GlobalSearchEntitiesResult } from "@/convex/search";
 import { Button } from "@/components/ui/button";
 import {
