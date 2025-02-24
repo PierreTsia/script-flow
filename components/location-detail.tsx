@@ -148,7 +148,7 @@ export function LocationDetail({ locationId }: LocationDetailProps) {
             </CardHeader>
             <CardContent>
               <div className="prose prose-sm dark:prose-invert">
-                {location.notes || t("notes.noNotes")}
+                {t("notes.noNotes")}
               </div>
             </CardContent>
           </Card>
@@ -173,9 +173,7 @@ export function LocationDetail({ locationId }: LocationDetailProps) {
                 <span className="text-muted-foreground">
                   {t("details.timeOfDay")}
                 </span>
-                <span>
-                  {location.default_time_of_day || t("details.notSpecified")}
-                </span>
+                <span>{t("details.notSpecified")}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
