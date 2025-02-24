@@ -32,8 +32,8 @@ interface SceneDetailProps {
   sceneId: Id<"scenes">;
 }
 
-const TimeOfDayIcon = ({ timeOfDay }: { timeOfDay: TimeOfDay }) => {
-  const t = useTranslations("S");
+export const TimeOfDayIcon = ({ timeOfDay }: { timeOfDay: TimeOfDay }) => {
+  const t = useTranslations("SceneDetail");
   const iconMap: Record<TimeOfDay, React.ReactNode> = {
     DAY: <Sun className="h-6 w-6" />,
     NIGHT: <Moon className="h-6 w-6" />,

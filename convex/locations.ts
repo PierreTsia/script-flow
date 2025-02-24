@@ -212,13 +212,28 @@ export const getLocationById = query({
       "location"
     );
 
+    const locationScenes = await ctx.db
+      .query("location_scenes")
+      .withIndex("by_location", (q) => q.eq("location_id", location._id))
+      .collect();
+
+    const scenes = await Promise.all(
+      locationScenes.map(async (ls) => ({
+        ...(await ctx.db.get(ls.scene_id))!,
+        notes: ls.notes,
+      }))
+    );
+
     await requireScriptOwnership(
       ctx,
       await ctx.db.get(location.script_id),
       "script"
     );
 
-    return location;
+    return {
+      ...location,
+      scenes,
+    };
   },
 });
 
