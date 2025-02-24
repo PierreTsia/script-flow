@@ -18,6 +18,7 @@ import type * as model_search from "../model/search.js";
 import type * as props from "../props.js";
 import type * as scenes from "../scenes.js";
 import type * as scripts from "../scripts.js";
+import type * as search from "../search.js";
 import type * as tasks from "../tasks.js";
 
 import type {
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   props: typeof props;
   scenes: typeof scenes;
   scripts: typeof scripts;
+  search: typeof search;
   tasks: typeof tasks;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

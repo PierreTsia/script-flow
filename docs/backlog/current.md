@@ -70,12 +70,12 @@
    - [x] save the verified analysis in the database
 
 8. **Convex improvements** (4h)
-   - [ ] Add pagination to large result sets:
-     - [ ] Scenes listing
-     - [ ] Characters listing
-     - [ ] Character-scene relationships
-     - [ ] Props listing
-     - [ ] Locations listing
+   - [x] Add pagination to large result sets:
+     - [x] Scenes listing
+     - [x] Characters listing
+     - [x] Character-scene relationships
+     - [x] Props listing
+     - [x] Locations listing
    - [x] Create auth helpers:
      - [x] Move common auth checks to `convex/model/auth.ts`
      - [x] Implement `requireAuth` utility function
