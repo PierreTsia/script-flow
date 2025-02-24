@@ -6,15 +6,11 @@ import { SceneDetail } from "@/components/scene-detail";
 import { Id } from "@/convex/_generated/dataModel";
 
 interface PageProps {
-  params: {
-    scriptId: Id<"scripts">;
-    entityType: "characters" | "locations" | "props" | "scenes";
-    entityId: string;
-  };
+  params: Promise<{ entityType: string; entityId: string }>;
 }
 
-export default function EntityDetailPage({ params }: PageProps) {
-  const { entityType, entityId } = params;
+export default async function EntityDetailPage({ params }: PageProps) {
+  const { entityType, entityId } = await params;
 
   switch (entityType) {
     case "characters":
