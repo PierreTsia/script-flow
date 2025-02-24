@@ -235,3 +235,43 @@ Technical Notes:
 - Add versioning to prompts for tracking effectiveness
 - Plan for backward compatibility with existing analyses
 - Consider adding confidence scores for entity classification
+
+## Global Search Implementation (8h)
+
+1. **Command Palette UI** (2.5h)
+   - [ ] Implement CMD+K listener and modal trigger
+   - [ ] Create SearchCommandPalette component with Cmdk
+   - [ ] Add keyboard navigation support
+   - [ ] Style search results with entity-specific icons
+   - [ ] Add loading states and empty states
+   - [ ] Implement mobile-friendly interface
+
+2. **Search Infrastructure** (2h)
+   - [ ] Create search index tables in Convex
+   - [ ] Implement fuzzy search using n-gram tokenization
+   - [ ] Add proper pagination for search results
+   - [ ] Set up debounced search with useStableQuery
+   - [ ] Create search history tracking
+
+3. **Entity-Specific Search** (2h)
+   - [ ] Implement search across all entity types:
+     - [ ] Scenes (by content, number, description)
+     - [ ] Characters (by name, type, scenes they appear in)
+     - [ ] Props (by name, type, associated scenes)
+     - [ ] Locations (by name, type, INT/EXT)
+   - [ ] Add type-ahead suggestions
+   - [ ] Create rich preview cards for each entity type
+
+4. **Search UX Enhancements** (1.5h)
+   - [ ] Add search filters (by entity type, date, status)
+   - [ ] Implement recent searches
+   - [ ] Add favorite searches functionality
+   - [ ] Create keyboard shortcuts for common filters
+   - [ ] Add search analytics tracking
+
+Technical Notes:
+- Use Cmdk for accessible command palette
+- Implement proper cursor-based pagination
+- Consider using aggregate tables for faster counting
+- Add proper error boundaries for search failures
+- Ensure proper debouncing for performance

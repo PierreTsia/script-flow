@@ -16,7 +16,7 @@ import {
 import { TableAggregate } from "@convex-dev/aggregate";
 import { DataModel } from "./_generated/dataModel";
 import { components } from "./_generated/api";
-
+import { generateSearchText } from "./model/search";
 export const scenesAggregate = new TableAggregate<{
   Key: null;
   DataModel: DataModel;
@@ -192,6 +192,12 @@ export const saveScene = mutation({
       text: args.text,
       summary: args.summary,
       sortKey: sceneNumberToSortKey(args.scene_number),
+      searchText: generateSearchText.scene({
+        scene_number: args.scene_number,
+        page_number: args.page_number,
+        text: args.text,
+        summary: args.summary,
+      }),
     });
 
     const scene = await requireExists(await ctx.db.get(sceneId), "scene");
@@ -416,6 +422,12 @@ export const updateScene = mutation({
         summary: args.summary,
         scene_number: args.sceneNumber,
         sortKey: sceneNumberToSortKey(args.sceneNumber),
+        searchText: generateSearchText.scene({
+          scene_number: args.sceneNumber,
+          page_number: scene.page_number,
+          text: scene.text,
+          summary: args.summary,
+        }),
       }),
     ]);
 
