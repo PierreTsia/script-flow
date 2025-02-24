@@ -14,31 +14,17 @@ interface PageProps {
 }
 
 export default function EntityDetailPage({ params }: PageProps) {
-  const { entityType, entityId, scriptId } = params;
+  const { entityType, entityId } = params;
 
   switch (entityType) {
     case "characters":
-      return (
-        <CharacterDetail
-          characterId={entityId as Id<"characters">}
-          scriptId={scriptId}
-        />
-      );
+      return <CharacterDetail characterId={entityId as Id<"characters">} />;
     case "locations":
-      return (
-        <LocationDetail
-          locationId={entityId as Id<"locations">}
-          scriptId={scriptId}
-        />
-      );
+      return <LocationDetail locationId={entityId as Id<"locations">} />;
     case "props":
-      return (
-        <PropDetail propId={entityId as Id<"props">} scriptId={scriptId} />
-      );
+      return <PropDetail propId={entityId as Id<"props">} />;
     case "scenes":
-      return (
-        <SceneDetail sceneId={entityId as Id<"scenes">} scriptId={scriptId} />
-      );
+      return <SceneDetail sceneId={entityId as Id<"scenes">} />;
     default:
       notFound();
   }
