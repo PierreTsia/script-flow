@@ -60,8 +60,16 @@ export const getCharacterById = query({
       await ctx.db.get(args.character_id),
       "character"
     );
+    const characterScenes = await getCharacterScenes(ctx, character._id);
+    const characterScenesWithNotes = characterScenes.map((cs) => ({
+      ...cs,
+      notes: cs.notes || "No notes",
+    }));
 
-    return character;
+    return {
+      ...character,
+      scenes: characterScenesWithNotes,
+    };
   },
 });
 

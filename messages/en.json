@@ -451,5 +451,33 @@
       "noNotes": "No additional notes"
     },
     "quantity": "Qty: {number}"
+  },
+  "CharacterDetail": {
+    "loading": "Loading...",
+    "details": {
+      "title": "Character Details",
+      "type": "Type",
+      "aliases": "Aliases",
+      "totalAppearances": "Total Appearances",
+      "notSpecified": "Not specified",
+      "noDescription": "No description available",
+      "scenes": "{count} scenes"
+    },
+    "scenes": {
+      "title": "Scene Appearances",
+      "scene": "Scene",
+      "page": "Page {number}"
+    },
+    "arc": {
+      "title": "Character Arc",
+      "noNotes": "No character arc notes available"
+    },
+    "characterTypes": {
+      "principal": "Principal",
+      "supporting": "Supporting",
+      "featured_extra": "Featured Extra",
+      "silent_key": "Silent Key",
+      "atmosphere": "Atmosphere"
+    }
   }
 }

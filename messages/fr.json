@@ -457,5 +457,33 @@
       "noNotes": "Aucune note"
     },
     "quantity": "Qté: {number}"
+  },
+  "CharacterDetail": {
+    "loading": "Chargement...",
+    "details": {
+      "title": "Détails du Personnage",
+      "type": "Type",
+      "aliases": "Alias",
+      "totalAppearances": "Apparitions Totales",
+      "notSpecified": "Non spécifié",
+      "noDescription": "Aucune description disponible",
+      "scenes": "{count} scènes"
+    },
+    "scenes": {
+      "title": "Apparitions dans les Scènes",
+      "scene": "Scène",
+      "page": "Page {number}"
+    },
+    "arc": {
+      "title": "Arc du Personnage",
+      "noNotes": "Aucune note sur l'arc du personnage"
+    },
+    "characterTypes": {
+      "principal": "Principal",
+      "supporting": "Secondaire",
+      "featured_extra": "Figurant Important",
+      "silent_key": "Silencieux",
+      "atmosphere": "Atmosphère"
+    }
   }
 }
