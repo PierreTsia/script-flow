@@ -24,8 +24,10 @@ export function SiteHeader() {
   const pathname = usePathname();
   const params = useParams<{ scriptId: string }>();
 
+  const scriptId = params?.scriptId as Id<"scripts"> | undefined;
+
   // Initialize search hook
-  const search = useSearchEntities(params.scriptId as Id<"scripts">);
+  const search = useSearchEntities(scriptId);
 
   // Create breadcrumb items from pathname
   const breadcrumbs =
@@ -84,6 +86,7 @@ export function SiteHeader() {
           searchTerm={search.searchTerm}
           results={search.results}
           isLoading={search.isLoading}
+          scriptId={scriptId}
         />
       </div>
     </header>

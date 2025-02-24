@@ -9,7 +9,8 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import React from "react";
-
+import { useRouter } from "next/navigation";
+import { Id } from "@/convex/_generated/dataModel";
 import {
   DialogTitle,
   DialogHeader,
@@ -21,6 +22,7 @@ interface SearchFormProps {
   searchTerm: string;
   results?: GlobalSearchEntitiesResult;
   isLoading: boolean;
+  scriptId: Id<"scripts"> | undefined;
 }
 
 export function SearchForm({
@@ -28,8 +30,10 @@ export function SearchForm({
   searchTerm,
   results,
   isLoading,
+  scriptId,
 }: SearchFormProps) {
   const [open, setOpen] = React.useState(false);
+  const router = useRouter();
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -79,7 +83,13 @@ export function SearchForm({
                       .map((result) => (
                         <CommandItem
                           key={result._id}
-                          className="flex items-center px-4 gap-2 w-full"
+                          className="flex items-center gap-2 py-3"
+                          onSelect={() => {
+                            setOpen(false);
+                            router.push(
+                              `/scripts/${scriptId}/entities/characters/${result._id}`
+                            );
+                          }}
                         >
                           {result.preview}
                         </CommandItem>
@@ -90,7 +100,16 @@ export function SearchForm({
                     {results
                       .filter((r) => r.entityType === "location")
                       .map((result) => (
-                        <CommandItem key={result._id}>
+                        <CommandItem
+                          key={result._id}
+                          className="flex items-center gap-2 py-3"
+                          onSelect={() => {
+                            setOpen(false);
+                            router.push(
+                              `/scripts/${scriptId}/entities/locations/${result._id}`
+                            );
+                          }}
+                        >
                           {result.preview}
                         </CommandItem>
                       ))}
@@ -99,7 +118,16 @@ export function SearchForm({
                     {results
                       .filter((r) => r.entityType === "prop")
                       .map((result) => (
-                        <CommandItem key={result._id}>
+                        <CommandItem
+                          key={result._id}
+                          className="flex items-center gap-2 py-3"
+                          onSelect={() => {
+                            setOpen(false);
+                            router.push(
+                              `/scripts/${scriptId}/entities/props/${result._id}`
+                            );
+                          }}
+                        >
                           {result.preview}
                         </CommandItem>
                       ))}
@@ -108,7 +136,16 @@ export function SearchForm({
                     {results
                       .filter((r) => r.entityType === "scene")
                       .map((result) => (
-                        <CommandItem key={result._id}>
+                        <CommandItem
+                          key={result._id}
+                          className="flex items-center gap-2 py-3"
+                          onSelect={() => {
+                            setOpen(false);
+                            router.push(
+                              `/scripts/${scriptId}/entities/scenes/${result._id}`
+                            );
+                          }}
+                        >
                           {result.preview}
                         </CommandItem>
                       ))}

@@ -77,7 +77,7 @@ const getPreviewText = (entity: SearchableEntity): string => {
 
 export const searchEntities = query({
   args: {
-    script_id: v.id("scripts"),
+    script_id: v.optional(v.id("scripts")),
     searchTerm: v.string(),
     entityTypes: v.optional(
       v.array(
@@ -92,6 +92,12 @@ export const searchEntities = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, { script_id, searchTerm, entityTypes, limit = 10 }) => {
+    console.log("script_id", script_id);
+
+    if (!script_id) {
+      return [];
+    }
+
     await requireAuth(ctx);
     const script = await requireScriptOwnership(
       ctx,

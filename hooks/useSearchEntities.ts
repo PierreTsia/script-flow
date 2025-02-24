@@ -5,7 +5,7 @@ import { useState, useMemo } from "react";
 import debounce from "lodash.debounce";
 import { GlobalSearchEntitiesResult } from "@/convex/search";
 
-export const useSearchEntities = (scriptId: Id<"scripts">) => {
+export const useSearchEntities = (scriptId?: Id<"scripts">) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
 
