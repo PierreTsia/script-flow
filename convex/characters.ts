@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, QueryCtx } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { characterTypeValidator } from "./helpers";
 import { Doc, Id } from "./_generated/dataModel";
@@ -12,6 +12,7 @@ import {
 import { components } from "./_generated/api";
 import { TableAggregate } from "@convex-dev/aggregate";
 import { DataModel } from "./_generated/dataModel";
+import { SceneDocument } from "./scenes";
 
 export type CharacterDocument = Doc<"characters">;
 export type CharacterSceneDocument = Doc<"character_scenes">;
@@ -41,6 +42,26 @@ const createCharacterWithSceneValidator = v.object({
   notes: v.optional(v.string()),
   scene_id: v.id("scenes"),
 });
+
+async function getCharacterScenes(
+  ctx: QueryCtx,
+  characterId: Id<"characters">
+): Promise<(SceneDocument & { notes?: string })[]> {
+  const scenes = await ctx.db
+    .query("character_scenes")
+    .withIndex("by_character", (q) => q.eq("character_id", characterId))
+    .collect();
+
+  return Promise.all(
+    scenes.map(async (cs) => {
+      const scene = await ctx.db.get(cs.scene_id);
+      return {
+        ...scene!,
+        notes: cs.notes,
+      };
+    })
+  );
+}
 
 export const createCharacter = mutation({
   args: {
@@ -163,6 +184,17 @@ export const getCharactersByScriptId = query({
       "script"
     );
 
+    const total = await charactersByScriptAggregate.count(ctx, {
+      namespace: myScript._id,
+      // @ts-ignore-next-line
+      bounds: {
+        // @ts-ignore-next-line
+        lower: { key: myScript._id, inclusive: true },
+        // @ts-ignore-next-line
+        upper: { key: myScript._id, inclusive: true },
+      },
+    });
+
     const paginatedCharacters = await ctx.db
       .query("characters")
       .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
@@ -172,37 +204,14 @@ export const getCharactersByScriptId = query({
         cursor: cursor || null,
       });
 
-    // Fetch character-scene relationships with notes
     const characterScenes = await Promise.all(
-      paginatedCharacters.page.map(async (character) => {
-        const scenes = await ctx.db
-          .query("character_scenes")
-          .withIndex("by_character", (q) => q.eq("character_id", character._id))
-          .collect();
-
-        return {
-          ...character,
-
-          scenes: await Promise.all(
-            scenes.map(async (cs) => {
-              const scene = await ctx.db.get(cs.scene_id);
-              return {
-                ...scene,
-                notes: cs.notes, // Include notes from junction table
-              };
-            })
-          ),
-        };
-      })
+      paginatedCharacters.page.map(async (character) => ({
+        ...character,
+        scenes: await getCharacterScenes(ctx, character._id),
+      }))
     );
 
-    const total = await charactersByScriptAggregate.count(ctx, {
-      namespace: myScript._id,
-      bounds: {
-        lower: { key: myScript._id, inclusive: true },
-        upper: { key: myScript._id, inclusive: true },
-      },
-    });
+    // Fetch character-scene relationships with notes
 
     return {
       characters: characterScenes,
@@ -362,32 +371,5 @@ export const updateCharacter = mutation({
     );
 
     return updatedCharacter;
-  },
-});
-
-export const backfillCharactersAggregate = mutation({
-  handler: async (ctx) => {
-    const characters = await ctx.db.query("characters").collect();
-    await Promise.all(
-      characters.map((character) =>
-        charactersByScriptAggregate.insert(ctx, character)
-      )
-    );
-    return {
-      success: true,
-      message: "Characters aggregate backfilled",
-      aggregateCount: await charactersByScriptAggregate.count(ctx),
-    };
-  },
-});
-
-export const clearCharactersAggregate = mutation({
-  handler: async (ctx) => {
-    await charactersByScriptAggregate.clear(ctx);
-    return {
-      success: true,
-      message: "Characters aggregate cleared",
-      aggregateCount: await charactersByScriptAggregate.count(ctx),
-    };
   },
 });

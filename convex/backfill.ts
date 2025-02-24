@@ -3,6 +3,7 @@ import { generateSearchText } from "./model/search";
 import { scenesByScriptAggregate } from "./scenes";
 import { locationsByScriptAggregate } from "./locations";
 import { propsByScriptAggregate } from "./props";
+import { v } from "convex/values";
 
 export const backfillSearchText = mutation({
   args: {},
@@ -50,33 +51,53 @@ export const backfillSearchText = mutation({
 });
 
 export const backfillLocationsAggregate = mutation({
-  args: {},
-  handler: async (ctx) => {
-    await locationsByScriptAggregate.clear(ctx);
+  args: {
+    scriptId: v.id("scripts"),
+  },
+  handler: async (ctx, args) => {
+    await locationsByScriptAggregate.clear(ctx, {
+      namespace: args.scriptId,
+    });
   },
 });
 
 export const backfillScenesAggregate = mutation({
-  args: {},
-  handler: async (ctx) => {
-    await scenesByScriptAggregate.clear(ctx);
+  args: {
+    scriptId: v.id("scripts"),
+  },
+  handler: async (ctx, args) => {
+    await scenesByScriptAggregate.clear(ctx, {
+      namespace: args.scriptId,
+    });
   },
 });
 
 export const backfillPropsAggregate = mutation({
-  args: {},
-  handler: async (ctx) => {
-    await propsByScriptAggregate.clear(ctx);
+  args: {
+    scriptId: v.id("scripts"),
+  },
+  handler: async (ctx, args) => {
+    await propsByScriptAggregate.clear(ctx, {
+      namespace: args.scriptId,
+    });
   },
 });
 
 export const backfillAllAggregates = mutation({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    scriptId: v.id("scripts"),
+  },
+  handler: async (ctx, args) => {
     // Clear all aggregates
-    await locationsByScriptAggregate.clear(ctx);
-    await scenesByScriptAggregate.clear(ctx);
-    await propsByScriptAggregate.clear(ctx);
+    await locationsByScriptAggregate.clear(ctx, {
+      namespace: args.scriptId,
+    });
+    await scenesByScriptAggregate.clear(ctx, {
+      namespace: args.scriptId,
+    });
+    await propsByScriptAggregate.clear(ctx, {
+      namespace: args.scriptId,
+    });
 
     // Reinsert with proper script_id sorting
     const locations = await ctx.db.query("locations").collect();
