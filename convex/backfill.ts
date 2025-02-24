@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { generateSearchText } from "./model/search";
 import { scenesByScriptAggregate } from "./scenes";
 import { locationsByScriptAggregate } from "./locations";
@@ -88,31 +88,34 @@ export const backfillAllAggregates = mutation({
     scriptId: v.id("scripts"),
   },
   handler: async (ctx, args) => {
-    // Clear all aggregates
-    await locationsByScriptAggregate.clear(ctx, {
-      namespace: args.scriptId,
-    });
-    await scenesByScriptAggregate.clear(ctx, {
-      namespace: args.scriptId,
-    });
-    await propsByScriptAggregate.clear(ctx, {
-      namespace: args.scriptId,
-    });
+    // Clear aggregates for this script
+    await locationsByScriptAggregate.clear(ctx, { namespace: args.scriptId });
+    await scenesByScriptAggregate.clear(ctx, { namespace: args.scriptId });
+    await propsByScriptAggregate.clear(ctx, { namespace: args.scriptId });
 
-    // Reinsert with proper script_id sorting
-    const locations = await ctx.db.query("locations").collect();
+    // Query and insert only documents for this script
+    const locations = await ctx.db
+      .query("locations")
+      .withIndex("by_script", (q) => q.eq("script_id", args.scriptId))
+      .collect();
     for (const location of locations) {
-      await locationsByScriptAggregate.insert(ctx, location);
+      await locationsByScriptAggregate.insertIfDoesNotExist(ctx, location);
     }
 
-    const scenes = await ctx.db.query("scenes").collect();
+    const scenes = await ctx.db
+      .query("scenes")
+      .withIndex("by_script", (q) => q.eq("script_id", args.scriptId))
+      .collect();
     for (const scene of scenes) {
-      await scenesByScriptAggregate.insert(ctx, scene);
+      await scenesByScriptAggregate.insertIfDoesNotExist(ctx, scene);
     }
 
-    const props = await ctx.db.query("props").collect();
+    const props = await ctx.db
+      .query("props")
+      .withIndex("by_script", (q) => q.eq("script_id", args.scriptId))
+      .collect();
     for (const prop of props) {
-      await propsByScriptAggregate.insert(ctx, prop);
+      await propsByScriptAggregate.insertIfDoesNotExist(ctx, prop);
     }
 
     return {

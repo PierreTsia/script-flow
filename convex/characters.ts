@@ -199,16 +199,10 @@ export const getCharactersByScriptId = query({
       "script"
     );
 
-    const total = await charactersByScriptAggregate.count(ctx, {
-      namespace: myScript._id,
-      // @ts-ignore-next-line
-      bounds: {
-        // @ts-ignore-next-line
-        lower: { key: myScript._id, inclusive: true },
-        // @ts-ignore-next-line
-        upper: { key: myScript._id, inclusive: true },
-      },
-    });
+    const allCharacters = await ctx.db
+      .query("characters")
+      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
+      .collect();
 
     const paginatedCharacters = await ctx.db
       .query("characters")
@@ -231,7 +225,7 @@ export const getCharactersByScriptId = query({
     return {
       characters: characterScenes,
       nextCursor: paginatedCharacters.continueCursor,
-      total,
+      total: allCharacters.length,
     };
   },
 });

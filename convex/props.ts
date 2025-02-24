@@ -91,8 +91,8 @@ export const createProp = mutation({
       type: args.type,
       searchText: [args.name, args.type].join(" ").toLowerCase(),
     });
-    const doc = await ctx.db.get(propId);
-    await propsByScriptAggregate.insert(ctx, doc!);
+    const doc = await requireExists(await ctx.db.get(propId), "prop");
+    await propsByScriptAggregate.insertIfDoesNotExist(ctx, doc);
 
     return propId;
   },
@@ -124,6 +124,8 @@ export const createPropWithScene = mutation({
         type, // Base/default type
         searchText: [name, type].join(" ").toLowerCase(),
       });
+      const doc = await requireExists(await ctx.db.get(propId), "prop");
+      await propsByScriptAggregate.insertIfDoesNotExist(ctx, doc);
     }
 
     // Create scene junction with potentially different type
@@ -188,18 +190,15 @@ export const getPropsByScriptId = query({
       })
     );
 
-    const total = await propsByScriptAggregate.count(ctx, {
-      namespace: myScript._id,
-      bounds: {
-        lower: { key: myScript._id, inclusive: true },
-        upper: { key: myScript._id, inclusive: true },
-      },
-    });
+    const allProps = await ctx.db
+      .query("props")
+      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
+      .collect();
 
     return {
       props: propsWithScenes ?? [],
       nextCursor: paginatedProps.continueCursor,
-      total,
+      total: allProps.length,
     };
   },
 });
@@ -217,7 +216,26 @@ export const getPropById = query({
       "script"
     );
 
-    return prop;
+    const propScenes = await ctx.db
+      .query("prop_scenes")
+      .withIndex("by_prop", (q) => q.eq("prop_id", prop_id))
+      .collect();
+
+    // Map scenes with their junction data
+    const scenesWithDetails = await Promise.all(
+      propScenes.map(async (ps) => {
+        const scene = await ctx.db.get(ps.scene_id);
+        return {
+          ...scene,
+          notes: ps.notes, // Include notes from prop_scenes
+        };
+      })
+    );
+
+    return {
+      ...prop,
+      scenes: scenesWithDetails,
+    };
   },
 });
 

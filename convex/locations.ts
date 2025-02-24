@@ -68,7 +68,7 @@ export const createLocation = mutation({
       );
     }
 
-    return await ctx.db.insert("locations", {
+    const locationId = await ctx.db.insert("locations", {
       ...args,
       searchText: generateSearchText.location({
         name: args.name,
@@ -76,6 +76,8 @@ export const createLocation = mutation({
         time_of_day: args.time_of_day,
       }),
     });
+    const doc = await requireExists(await ctx.db.get(locationId), "location");
+    await locationsByScriptAggregate.insertIfDoesNotExist(ctx, doc);
   },
 });
 export const createLocationWithScene = mutation({
@@ -119,6 +121,8 @@ export const createLocationWithScene = mutation({
           time_of_day: args.time_of_day,
         }),
       });
+      const doc = await requireExists(await ctx.db.get(locationId), "location");
+      await locationsByScriptAggregate.insertIfDoesNotExist(ctx, doc);
     }
 
     // Check if the location is already linked to the scene
@@ -185,18 +189,15 @@ export const getLocationsByScriptId = query({
       })
     );
 
-    const total = await locationsByScriptAggregate.count(ctx, {
-      namespace: myScript._id,
-      bounds: {
-        lower: { key: myScript._id, inclusive: true },
-        upper: { key: myScript._id, inclusive: true },
-      },
-    });
+    const allLocations = await ctx.db
+      .query("locations")
+      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
+      .collect();
 
     return {
       locations: locationsWithScenes,
       nextCursor: paginatedLocations.continueCursor,
-      total,
+      total: allLocations.length,
     };
   },
 });

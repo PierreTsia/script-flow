@@ -92,8 +92,6 @@ export const searchEntities = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, { script_id, searchTerm, entityTypes, limit = 10 }) => {
-    console.log("script_id", script_id);
-
     if (!script_id) {
       return [];
     }
