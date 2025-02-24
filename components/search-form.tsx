@@ -28,7 +28,6 @@ interface SearchFormProps {
 }
 
 export function SearchForm({
-  className,
   onSearch,
   searchTerm,
   results,
@@ -60,66 +59,68 @@ export function SearchForm({
         </kbd>
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <CommandInput
-            placeholder="Search anything..."
-            value={searchTerm}
-            onValueChange={onSearch}
-          />
-          <CommandList>
-            {isLoading && <CommandEmpty>Searching...</CommandEmpty>}
+        <DialogHeader className="sr-only">
+          <DialogTitle>Search</DialogTitle>
+          <DialogDescription>
+            Search for characters, locations, scenes, and props.
+          </DialogDescription>
+        </DialogHeader>
+        <CommandInput
+          placeholder="Search anything..."
+          value={searchTerm}
+          onValueChange={onSearch}
+        />
+        <CommandList>
+          {isLoading && <CommandEmpty>Searching...</CommandEmpty>}
 
-            {!isLoading && results && (
-              <>
-                {results.length > 0 ? (
-                  <>
-                    <CommandGroup heading="Characters">
-                      {results
-                        .filter((r) => r.entityType === "character")
-                        .map((result) => (
-                          <CommandItem key={result._id}>
-                            {result.preview}
-                          </CommandItem>
-                        ))}
-                    </CommandGroup>
+          {!isLoading && results && (
+            <>
+              {results.length > 0 ? (
+                <>
+                  <CommandGroup heading="Characters">
+                    {results
+                      .filter((r) => r.entityType === "character")
+                      .map((result) => (
+                        <CommandItem key={result._id}>
+                          {result.preview}
+                        </CommandItem>
+                      ))}
+                  </CommandGroup>
 
-                    <CommandGroup heading="Locations">
-                      {results
-                        .filter((r) => r.entityType === "location")
-                        .map((result) => (
-                          <CommandItem key={result._id}>
-                            {result.preview}
-                          </CommandItem>
-                        ))}
-                    </CommandGroup>
-
-                    <CommandGroup heading="Scenes">
-                      {results
-                        .filter((r) => r.entityType === "scene")
-                        .map((result) => (
-                          <CommandItem key={result._id}>
-                            {result.preview}
-                          </CommandItem>
-                        ))}
-                    </CommandGroup>
-
-                    <CommandGroup heading="Props">
-                      {results
-                        .filter((r) => r.entityType === "prop")
-                        .map((result) => (
-                          <CommandItem key={result._id}>
-                            {result.preview}
-                          </CommandItem>
-                        ))}
-                    </CommandGroup>
-                  </>
-                ) : (
-                  <CommandEmpty>No results found.</CommandEmpty>
-                )}
-              </>
-            )}
-          </CommandList>
-        </DialogContent>
+                  <CommandGroup heading="Locations">
+                    {results
+                      .filter((r) => r.entityType === "location")
+                      .map((result) => (
+                        <CommandItem key={result._id}>
+                          {result.preview}
+                        </CommandItem>
+                      ))}
+                  </CommandGroup>
+                  <CommandGroup heading="Props">
+                    {results
+                      .filter((r) => r.entityType === "prop")
+                      .map((result) => (
+                        <CommandItem key={result._id}>
+                          {result.preview}
+                        </CommandItem>
+                      ))}
+                  </CommandGroup>
+                  <CommandGroup heading="Scenes">
+                    {results
+                      .filter((r) => r.entityType === "scene")
+                      .map((result) => (
+                        <CommandItem key={result._id}>
+                          {result.preview}
+                        </CommandItem>
+                      ))}
+                  </CommandGroup>
+                </>
+              ) : (
+                <CommandEmpty>No results found.</CommandEmpty>
+              )}
+            </>
+          )}
+        </CommandList>
       </CommandDialog>
     </>
   );
