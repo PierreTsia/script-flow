@@ -1,4 +1,8 @@
 import { notFound } from "next/navigation";
+import { CharacterDetail } from "@/components/character-detail";
+import { LocationDetail } from "@/components/location-detail";
+import { PropDetail } from "@/components/prop-detail";
+import { SceneDetail } from "@/components/scene-detail";
 import { Id } from "@/convex/_generated/dataModel";
 
 interface PageProps {
@@ -9,55 +13,33 @@ interface PageProps {
   };
 }
 
-export default async function EntityDetailPage({ params }: PageProps) {
-  const { scriptId, entityType, entityId } = await params;
+export default function EntityDetailPage({ params }: PageProps) {
+  const { entityType, entityId, scriptId } = params;
 
-  // Validate entity type
-  if (!["characters", "locations", "props", "scenes"].includes(entityType)) {
-    notFound();
+  switch (entityType) {
+    case "characters":
+      return (
+        <CharacterDetail
+          characterId={entityId as Id<"characters">}
+          scriptId={scriptId}
+        />
+      );
+    case "locations":
+      return (
+        <LocationDetail
+          locationId={entityId as Id<"locations">}
+          scriptId={scriptId}
+        />
+      );
+    case "props":
+      return (
+        <PropDetail propId={entityId as Id<"props">} scriptId={scriptId} />
+      );
+    case "scenes":
+      return (
+        <SceneDetail sceneId={entityId as Id<"scenes">} scriptId={scriptId} />
+      );
+    default:
+      notFound();
   }
-
-  return (
-    <div className="flex flex-col gap-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {entityType.slice(0, -1).charAt(0).toUpperCase() +
-            entityType.slice(1, -1)}{" "}
-          Details
-        </h1>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-[2fr,1fr]">
-        {/* Main content */}
-        <div className="space-y-6">
-          <div className="rounded-lg border bg-card p-6">
-            <h2 className="font-semibold">Overview</h2>
-            <p className="text-muted-foreground">ID: {entityId}</p>
-          </div>
-
-          <div className="rounded-lg border bg-card p-6">
-            <h2 className="font-semibold">Appearances</h2>
-            <p className="text-muted-foreground">
-              Scene references will go here
-            </p>
-          </div>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          <div className="rounded-lg border bg-card p-6">
-            <h2 className="font-semibold">Related Entities</h2>
-            <p className="text-muted-foreground">
-              Connected entities will go here
-            </p>
-          </div>
-
-          <div className="rounded-lg border bg-card p-6">
-            <h2 className="font-semibold">Notes</h2>
-            <p className="text-muted-foreground">Entity notes will go here</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 }

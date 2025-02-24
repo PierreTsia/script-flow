@@ -3,6 +3,7 @@ import { parseSceneAnalysis } from "@/lib/llm/parser";
 import { MistralProvider } from "@/lib/llm/providers/mistral";
 import { SceneAnalysis } from "@/lib/llm/providers/index";
 import { FunctionReturnType } from "convex/server";
+import { getAll } from "convex-helpers/server/relationships";
 
 import { ConvexError, v } from "convex/values";
 import { Doc, Id } from "@/convex/_generated/dataModel";
@@ -208,6 +209,70 @@ export const saveScene = mutation({
     await scenesByScriptAggregate.insertIfDoesNotExist(ctx, scene);
 
     return sceneId;
+  },
+});
+
+export const getSceneById = query({
+  args: {
+    sceneId: v.id("scenes"),
+  },
+  handler: async (ctx, { sceneId }) => {
+    await requireAuth(ctx);
+    const scene = await requireExists(await ctx.db.get(sceneId), "scene");
+
+    await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(scene.script_id),
+      "script"
+    );
+
+    // Fetch all related data in parallel
+    const [characterScenes, locationScenes, propScenes] = await Promise.all([
+      ctx.db
+        .query("character_scenes")
+        .withIndex("by_scene", (q) => q.eq("scene_id", scene._id))
+        .collect(),
+      ctx.db
+        .query("location_scenes")
+        .withIndex("by_scene", (q) => q.eq("scene_id", scene._id))
+        .collect(),
+      ctx.db
+        .query("prop_scenes")
+        .withIndex("by_scene", (q) => q.eq("scene_id", scene._id))
+        .collect(),
+    ]);
+
+    // Batch fetch details
+    const [characterDetails, locationDetails, propDetails] = await Promise.all([
+      getAll(
+        ctx.db,
+        characterScenes.map((c) => c.character_id)
+      ),
+      getAll(
+        ctx.db,
+        locationScenes.map((l) => l.location_id)
+      ),
+      getAll(
+        ctx.db,
+        propScenes.map((p) => p.prop_id)
+      ),
+    ]);
+
+    return {
+      ...scene,
+      characters: characterScenes.map((c) => ({
+        ...characterDetails.find((d) => d?._id === c.character_id),
+        notes: c.notes,
+      })),
+      locations: locationScenes.map((l) => ({
+        ...locationDetails.find((d) => d?._id === l.location_id),
+        notes: l.notes,
+      })),
+      props: propScenes.map((p) => ({
+        ...propDetails.find((d) => d?._id === p.prop_id),
+        notes: p.notes,
+      })),
+    };
   },
 });
 

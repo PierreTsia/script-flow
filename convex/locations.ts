@@ -201,6 +201,26 @@ export const getLocationsByScriptId = query({
   },
 });
 
+export const getLocationById = query({
+  args: { location_id: v.id("locations") },
+  handler: async (ctx, { location_id }) => {
+    await requireAuth(ctx);
+
+    const location = await requireExists(
+      await ctx.db.get(location_id),
+      "location"
+    );
+
+    await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(location.script_id),
+      "script"
+    );
+
+    return location;
+  },
+});
+
 export const deleteLocation = mutation({
   args: { location_id: v.id("locations") },
   handler: async (ctx, { location_id }) => {

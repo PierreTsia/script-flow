@@ -63,6 +63,21 @@ async function getCharacterScenes(
   );
 }
 
+export const getCharacterById = query({
+  args: {
+    character_id: v.id("characters"),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+    const character = await requireExists(
+      await ctx.db.get(args.character_id),
+      "character"
+    );
+
+    return character;
+  },
+});
+
 export const createCharacter = mutation({
   args: {
     script_id: v.id("scripts"),

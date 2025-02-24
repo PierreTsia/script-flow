@@ -204,6 +204,23 @@ export const getPropsByScriptId = query({
   },
 });
 
+export const getPropById = query({
+  args: { prop_id: v.id("props") },
+  handler: async (ctx, { prop_id }) => {
+    await requireAuth(ctx);
+
+    const prop = await requireExists(await ctx.db.get(prop_id), "prop");
+
+    await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(prop.script_id),
+      "script"
+    );
+
+    return prop;
+  },
+});
+
 export const updateProp = mutation({
   args: {
     prop_id: v.id("props"),
