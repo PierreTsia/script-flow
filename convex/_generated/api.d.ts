@@ -8,11 +8,13 @@
  * @module
  */
 
+import type * as backfill from "../backfill.js";
 import type * as characters from "../characters.js";
 import type * as helpers from "../helpers.js";
 import type * as http from "../http.js";
 import type * as locations from "../locations.js";
 import type * as model_auth from "../model/auth.js";
+import type * as model_search from "../model/search.js";
 import type * as props from "../props.js";
 import type * as scenes from "../scenes.js";
 import type * as scripts from "../scripts.js";
@@ -32,11 +34,13 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  backfill: typeof backfill;
   characters: typeof characters;
   helpers: typeof helpers;
   http: typeof http;
   locations: typeof locations;
   "model/auth": typeof model_auth;
+  "model/search": typeof model_search;
   props: typeof props;
   scenes: typeof scenes;
   scripts: typeof scripts;

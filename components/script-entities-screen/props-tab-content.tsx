@@ -40,6 +40,7 @@ const PropsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   if (!result) return <EntityScreenSkeleton />;
 
   const { props: propsList, nextCursor, total } = result;
+  console.log("total", total);
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   const groupedProps = propsList?.reduce<GroupedProps>(

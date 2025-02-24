@@ -1,7 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { Infer, v } from "convex/values";
 import { ConvexError } from "convex/values";
-import { Doc } from "./_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { api } from "./_generated/api";
 import {
@@ -21,12 +21,14 @@ export type PropsWithScenes = FunctionReturnType<
   typeof api.props.getPropsByScriptId
 >;
 
-export const propsAggregate = new TableAggregate<{
-  Key: null;
+export const propsByScriptAggregate = new TableAggregate<{
+  Key: Id<"scripts">;
+  Namespace: Id<"scripts">;
   DataModel: DataModel;
   TableName: "props";
 }>(components.aggregate, {
-  sortKey: () => null,
+  sortKey: (prop) => prop.script_id,
+  namespace: (doc) => doc.script_id,
 });
 
 /**
@@ -90,7 +92,7 @@ export const createProp = mutation({
       searchText: [args.name, args.type].join(" ").toLowerCase(),
     });
     const doc = await ctx.db.get(propId);
-    await propsAggregate.insert(ctx, doc!);
+    await propsByScriptAggregate.insert(ctx, doc!);
 
     return propId;
   },
@@ -186,12 +188,18 @@ export const getPropsByScriptId = query({
       })
     );
 
-    const totalProps = await propsAggregate.count(ctx);
+    const total = await propsByScriptAggregate.count(ctx, {
+      namespace: myScript._id,
+      bounds: {
+        lower: { key: myScript._id, inclusive: true },
+        upper: { key: myScript._id, inclusive: true },
+      },
+    });
 
     return {
-      total: totalProps,
       props: propsWithScenes ?? [],
       nextCursor: paginatedProps.continueCursor,
+      total,
     };
   },
 });
@@ -217,13 +225,27 @@ export const updateProp = mutation({
 
     const newProp = await requireExists(await ctx.db.get(prop_id), "prop");
 
-    await propsAggregate.replaceOrInsert(ctx, oldProp, newProp);
+    await propsByScriptAggregate.replaceOrInsert(ctx, oldProp, newProp);
   },
 });
 
 export const getTotalProps = query({
-  handler: async (ctx) => {
-    return await propsAggregate.count(ctx);
+  args: {
+    script_id: v.id("scripts"),
+  },
+  handler: async (ctx, { script_id }) => {
+    const myScript = await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(script_id),
+      "script"
+    );
+    return await propsByScriptAggregate.count(ctx, {
+      namespace: myScript._id,
+      bounds: {
+        lower: { key: myScript._id, inclusive: true },
+        upper: { key: myScript._id, inclusive: true },
+      },
+    });
   },
 });
 
@@ -247,19 +269,10 @@ export const deleteProp = mutation({
 
     const mutations = [
       ctx.db.delete(prop_id),
-      propsAggregate.delete(ctx, prop),
+      propsByScriptAggregate.delete(ctx, prop),
       ...propScenes.map((ps) => ctx.db.delete(ps._id)),
     ];
 
     await Promise.all(mutations);
-  },
-});
-
-export const backfillPropsAggregate = mutation({
-  handler: async (ctx) => {
-    const allProps = await ctx.db.query("props").collect();
-    for (const prop of allProps) {
-      await propsAggregate.insertIfDoesNotExist(ctx, prop);
-    }
   },
 });

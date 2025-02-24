@@ -5,7 +5,7 @@ import { SceneAnalysis } from "@/lib/llm/providers/index";
 import { FunctionReturnType } from "convex/server";
 
 import { ConvexError, v } from "convex/values";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { api } from "./_generated/api";
 import { filter } from "convex-helpers/server/filter";
 import {
@@ -16,13 +16,16 @@ import {
 import { TableAggregate } from "@convex-dev/aggregate";
 import { DataModel } from "./_generated/dataModel";
 import { components } from "./_generated/api";
+import { generateSearchText } from "./model/search";
 
-export const scenesAggregate = new TableAggregate<{
-  Key: null;
+export const scenesByScriptAggregate = new TableAggregate<{
+  Key: Id<"scripts">;
+  Namespace: Id<"scripts">;
   DataModel: DataModel;
   TableName: "scenes";
 }>(components.aggregate, {
-  sortKey: () => null,
+  sortKey: (scene) => scene.script_id,
+  namespace: (doc) => doc.script_id,
 });
 
 export type SceneDocument = Doc<"scenes">;
@@ -192,11 +195,17 @@ export const saveScene = mutation({
       text: args.text,
       summary: args.summary,
       sortKey: sceneNumberToSortKey(args.scene_number),
+      searchText: generateSearchText.scene({
+        scene_number: args.scene_number,
+        page_number: args.page_number,
+        text: args.text,
+        summary: args.summary,
+      }),
     });
 
     const scene = await requireExists(await ctx.db.get(sceneId), "scene");
 
-    await scenesAggregate.insertIfDoesNotExist(ctx, scene);
+    await scenesByScriptAggregate.insertIfDoesNotExist(ctx, scene);
 
     return sceneId;
   },
@@ -297,7 +306,7 @@ export const deleteScene = mutation({
       ...propScenes.map((ps) => ctx.db.delete(ps._id)),
     ]);
 
-    await scenesAggregate.delete(ctx, scene!);
+    await scenesByScriptAggregate.delete(ctx, scene!);
   },
 });
 
@@ -416,12 +425,18 @@ export const updateScene = mutation({
         summary: args.summary,
         scene_number: args.sceneNumber,
         sortKey: sceneNumberToSortKey(args.sceneNumber),
+        searchText: generateSearchText.scene({
+          scene_number: args.sceneNumber,
+          page_number: scene.page_number,
+          text: scene.text,
+          summary: args.summary,
+        }),
       }),
     ]);
 
     const newScene = await ctx.db.get(args.sceneId);
 
-    await scenesAggregate.replaceOrInsert(ctx, scene!, newScene!);
+    await scenesByScriptAggregate.replaceOrInsert(ctx, scene!, newScene!);
 
     return scene._id;
   },
@@ -456,34 +471,37 @@ export const backfillSceneSortKeys = mutation({
   },
 });
 
-// Mutation to initialize/repair the aggregate
 export const backfillScenesAggregate = mutation({
   handler: async (ctx) => {
-    // First, get accurate count
     const scenes = await ctx.db.query("scenes").collect();
-
-    // Rebuild aggregate
     let updated = 0;
     let errors = 0;
 
+    // Clear existing aggregates first
     for (const scene of scenes) {
       try {
-        await scenesAggregate.insert(ctx, scene);
+        await scenesByScriptAggregate.delete(ctx, scene);
+      } catch (e) {
+        // Ignore delete errors
+      }
+    }
+
+    // Insert with proper script_id grouping
+    for (const scene of scenes) {
+      try {
+        await scenesByScriptAggregate.insert(ctx, scene);
         updated++;
       } catch (e) {
-        console.error(`Failed to insert scene ${scene._id}:`, e);
+        console.error(`Failed to update scene ${scene._id}:`, e);
         errors++;
       }
     }
 
-    // Verify final count
-    const finalCount = await scenesAggregate.count(ctx);
-
     return {
-      actualScenes: scenes.length,
-      aggregateCount: finalCount,
+      processed: scenes.length,
       updated,
       errors,
+      skipped: scenes.length - updated - errors,
     };
   },
 });

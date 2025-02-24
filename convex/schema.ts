@@ -59,10 +59,15 @@ export default defineSchema({
     text: v.string(),
     summary: v.optional(v.string()),
     sortKey: v.string(),
+    searchText: v.string(),
   })
     .index("unique_scene_constraint", ["script_id", "scene_number"])
     .index("by_script", ["script_id"])
-    .index("by_script_and_sort", ["script_id", "sortKey"]),
+    .index("by_script_and_sort", ["script_id", "sortKey"])
+    .searchIndex("search_scenes", {
+      searchField: "searchText",
+      filterFields: ["script_id"],
+    }),
 
   characters: defineTable({
     script_id: v.id("scripts"),
@@ -91,11 +96,16 @@ export default defineSchema({
     name: v.string(),
     type: locationTypeValidator,
     time_of_day: timeOfDayValidator,
+    searchText: v.string(),
   })
     .index("unique_location_per_script", ["script_id", "name", "type"])
     .index("by_script", ["script_id"])
     .index("by_type", ["type"])
-    .index("by_time_of_day", ["time_of_day"]),
+    .index("by_time_of_day", ["time_of_day"])
+    .searchIndex("search_locations", {
+      searchField: "searchText",
+      filterFields: ["script_id", "type", "time_of_day"],
+    }),
   location_scenes: defineTable({
     location_id: v.id("locations"),
     scene_id: v.id("scenes"),
@@ -136,6 +146,21 @@ export default defineSchema({
     .index("by_prop", ["prop_id"])
     .index("by_scene", ["scene_id"])
     .index("by_type", ["type"]),
+
+  // Add search history for better UX
+  searchHistory: defineTable({
+    userId: v.string(),
+    query: v.string(),
+    timestamp: v.number(),
+    entityType: v.optional(
+      v.union(
+        v.literal("character"),
+        v.literal("prop"),
+        v.literal("location"),
+        v.literal("scene")
+      )
+    ),
+  }).index("by_user_recent", ["userId", "timestamp"]),
 
   /* 
   use like so: 
