@@ -405,5 +405,51 @@
       "title": "Notes & References",
       "noNotes": "No additional notes"
     }
+  },
+  "LocationDetail": {
+    "title": "Location Details",
+    "loading": "Loading...",
+    "details": {
+      "title": "Location Details",
+      "type": "Type",
+      "timeOfDay": "Most Common Time",
+      "totalAppearances": "Total Appearances",
+      "notSpecified": "Not specified",
+      "scenes": "{count} scenes"
+    },
+    "scenes": {
+      "title": "Scene Appearances",
+      "scene": "Scene"
+    },
+    "notes": {
+      "title": "Notes & References",
+      "noNotes": "No additional notes"
+    },
+    "type": {
+      "interior": "Interior Location",
+      "exterior": "Exterior Location"
+    }
+  },
+  "PropDetail": {
+    "title": "Prop Details",
+    "loading": "Loading...",
+    "details": {
+      "title": "Prop Details",
+      "status": "Status",
+      "category": "Category",
+      "totalAppearances": "Total Appearances",
+      "notSpecified": "Not specified",
+      "scenes": "{count} scenes"
+    },
+    "scenes": {
+      "title": "Scene Appearances",
+      "scene": "Scene",
+      "page": "Page {number}"
+    },
+    "notes": {
+      "title": "Notes & References",
+      "noNotes": "No additional notes"
+    },
+    "quantity": "Qty: {number}"
   }
 }

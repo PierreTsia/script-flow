@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import PropBadge from "./ui/prop-badge";
+import { useTranslations } from "next-intl";
 
 interface PropDetailProps {
   propId: Id<"props">;
@@ -15,8 +16,9 @@ interface PropDetailProps {
 export function PropDetail({ propId }: PropDetailProps) {
   const { useGetPropById } = useProp();
   const prop = useGetPropById(propId);
+  const t = useTranslations("PropDetail");
 
-  if (!prop) return <div>Loading...</div>;
+  if (!prop) return <div>{t("loading")}</div>;
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -34,7 +36,7 @@ export function PropDetail({ propId }: PropDetailProps) {
               </PropBadge>
               {prop.quantity && (
                 <Badge variant="outline" className="text-sm">
-                  Qty: {prop.quantity}
+                  {t("quantity", { number: prop.quantity })}
                 </Badge>
               )}
             </div>
@@ -52,16 +54,20 @@ export function PropDetail({ propId }: PropDetailProps) {
       {/* Scene Details - Mobile View */}
       <Card className="md:hidden">
         <CardHeader>
-          <CardTitle className="text-base font-medium">Prop Details</CardTitle>
+          <CardTitle className="text-base font-medium">
+            {t("details.title")}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Status</span>
-            <span>Not specified</span>
+            <span className="text-muted-foreground">{t("details.status")}</span>
+            <span>{t("details.notSpecified")}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Category</span>
-            <span>Not specified</span>
+            <span className="text-muted-foreground">
+              {t("details.category")}
+            </span>
+            <span>{t("details.notSpecified")}</span>
           </div>
         </CardContent>
       </Card>
@@ -74,7 +80,7 @@ export function PropDetail({ propId }: PropDetailProps) {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base font-medium">
                 <Clapperboard className="h-4 w-4 text-primary" />
-                Scene Appearances
+                {t("scenes.title")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -87,7 +93,7 @@ export function PropDetail({ propId }: PropDetailProps) {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         <p className="font-medium">
-                          Scene {scene.scene_number}
+                          {t("scenes.scene")} {scene.scene_number}
                         </p>
 
                         {scene.notes && (
@@ -99,7 +105,9 @@ export function PropDetail({ propId }: PropDetailProps) {
                     </div>
                     <div className="flex items-center gap-1 text-muted-foreground text-sm">
                       <FileText className="h-4 w-4" />
-                      <span>Page {scene.page_number}</span>
+                      <span>
+                        {t("scenes.page", { number: scene.page_number })}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -111,12 +119,12 @@ export function PropDetail({ propId }: PropDetailProps) {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base font-medium">
-                Notes & References
+                {t("notes.title")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="prose prose-sm dark:prose-invert">
-                {"No additional notes"}
+                {t("notes.noNotes")}
               </div>
             </CardContent>
           </Card>
@@ -127,21 +135,29 @@ export function PropDetail({ propId }: PropDetailProps) {
           <Card>
             <CardHeader>
               <CardTitle className="text-base font-medium">
-                Prop Details
+                {t("details.title")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Status</span>
-                <span>{"Not specified"}</span>
+                <span className="text-muted-foreground">
+                  {t("details.status")}
+                </span>
+                <span>{t("details.notSpecified")}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Category</span>
-                <span>{"Not specified"}</span>
+                <span className="text-muted-foreground">
+                  {t("details.category")}
+                </span>
+                <span>{t("details.notSpecified")}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Appearances</span>
-                <span>{prop.scenes?.length || 0} scenes</span>
+                <span className="text-muted-foreground">
+                  {t("details.totalAppearances")}
+                </span>
+                <span>
+                  {t("details.scenes", { count: prop.scenes?.length || 0 })}
+                </span>
               </div>
             </CardContent>
           </Card>

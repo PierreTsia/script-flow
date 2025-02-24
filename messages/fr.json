@@ -411,5 +411,51 @@
       "title": "Notes & Références",
       "noNotes": "Aucune note"
     }
+  },
+  "LocationDetail": {
+    "title": "Détails du Lieu",
+    "loading": "Chargement...",
+    "details": {
+      "title": "Détails du Lieu",
+      "type": "Type",
+      "timeOfDay": "Moment habituel",
+      "totalAppearances": "Apparitions Totales",
+      "notSpecified": "Non spécifié",
+      "scenes": "{count} scènes"
+    },
+    "scenes": {
+      "title": "Apparitions dans les Scènes",
+      "scene": "Scène"
+    },
+    "notes": {
+      "title": "Notes & Références",
+      "noNotes": "Aucune note"
+    },
+    "type": {
+      "interior": "Lieu Intérieur",
+      "exterior": "Lieu Extérieur"
+    }
+  },
+  "PropDetail": {
+    "title": "Détails de l'Accessoire",
+    "loading": "Chargement...",
+    "details": {
+      "title": "Détails de l'Accessoire",
+      "status": "Statut",
+      "category": "Catégorie",
+      "totalAppearances": "Apparitions Totales",
+      "notSpecified": "Non spécifié",
+      "scenes": "{count} scènes"
+    },
+    "scenes": {
+      "title": "Apparitions dans les Scènes",
+      "scene": "Scène",
+      "page": "Page {number}"
+    },
+    "notes": {
+      "title": "Notes & Références",
+      "noNotes": "Aucune note"
+    },
+    "quantity": "Qté: {number}"
   }
 }

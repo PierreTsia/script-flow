@@ -1,8 +1,6 @@
-import { mutation, query } from "./_generated/server";
+import { mutation } from "./_generated/server";
 import { generateSearchText } from "./model/search";
-import { scenesByScriptAggregate } from "./scenes";
-import { locationsByScriptAggregate } from "./locations";
-import { propsByScriptAggregate } from "./props";
+
 import { v } from "convex/values";
 
 export const backfillSearchText = mutation({
@@ -46,82 +44,6 @@ export const backfillSearchText = mutation({
       scenesUpdated: scenes.length,
       propsUpdated: props.length,
       charactersUpdated: characters.length,
-    };
-  },
-});
-
-export const backfillLocationsAggregate = mutation({
-  args: {
-    scriptId: v.id("scripts"),
-  },
-  handler: async (ctx, args) => {
-    await locationsByScriptAggregate.clear(ctx, {
-      namespace: args.scriptId,
-    });
-  },
-});
-
-export const backfillScenesAggregate = mutation({
-  args: {
-    scriptId: v.id("scripts"),
-  },
-  handler: async (ctx, args) => {
-    await scenesByScriptAggregate.clear(ctx, {
-      namespace: args.scriptId,
-    });
-  },
-});
-
-export const backfillPropsAggregate = mutation({
-  args: {
-    scriptId: v.id("scripts"),
-  },
-  handler: async (ctx, args) => {
-    await propsByScriptAggregate.clear(ctx, {
-      namespace: args.scriptId,
-    });
-  },
-});
-
-export const backfillAllAggregates = mutation({
-  args: {
-    scriptId: v.id("scripts"),
-  },
-  handler: async (ctx, args) => {
-    // Clear aggregates for this script
-    await locationsByScriptAggregate.clear(ctx, { namespace: args.scriptId });
-    await scenesByScriptAggregate.clear(ctx, { namespace: args.scriptId });
-    await propsByScriptAggregate.clear(ctx, { namespace: args.scriptId });
-
-    // Query and insert only documents for this script
-    const locations = await ctx.db
-      .query("locations")
-      .withIndex("by_script", (q) => q.eq("script_id", args.scriptId))
-      .collect();
-    for (const location of locations) {
-      await locationsByScriptAggregate.insertIfDoesNotExist(ctx, location);
-    }
-
-    const scenes = await ctx.db
-      .query("scenes")
-      .withIndex("by_script", (q) => q.eq("script_id", args.scriptId))
-      .collect();
-    for (const scene of scenes) {
-      await scenesByScriptAggregate.insertIfDoesNotExist(ctx, scene);
-    }
-
-    const props = await ctx.db
-      .query("props")
-      .withIndex("by_script", (q) => q.eq("script_id", args.scriptId))
-      .collect();
-    for (const prop of props) {
-      await propsByScriptAggregate.insertIfDoesNotExist(ctx, prop);
-    }
-
-    return {
-      locations: locations.length,
-      scenes: scenes.length,
-      props: props.length,
     };
   },
 });

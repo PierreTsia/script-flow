@@ -1,15 +1,14 @@
 import { mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { locationTypeValidator, timeOfDayValidator } from "./helpers";
-import { DataModel, Doc, Id } from "./_generated/dataModel";
+import { Doc } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
-import { api, components } from "./_generated/api";
+import { api } from "./_generated/api";
 import {
   requireAuth,
   requireScriptOwnership,
   requireExists,
 } from "./model/auth";
-import { TableAggregate } from "@convex-dev/aggregate";
 import { generateSearchText } from "./model/search";
 export type LocationDocument = Doc<"locations">;
 export type LocationSceneDocument = Doc<"location_scenes">;
@@ -24,16 +23,6 @@ const createLocationWithSceneValidator = v.object({
   time_of_day: timeOfDayValidator,
   scene_id: v.id("scenes"),
   notes: v.optional(v.string()),
-});
-
-export const locationsByScriptAggregate = new TableAggregate<{
-  Key: Id<"scripts">;
-  Namespace: Id<"scripts">;
-  DataModel: DataModel;
-  TableName: "locations";
-}>(components.aggregate, {
-  sortKey: (location) => location.script_id,
-  namespace: (doc) => doc.script_id,
 });
 
 export const createLocation = mutation({
@@ -76,8 +65,8 @@ export const createLocation = mutation({
         time_of_day: args.time_of_day,
       }),
     });
-    const doc = await requireExists(await ctx.db.get(locationId), "location");
-    await locationsByScriptAggregate.insertIfDoesNotExist(ctx, doc);
+
+    return locationId;
   },
 });
 export const createLocationWithScene = mutation({
@@ -121,8 +110,6 @@ export const createLocationWithScene = mutation({
           time_of_day: args.time_of_day,
         }),
       });
-      const doc = await requireExists(await ctx.db.get(locationId), "location");
-      await locationsByScriptAggregate.insertIfDoesNotExist(ctx, doc);
     }
 
     // Check if the location is already linked to the scene
@@ -247,8 +234,6 @@ export const deleteLocation = mutation({
       "location"
     );
 
-    await locationsByScriptAggregate.delete(ctx, location);
-
     const locationScenes = await ctx.db
       .query("location_scenes")
       .withIndex("by_location", (q) => q.eq("location_id", location._id))
@@ -282,13 +267,6 @@ export const updateLocation = mutation({
       "script"
     );
 
-    await ctx.db.patch(location_id, { name, type, time_of_day });
-
-    const newLocation = await requireExists(
-      await ctx.db.get(location_id),
-      "location"
-    );
-
-    await locationsByScriptAggregate.replace(ctx, oldLocation, newLocation);
+    return await ctx.db.patch(location_id, { name, type, time_of_day });
   },
 });

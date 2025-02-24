@@ -13,6 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useTranslations } from "next-intl";
 
 interface LocationDetailProps {
   locationId: Id<"locations">;
@@ -45,8 +46,9 @@ const LocationTypeIcon = ({ type }: { type: string }) => {
 export function LocationDetail({ locationId }: LocationDetailProps) {
   const { useGetLocationById } = useLocation();
   const location = useGetLocationById(locationId);
+  const t = useTranslations("LocationDetail");
 
-  if (!location) return <div>Loading...</div>;
+  if (!location) return <div>{t("loading")}</div>;
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -75,17 +77,19 @@ export function LocationDetail({ locationId }: LocationDetailProps) {
       <Card className="md:hidden">
         <CardHeader>
           <CardTitle className="text-base font-medium">
-            Location Details
+            {t("details.title")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Type</span>
-            <span>{location.type || "Not specified"}</span>
+            <span className="text-muted-foreground">{t("details.type")}</span>
+            <span>{location.type || t("details.notSpecified")}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Most Common Time</span>
-            <span>{"Not specified"}</span>
+            <span className="text-muted-foreground">
+              {t("details.timeOfDay")}
+            </span>
+            <span>{t("details.notSpecified")}</span>
           </div>
         </CardContent>
       </Card>
@@ -98,7 +102,7 @@ export function LocationDetail({ locationId }: LocationDetailProps) {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base font-medium">
                 <Clapperboard className="h-4 w-4 text-primary" />
-                Scene Appearances
+                {t("scenes.title")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -139,12 +143,12 @@ export function LocationDetail({ locationId }: LocationDetailProps) {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base font-medium">
-                Notes & References
+                {t("notes.title")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="prose prose-sm dark:prose-invert">
-                {"No additional notes"}
+                {location.notes || t("notes.noNotes")}
               </div>
             </CardContent>
           </Card>
@@ -155,21 +159,31 @@ export function LocationDetail({ locationId }: LocationDetailProps) {
           <Card>
             <CardHeader>
               <CardTitle className="text-base font-medium">
-                Location Details
+                {t("details.title")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Type</span>
-                <span>{location.type || "Not specified"}</span>
+                <span className="text-muted-foreground">
+                  {t("details.type")}
+                </span>
+                <span>{location.type || t("details.notSpecified")}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Most Common Time</span>
-                <span>{"Not specified"}</span>
+                <span className="text-muted-foreground">
+                  {t("details.timeOfDay")}
+                </span>
+                <span>
+                  {location.default_time_of_day || t("details.notSpecified")}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Appearances</span>
-                <span>{location.scenes?.length || 0} scenes</span>
+                <span className="text-muted-foreground">
+                  {t("details.totalAppearances")}
+                </span>
+                <span>
+                  {t("details.scenes", { count: location.scenes?.length || 0 })}
+                </span>
               </div>
             </CardContent>
           </Card>

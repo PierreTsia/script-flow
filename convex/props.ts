@@ -1,7 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { Infer, v } from "convex/values";
 import { ConvexError } from "convex/values";
-import { Doc, Id } from "./_generated/dataModel";
+import { Doc } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { api } from "./_generated/api";
 import {
@@ -10,26 +10,12 @@ import {
   requireScriptOwnership,
 } from "./model/auth";
 
-import { TableAggregate } from "@convex-dev/aggregate";
-import { DataModel } from "./_generated/dataModel";
-import { components } from "./_generated/api";
-
 export type PropDocument = Doc<"props">;
 export type PropSceneDocument = Doc<"prop_scenes">;
 
 export type PropsWithScenes = FunctionReturnType<
   typeof api.props.getPropsByScriptId
 >;
-
-export const propsByScriptAggregate = new TableAggregate<{
-  Key: Id<"scripts">;
-  Namespace: Id<"scripts">;
-  DataModel: DataModel;
-  TableName: "props";
-}>(components.aggregate, {
-  sortKey: (prop) => prop.script_id,
-  namespace: (doc) => doc.script_id,
-});
 
 /**
  * Prop Type System
@@ -91,8 +77,6 @@ export const createProp = mutation({
       type: args.type,
       searchText: [args.name, args.type].join(" ").toLowerCase(),
     });
-    const doc = await requireExists(await ctx.db.get(propId), "prop");
-    await propsByScriptAggregate.insertIfDoesNotExist(ctx, doc);
 
     return propId;
   },
@@ -117,15 +101,13 @@ export const createPropWithScene = mutation({
       // Create new prop with base type
       const { scene_id, type, name, quantity } = args;
       await requireExists(await ctx.db.get(scene_id), "scene");
-      propId = await ctx.db.insert("props", {
+      return await ctx.db.insert("props", {
         script_id: args.script_id,
         name,
         quantity: quantity ?? 1,
         type, // Base/default type
         searchText: [name, type].join(" ").toLowerCase(),
       });
-      const doc = await requireExists(await ctx.db.get(propId), "prop");
-      await propsByScriptAggregate.insertIfDoesNotExist(ctx, doc);
     }
 
     // Create scene junction with potentially different type
@@ -256,31 +238,7 @@ export const updateProp = mutation({
       await ctx.db.get(oldProp.script_id),
       "script"
     );
-    await ctx.db.patch(prop_id, { name, quantity, type });
-
-    const newProp = await requireExists(await ctx.db.get(prop_id), "prop");
-
-    await propsByScriptAggregate.replaceOrInsert(ctx, oldProp, newProp);
-  },
-});
-
-export const getTotalProps = query({
-  args: {
-    script_id: v.id("scripts"),
-  },
-  handler: async (ctx, { script_id }) => {
-    const myScript = await requireScriptOwnership(
-      ctx,
-      await ctx.db.get(script_id),
-      "script"
-    );
-    return await propsByScriptAggregate.count(ctx, {
-      namespace: myScript._id,
-      bounds: {
-        lower: { key: myScript._id, inclusive: true },
-        upper: { key: myScript._id, inclusive: true },
-      },
-    });
+    return await ctx.db.patch(prop_id, { name, quantity, type });
   },
 });
 
@@ -304,7 +262,6 @@ export const deleteProp = mutation({
 
     const mutations = [
       ctx.db.delete(prop_id),
-      propsByScriptAggregate.delete(ctx, prop),
       ...propScenes.map((ps) => ctx.db.delete(ps._id)),
     ];
 

@@ -5,7 +5,15 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sun, Moon, Clapperboard, Sunrise, Sunset, Clock } from "lucide-react";
+import {
+  Sun,
+  Moon,
+  Clapperboard,
+  Sunrise,
+  Sunset,
+  Clock,
+  Eye,
+} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -21,7 +29,7 @@ import useSceneEntities from "@/hooks/useSceneEntities";
 import { EditLocationDialog } from "./edit-location-dialog";
 import { useTranslations } from "next-intl";
 import { TimeOfDay } from "@/convex/helpers";
-
+import Link from "next/link";
 const TimeOfDayIcon = ({ timeOfDay }: { timeOfDay: TimeOfDay }) => {
   const t = useTranslations("ScriptEntitiesScreen");
   const iconMap: Record<TimeOfDay, React.ReactNode> = {
@@ -53,7 +61,7 @@ const LocationSummaryCard = ({
   const { deleteLocation, isLoading } = useSceneEntities();
 
   return (
-    <Card className="hover:bg-accent transition-colors">
+    <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
           <h4 className="font-semibold">{location.name}</h4>
@@ -79,6 +87,13 @@ const LocationSummaryCard = ({
           ))}
         </div>
         <CardFooter className="flex gap-2 justify-end">
+          <Link
+            href={`/scripts/${location.script_id}/entities/locations/${location._id}`}
+          >
+            <Button variant="ghost" size="icon" title="View location">
+              <Eye className="h-4 w-4" />
+            </Button>
+          </Link>
           <ConfirmDeleteDialog
             entityType="location"
             entityName={location.name}

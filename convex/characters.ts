@@ -9,9 +9,6 @@ import {
   requireScriptOwnership,
   requireExists,
 } from "./model/auth";
-import { components } from "./_generated/api";
-import { TableAggregate } from "@convex-dev/aggregate";
-import { DataModel } from "./_generated/dataModel";
 import { SceneDocument } from "./scenes";
 
 export type CharacterDocument = Doc<"characters">;
@@ -23,16 +20,6 @@ export type CharacterSceneWithNotes = CharacterSceneDocument & {
 export type CharactersWithScenes = FunctionReturnType<
   typeof api.characters.getCharactersByScriptId
 >;
-
-const charactersByScriptAggregate = new TableAggregate<{
-  Key: Id<"scripts">;
-  Namespace: Id<"scripts">;
-  DataModel: DataModel;
-  TableName: "characters";
-}>(components.aggregate, {
-  sortKey: (character) => character.script_id,
-  namespace: (doc) => doc.script_id,
-});
 
 const createCharacterWithSceneValidator = v.object({
   script_id: v.id("scripts"),
@@ -118,13 +105,6 @@ export const createCharacter = mutation({
         ` ${args.type}`,
     });
 
-    const character = await requireExists(
-      await ctx.db.get(characterId),
-      "character"
-    );
-
-    await charactersByScriptAggregate.insert(ctx, character);
-
     return characterId;
   },
 });
@@ -166,13 +146,6 @@ export const createCharacterWithScene = mutation({
         aliases,
         searchText,
       });
-
-      const newCharacter = await requireExists(
-        await ctx.db.get(characterId),
-        "character"
-      );
-
-      await charactersByScriptAggregate.insert(ctx, newCharacter);
     }
 
     // Create the junction with notes
@@ -327,8 +300,6 @@ export const deleteCharacter = mutation({
       "character"
     );
 
-    await charactersByScriptAggregate.delete(ctx, characterToDelete);
-
     // delete join tables rows
     const characterScenes = await ctx.db
       .query("character_scenes")
@@ -371,12 +342,6 @@ export const updateCharacter = mutation({
     const updatedCharacter = await requireExists(
       await ctx.db.get(oldCharacter._id),
       "character"
-    );
-
-    await charactersByScriptAggregate.replaceOrInsert(
-      ctx,
-      oldCharacter,
-      updatedCharacter
     );
 
     return updatedCharacter;

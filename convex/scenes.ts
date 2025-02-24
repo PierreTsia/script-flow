@@ -6,7 +6,7 @@ import { FunctionReturnType } from "convex/server";
 import { getAll } from "convex-helpers/server/relationships";
 
 import { ConvexError, v } from "convex/values";
-import { Doc, Id } from "@/convex/_generated/dataModel";
+import { Doc } from "@/convex/_generated/dataModel";
 import { api } from "./_generated/api";
 import { filter } from "convex-helpers/server/filter";
 import {
@@ -14,20 +14,8 @@ import {
   requireScriptOwnership,
   requireExists,
 } from "./model/auth";
-import { TableAggregate } from "@convex-dev/aggregate";
-import { DataModel } from "./_generated/dataModel";
-import { components } from "./_generated/api";
-import { generateSearchText } from "./model/search";
 
-export const scenesByScriptAggregate = new TableAggregate<{
-  Key: Id<"scripts">;
-  Namespace: Id<"scripts">;
-  DataModel: DataModel;
-  TableName: "scenes";
-}>(components.aggregate, {
-  sortKey: (scene) => scene.script_id,
-  namespace: (doc) => doc.script_id,
-});
+import { generateSearchText } from "./model/search";
 
 export type SceneDocument = Doc<"scenes">;
 
@@ -204,10 +192,6 @@ export const saveScene = mutation({
       }),
     });
 
-    const scene = await requireExists(await ctx.db.get(sceneId), "scene");
-
-    await scenesByScriptAggregate.insertIfDoesNotExist(ctx, scene);
-
     return sceneId;
   },
 });
@@ -370,8 +354,6 @@ export const deleteScene = mutation({
       ...locationScenes.map((ls) => ctx.db.delete(ls._id)),
       ...propScenes.map((ps) => ctx.db.delete(ps._id)),
     ]);
-
-    await scenesByScriptAggregate.delete(ctx, scene!);
   },
 });
 
@@ -499,10 +481,6 @@ export const updateScene = mutation({
       }),
     ]);
 
-    const newScene = await ctx.db.get(args.sceneId);
-
-    await scenesByScriptAggregate.replaceOrInsert(ctx, scene!, newScene!);
-
     return scene._id;
   },
 });
@@ -521,41 +499,6 @@ export const backfillSceneSortKeys = mutation({
           });
           updated++;
         }
-      } catch (e) {
-        console.error(`Failed to update scene ${scene._id}:`, e);
-        errors++;
-      }
-    }
-
-    return {
-      processed: scenes.length,
-      updated,
-      errors,
-      skipped: scenes.length - updated - errors,
-    };
-  },
-});
-
-export const backfillScenesAggregate = mutation({
-  handler: async (ctx) => {
-    const scenes = await ctx.db.query("scenes").collect();
-    let updated = 0;
-    let errors = 0;
-
-    // Clear existing aggregates first
-    for (const scene of scenes) {
-      try {
-        await scenesByScriptAggregate.delete(ctx, scene);
-      } catch (e) {
-        // Ignore delete errors
-      }
-    }
-
-    // Insert with proper script_id grouping
-    for (const scene of scenes) {
-      try {
-        await scenesByScriptAggregate.insert(ctx, scene);
-        updated++;
       } catch (e) {
         console.error(`Failed to update scene ${scene._id}:`, e);
         errors++;
