@@ -1,6 +1,5 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { scenesByScriptAggregate } from "./scenes";
 import {
   requireAuth,
   getAuthState,
@@ -173,19 +172,16 @@ export const getScriptEntities = query({
         .map((link) => props.find((prop) => prop._id === link.prop_id)),
     }));
 
-    const totalScenes = await scenesByScriptAggregate.count(ctx, {
-      namespace: scriptId,
-      bounds: {
-        lower: { key: scriptId, inclusive: true },
-        upper: { key: scriptId, inclusive: true },
-      },
-    });
+    const allScenes = await ctx.db
+      .query("scenes")
+      .withIndex("by_script", (q) => q.eq("script_id", scriptId))
+      .collect();
 
     return {
       script: myScript,
       scenes: scenesWithEntities,
       nextCursor: paginatedScenes.continueCursor,
-      total: totalScenes,
+      total: allScenes.length,
     };
   },
 });

@@ -30,6 +30,7 @@ import {
   Users,
   Pencil,
   Star,
+  Eye,
 } from "lucide-react";
 import {
   Tooltip,
@@ -210,6 +211,12 @@ const SceneSummaryCard = ({
         </div>
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
+        <Link href={`/scripts/${scriptId}/entities/scenes/${scene._id}`}>
+          <Button variant="ghost" size="icon" title="View scene">
+            <Eye className="h-4 w-4" />
+          </Button>
+        </Link>
+
         <EditSceneDialog
           scene={scene}
           isOpen={isEditDialogOpen}
@@ -241,7 +248,7 @@ const SceneSummaryCard = ({
 
 export default SceneSummaryCard;
 
-const CharacterTypeIcon = ({ type }: { type: CharacterType }) => {
+export const CharacterTypeIcon = ({ type }: { type: CharacterType }) => {
   const t = useTranslations("ScriptEntitiesScreen");
   const CharacterTypeIconMap: Record<CharacterType, React.ReactNode> = {
     PRINCIPAL: (

@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clapperboard, Pencil } from "lucide-react";
+import { Clapperboard, Eye, Pencil } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -20,7 +20,7 @@ import ConfirmDeleteDialog from "./confirm-delete-dialog";
 import { EditPropDialog } from "./edit-prop-dialog";
 import { useState } from "react";
 import PropBadge from "../ui/prop-badge";
-
+import Link from "next/link";
 export default function PropSummaryCard({
   prop,
 }: {
@@ -62,6 +62,11 @@ export default function PropSummaryCard({
         </div>
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
+        <Link href={`/scripts/${prop.script_id}/entities/props/${prop._id}`}>
+          <Button variant="ghost" size="icon" title="View prop">
+            <Eye className="h-4 w-4" />
+          </Button>
+        </Link>
         <ConfirmDeleteDialog
           entityType="prop"
           entityName={prop.name}

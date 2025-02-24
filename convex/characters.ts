@@ -9,9 +9,6 @@ import {
   requireScriptOwnership,
   requireExists,
 } from "./model/auth";
-import { components } from "./_generated/api";
-import { TableAggregate } from "@convex-dev/aggregate";
-import { DataModel } from "./_generated/dataModel";
 import { SceneDocument } from "./scenes";
 
 export type CharacterDocument = Doc<"characters">;
@@ -23,16 +20,6 @@ export type CharacterSceneWithNotes = CharacterSceneDocument & {
 export type CharactersWithScenes = FunctionReturnType<
   typeof api.characters.getCharactersByScriptId
 >;
-
-const charactersByScriptAggregate = new TableAggregate<{
-  Key: Id<"scripts">;
-  Namespace: Id<"scripts">;
-  DataModel: DataModel;
-  TableName: "characters";
-}>(components.aggregate, {
-  sortKey: (character) => character.script_id,
-  namespace: (doc) => doc.script_id,
-});
 
 const createCharacterWithSceneValidator = v.object({
   script_id: v.id("scripts"),
@@ -62,6 +49,29 @@ async function getCharacterScenes(
     })
   );
 }
+
+export const getCharacterById = query({
+  args: {
+    character_id: v.id("characters"),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+    const character = await requireExists(
+      await ctx.db.get(args.character_id),
+      "character"
+    );
+    const characterScenes = await getCharacterScenes(ctx, character._id);
+    const characterScenesWithNotes = characterScenes.map((cs) => ({
+      ...cs,
+      notes: cs.notes || "No notes",
+    }));
+
+    return {
+      ...character,
+      scenes: characterScenesWithNotes,
+    };
+  },
+});
 
 export const createCharacter = mutation({
   args: {
@@ -102,13 +112,6 @@ export const createCharacter = mutation({
         [args.name, ...(args.aliases || [])].join(" ").toLowerCase() +
         ` ${args.type}`,
     });
-
-    const character = await requireExists(
-      await ctx.db.get(characterId),
-      "character"
-    );
-
-    await charactersByScriptAggregate.insert(ctx, character);
 
     return characterId;
   },
@@ -151,13 +154,6 @@ export const createCharacterWithScene = mutation({
         aliases,
         searchText,
       });
-
-      const newCharacter = await requireExists(
-        await ctx.db.get(characterId),
-        "character"
-      );
-
-      await charactersByScriptAggregate.insert(ctx, newCharacter);
     }
 
     // Create the junction with notes
@@ -184,16 +180,10 @@ export const getCharactersByScriptId = query({
       "script"
     );
 
-    const total = await charactersByScriptAggregate.count(ctx, {
-      namespace: myScript._id,
-      // @ts-ignore-next-line
-      bounds: {
-        // @ts-ignore-next-line
-        lower: { key: myScript._id, inclusive: true },
-        // @ts-ignore-next-line
-        upper: { key: myScript._id, inclusive: true },
-      },
-    });
+    const allCharacters = await ctx.db
+      .query("characters")
+      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
+      .collect();
 
     const paginatedCharacters = await ctx.db
       .query("characters")
@@ -216,7 +206,7 @@ export const getCharactersByScriptId = query({
     return {
       characters: characterScenes,
       nextCursor: paginatedCharacters.continueCursor,
-      total,
+      total: allCharacters.length,
     };
   },
 });
@@ -318,8 +308,6 @@ export const deleteCharacter = mutation({
       "character"
     );
 
-    await charactersByScriptAggregate.delete(ctx, characterToDelete);
-
     // delete join tables rows
     const characterScenes = await ctx.db
       .query("character_scenes")
@@ -362,12 +350,6 @@ export const updateCharacter = mutation({
     const updatedCharacter = await requireExists(
       await ctx.db.get(oldCharacter._id),
       "character"
-    );
-
-    await charactersByScriptAggregate.replaceOrInsert(
-      ctx,
-      oldCharacter,
-      updatedCharacter
     );
 
     return updatedCharacter;

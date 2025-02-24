@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, Clapperboard } from "lucide-react";
+import { Pencil, Clapperboard, Eye } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -21,6 +21,8 @@ import useSceneEntities from "@/hooks/useSceneEntities";
 import ConfirmDeleteDialog from "@/components/script-entities-screen/confirm-delete-dialog";
 import { EditCharacterDialog } from "./edit-character-dialog";
 import { useState } from "react";
+import Link from "next/link";
+
 const CharacterSummaryCard = ({
   character,
   potentialDuplicates,
@@ -33,7 +35,7 @@ const CharacterSummaryCard = ({
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   return (
-    <Card className="hover:bg-accent transition-colors">
+    <Card>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
@@ -84,6 +86,14 @@ const CharacterSummaryCard = ({
         </div>
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
+        <Link
+          href={`/scripts/${character.script_id}/entities/characters/${character._id}`}
+        >
+          <Button variant="ghost" size="icon" title="View character">
+            <Eye className="h-4 w-4" />
+          </Button>
+        </Link>
+
         {potentialDuplicates && (
           <DeduplicateCharacterButton
             character={character}

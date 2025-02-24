@@ -25,7 +25,6 @@ const ScenesTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
 
   const { scenes, nextCursor, total } = result;
 
-  console.log("Total scenes", total);
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { SidebarIcon } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import React from "react";
 import Link from "next/link";
 
@@ -16,10 +16,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useSidebar } from "@/components/ui/sidebar";
+import { useSearchEntities } from "@/hooks/useSearchEntities";
+import { Id } from "@/convex/_generated/dataModel";
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar();
   const pathname = usePathname();
+  const params = useParams<{ scriptId: string }>();
+
+  const scriptId = params?.scriptId as Id<"scripts"> | undefined;
+
+  // Initialize search hook
+  const search = useSearchEntities(scriptId);
 
   // Create breadcrumb items from pathname
   const breadcrumbs =
@@ -72,7 +80,14 @@ export function SiteHeader() {
             ))}
           </BreadcrumbList>
         </Breadcrumb>
-        <SearchForm className="w-full sm:ml-auto sm:w-auto" />
+        <SearchForm
+          className="w-full sm:ml-auto sm:w-auto"
+          onSearch={search.handleSearch}
+          searchTerm={search.searchTerm}
+          results={search.results}
+          isLoading={search.isLoading}
+          scriptId={scriptId}
+        />
       </div>
     </header>
   );

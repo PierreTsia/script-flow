@@ -31,6 +31,10 @@ export const useScene = () => {
     });
   };
 
+  const useGetSceneById = (sceneId: Id<"scenes">) => {
+    return useQuery(api.scenes.getSceneById, { sceneId });
+  };
+
   const useGetLocationsByScriptId = (
     scriptId: Id<"scripts">,
     limit = 25,
@@ -250,5 +254,6 @@ export const useScene = () => {
     useGetPropsByScriptId,
     deleteScene,
     updateScene,
+    useGetSceneById,
   };
 };

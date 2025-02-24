@@ -1,15 +1,14 @@
 import { mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { locationTypeValidator, timeOfDayValidator } from "./helpers";
-import { DataModel, Doc, Id } from "./_generated/dataModel";
+import { Doc } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
-import { api, components } from "./_generated/api";
+import { api } from "./_generated/api";
 import {
   requireAuth,
   requireScriptOwnership,
   requireExists,
 } from "./model/auth";
-import { TableAggregate } from "@convex-dev/aggregate";
 import { generateSearchText } from "./model/search";
 export type LocationDocument = Doc<"locations">;
 export type LocationSceneDocument = Doc<"location_scenes">;
@@ -24,16 +23,6 @@ const createLocationWithSceneValidator = v.object({
   time_of_day: timeOfDayValidator,
   scene_id: v.id("scenes"),
   notes: v.optional(v.string()),
-});
-
-export const locationsByScriptAggregate = new TableAggregate<{
-  Key: Id<"scripts">;
-  Namespace: Id<"scripts">;
-  DataModel: DataModel;
-  TableName: "locations";
-}>(components.aggregate, {
-  sortKey: (location) => location.script_id,
-  namespace: (doc) => doc.script_id,
 });
 
 export const createLocation = mutation({
@@ -68,7 +57,7 @@ export const createLocation = mutation({
       );
     }
 
-    return await ctx.db.insert("locations", {
+    const locationId = await ctx.db.insert("locations", {
       ...args,
       searchText: generateSearchText.location({
         name: args.name,
@@ -76,6 +65,8 @@ export const createLocation = mutation({
         time_of_day: args.time_of_day,
       }),
     });
+
+    return locationId;
   },
 });
 export const createLocationWithScene = mutation({
@@ -185,18 +176,50 @@ export const getLocationsByScriptId = query({
       })
     );
 
-    const total = await locationsByScriptAggregate.count(ctx, {
-      namespace: myScript._id,
-      bounds: {
-        lower: { key: myScript._id, inclusive: true },
-        upper: { key: myScript._id, inclusive: true },
-      },
-    });
+    const allLocations = await ctx.db
+      .query("locations")
+      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
+      .collect();
 
     return {
       locations: locationsWithScenes,
       nextCursor: paginatedLocations.continueCursor,
-      total,
+      total: allLocations.length,
+    };
+  },
+});
+
+export const getLocationById = query({
+  args: { location_id: v.id("locations") },
+  handler: async (ctx, { location_id }) => {
+    await requireAuth(ctx);
+
+    const location = await requireExists(
+      await ctx.db.get(location_id),
+      "location"
+    );
+
+    const locationScenes = await ctx.db
+      .query("location_scenes")
+      .withIndex("by_location", (q) => q.eq("location_id", location._id))
+      .collect();
+
+    const scenes = await Promise.all(
+      locationScenes.map(async (ls) => ({
+        ...(await ctx.db.get(ls.scene_id))!,
+        notes: ls.notes,
+      }))
+    );
+
+    await requireScriptOwnership(
+      ctx,
+      await ctx.db.get(location.script_id),
+      "script"
+    );
+
+    return {
+      ...location,
+      scenes,
     };
   },
 });
@@ -210,8 +233,6 @@ export const deleteLocation = mutation({
       await ctx.db.get(location_id),
       "location"
     );
-
-    await locationsByScriptAggregate.delete(ctx, location);
 
     const locationScenes = await ctx.db
       .query("location_scenes")
@@ -246,13 +267,6 @@ export const updateLocation = mutation({
       "script"
     );
 
-    await ctx.db.patch(location_id, { name, type, time_of_day });
-
-    const newLocation = await requireExists(
-      await ctx.db.get(location_id),
-      "location"
-    );
-
-    await locationsByScriptAggregate.replace(ctx, oldLocation, newLocation);
+    return await ctx.db.patch(location_id, { name, type, time_of_day });
   },
 });

@@ -31,7 +31,6 @@ const LocationsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   if (!result) return <EntityScreenSkeleton />;
 
   const { locations, nextCursor, total } = result;
-  console.log("total", total);
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   // Group by INT/EXT

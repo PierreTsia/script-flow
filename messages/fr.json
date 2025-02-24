@@ -377,5 +377,113 @@
       "analyze": "Analyser"
     },
     "cancel": "Annuler"
+  },
+  "SceneDetail": {
+    "title": "Détails de la Scène",
+    "loading": "Chargement...",
+    "pageNumber": "Page {number}",
+    "locations": {
+      "title": "Lieux",
+      "interior": "Lieu Intérieur",
+      "exterior": "Lieu Extérieur"
+    },
+    "characters": {
+      "title": "Personnages"
+    },
+    "props": {
+      "title": "Accessoires",
+      "quantity": "Qté: {number}"
+    },
+    "details": {
+      "title": "Détails",
+      "duration": "Durée",
+      "timeOfDay": "Moment de la journée",
+      "notSpecified": "Non spécifié"
+    },
+    "timeOfDay": {
+      "day": "Jour",
+      "night": "Nuit",
+      "dawn": "Aube",
+      "dusk": "Crépuscule",
+      "unspecified": "Non spécifié"
+    },
+    "notes": {
+      "title": "Notes & Références",
+      "noNotes": "Aucune note"
+    }
+  },
+  "LocationDetail": {
+    "title": "Détails du Lieu",
+    "loading": "Chargement...",
+    "details": {
+      "title": "Détails du Lieu",
+      "type": "Type",
+      "timeOfDay": "Moment habituel",
+      "totalAppearances": "Apparitions Totales",
+      "notSpecified": "Non spécifié",
+      "scenes": "{count} scènes"
+    },
+    "scenes": {
+      "title": "Apparitions dans les Scènes",
+      "scene": "Scène"
+    },
+    "notes": {
+      "title": "Notes & Références",
+      "noNotes": "Aucune note"
+    },
+    "type": {
+      "interior": "Lieu Intérieur",
+      "exterior": "Lieu Extérieur"
+    }
+  },
+  "PropDetail": {
+    "title": "Détails de l'Accessoire",
+    "loading": "Chargement...",
+    "details": {
+      "title": "Détails de l'Accessoire",
+      "status": "Statut",
+      "category": "Catégorie",
+      "totalAppearances": "Apparitions Totales",
+      "notSpecified": "Non spécifié",
+      "scenes": "{count} scènes"
+    },
+    "scenes": {
+      "title": "Apparitions dans les Scènes",
+      "scene": "Scène",
+      "page": "Page {number}"
+    },
+    "notes": {
+      "title": "Notes & Références",
+      "noNotes": "Aucune note"
+    },
+    "quantity": "Qté: {number}"
+  },
+  "CharacterDetail": {
+    "loading": "Chargement...",
+    "details": {
+      "title": "Détails du Personnage",
+      "type": "Type",
+      "aliases": "Alias",
+      "totalAppearances": "Apparitions Totales",
+      "notSpecified": "Non spécifié",
+      "noDescription": "Aucune description disponible",
+      "scenes": "{count} scènes"
+    },
+    "scenes": {
+      "title": "Apparitions dans les Scènes",
+      "scene": "Scène",
+      "page": "Page {number}"
+    },
+    "arc": {
+      "title": "Arc du Personnage",
+      "noNotes": "Aucune note sur l'arc du personnage"
+    },
+    "characterTypes": {
+      "principal": "Principal",
+      "supporting": "Secondaire",
+      "featured_extra": "Figurant Important",
+      "silent_key": "Silencieux",
+      "atmosphere": "Atmosphère"
+    }
   }
 }
