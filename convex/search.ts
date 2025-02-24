@@ -13,8 +13,6 @@ export type GlobalSearchEntitiesResult = FunctionReturnType<
 export const isCharacter = (
   entity: SearchableEntity
 ): entity is Doc<"characters"> => {
-  console.log("===>", entity);
-
   return (
     "name" in entity &&
     "type" in entity &&
