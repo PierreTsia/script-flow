@@ -173,8 +173,12 @@ export const getScriptEntities = query({
         .map((link) => props.find((prop) => prop._id === link.prop_id)),
     }));
 
-    // Get total count using aggregate (you'll need to create this)
-    const totalScenes = await scenesAggregate.count(ctx);
+    const totalScenes = await scenesAggregate.count(ctx, {
+      bounds: {
+        lower: { key: scriptId, inclusive: true },
+        upper: { key: scriptId, inclusive: true },
+      },
+    });
 
     return {
       script: myScript,

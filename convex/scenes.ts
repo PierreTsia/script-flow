@@ -5,7 +5,7 @@ import { SceneAnalysis } from "@/lib/llm/providers/index";
 import { FunctionReturnType } from "convex/server";
 
 import { ConvexError, v } from "convex/values";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { api } from "./_generated/api";
 import { filter } from "convex-helpers/server/filter";
 import {
@@ -17,12 +17,13 @@ import { TableAggregate } from "@convex-dev/aggregate";
 import { DataModel } from "./_generated/dataModel";
 import { components } from "./_generated/api";
 import { generateSearchText } from "./model/search";
+
 export const scenesAggregate = new TableAggregate<{
-  Key: null;
+  Key: Id<"scripts">;
   DataModel: DataModel;
   TableName: "scenes";
 }>(components.aggregate, {
-  sortKey: () => null,
+  sortKey: (scene) => scene.script_id,
 });
 
 export type SceneDocument = Doc<"scenes">;
@@ -468,34 +469,37 @@ export const backfillSceneSortKeys = mutation({
   },
 });
 
-// Mutation to initialize/repair the aggregate
 export const backfillScenesAggregate = mutation({
   handler: async (ctx) => {
-    // First, get accurate count
     const scenes = await ctx.db.query("scenes").collect();
-
-    // Rebuild aggregate
     let updated = 0;
     let errors = 0;
 
+    // Clear existing aggregates first
+    for (const scene of scenes) {
+      try {
+        await scenesAggregate.delete(ctx, scene);
+      } catch (e) {
+        // Ignore delete errors
+      }
+    }
+
+    // Insert with proper script_id grouping
     for (const scene of scenes) {
       try {
         await scenesAggregate.insert(ctx, scene);
         updated++;
       } catch (e) {
-        console.error(`Failed to insert scene ${scene._id}:`, e);
+        console.error(`Failed to update scene ${scene._id}:`, e);
         errors++;
       }
     }
 
-    // Verify final count
-    const finalCount = await scenesAggregate.count(ctx);
-
     return {
-      actualScenes: scenes.length,
-      aggregateCount: finalCount,
+      processed: scenes.length,
       updated,
       errors,
+      skipped: scenes.length - updated - errors,
     };
   },
 });

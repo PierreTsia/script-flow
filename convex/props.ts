@@ -1,7 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { Infer, v } from "convex/values";
 import { ConvexError } from "convex/values";
-import { Doc } from "./_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { api } from "./_generated/api";
 import {
@@ -22,11 +22,11 @@ export type PropsWithScenes = FunctionReturnType<
 >;
 
 export const propsAggregate = new TableAggregate<{
-  Key: null;
+  Key: Id<"scripts">;
   DataModel: DataModel;
   TableName: "props";
 }>(components.aggregate, {
-  sortKey: () => null,
+  sortKey: (prop) => prop.script_id,
 });
 
 /**
@@ -186,12 +186,17 @@ export const getPropsByScriptId = query({
       })
     );
 
-    const totalProps = await propsAggregate.count(ctx);
+    const total = await propsAggregate.count(ctx, {
+      bounds: {
+        lower: { key: script_id, inclusive: true },
+        upper: { key: script_id, inclusive: true },
+      },
+    });
 
     return {
-      total: totalProps,
       props: propsWithScenes ?? [],
       nextCursor: paginatedProps.continueCursor,
+      total,
     };
   },
 });
