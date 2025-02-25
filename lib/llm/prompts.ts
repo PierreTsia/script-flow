@@ -85,6 +85,12 @@ const PROP_RULES = `
      - Set pieces that become interactive
      - Example: "CURTAINS she later tears down" → type: "TRANSFORMING"
 
+
+  - Attribution Rules:
+    - If a prop is closely related to a character, it should be mentioned in the prop name 
+    ie "Marie lit un sms sur son téléphone" → {"name": "téléphone portable de Marie", "type": "ACTIVE", "quantity": 1, "notes": "Marie lit un sms"}
+ 
+
   - Exclusions:
     - Characters, people, or living beings
     - Abstract concepts
@@ -319,10 +325,10 @@ Output:
     }
   ],
   "props": [
-    {"name": "newspaper", "type": "ACTIVE", "quantity": 1, "notes": "read by Alex"},
+    {"name": "Alex's newspaper", "type": "ACTIVE", "quantity": 1, "notes": "read by Alex"},
     {"name": "bench", "type": "SET", "quantity": 1, "notes": "where Alex sits"},
     {"name": "hot dog cart", "type": "ACTIVE", "quantity": 1, "notes": "used by vendor"},
-    {"name": "guitar", "type": "ACTIVE", "quantity": 1, "notes": "played by musician"},
+    {"name": "Old Musician's guitar", "type": "ACTIVE", "quantity": 1, "notes": "played by musician"},
     {"name": "swings", "type": "SET", "quantity": 2, "notes": "used by children"}
   ],
   "locations": [

@@ -1,6 +1,6 @@
-import { mutation, query, QueryCtx } from "./_generated/server";
+import { mutation, query, QueryCtx, MutationCtx } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
-import { characterTypeValidator } from "./helpers";
+import { CharacterType, characterTypeValidator } from "./helpers";
 import { Doc, Id } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { api } from "./_generated/api";
@@ -30,10 +30,10 @@ const createCharacterWithSceneValidator = v.object({
   scene_id: v.id("scenes"),
 });
 
-async function getCharacterScenes(
+const getCharacterScenes = async (
   ctx: QueryCtx,
   characterId: Id<"characters">
-): Promise<(SceneDocument & { notes?: string })[]> {
+): Promise<(SceneDocument & { notes?: string })[]> => {
   const scenes = await ctx.db
     .query("character_scenes")
     .withIndex("by_character", (q) => q.eq("character_id", characterId))
@@ -48,7 +48,82 @@ async function getCharacterScenes(
       };
     })
   );
-}
+};
+
+const getCharacterScenesWithNotes = async (
+  ctx: QueryCtx,
+  characterId: Id<"characters">
+): Promise<(SceneDocument & { notes?: string })[]> => {
+  const scenes = await getCharacterScenes(ctx, characterId);
+  return scenes.map((cs) => ({ ...cs, notes: cs.notes || "No notes" }));
+};
+
+const createNewCharacter = async (
+  ctx: MutationCtx,
+  scriptId: Id<"scripts">,
+  name: string,
+  type: CharacterType,
+  aliases?: string[]
+) => {
+  const characterId = await ctx.db.insert("characters", {
+    script_id: scriptId,
+    name,
+    type,
+    aliases: aliases || [],
+    searchText: [name, ...(aliases || [])].join(" ").toLowerCase() + ` ${type}`,
+  });
+
+  return characterId;
+};
+
+const getCharacterNyUniqName = async (
+  ctx: QueryCtx,
+  scriptId: Id<"scripts">,
+  name: string,
+  type: CharacterType
+): Promise<CharacterDocument | null> => {
+  const character = await ctx.db
+    .query("characters")
+    .withIndex("unique_character_per_script", (q) =>
+      q.eq("script_id", scriptId).eq("name", name).eq("type", type)
+    )
+    .unique();
+
+  return character;
+};
+
+const getCharactersCount = async (ctx: QueryCtx, scriptId: Id<"scripts">) => {
+  const characters = await ctx.db
+    .query("characters")
+    .withIndex("by_script", (q) => q.eq("script_id", scriptId))
+    .collect();
+  return characters.length;
+};
+
+const addCharacterToScene = async (
+  ctx: MutationCtx,
+  characterId: Id<"characters">,
+  sceneId: Id<"scenes">,
+  notes?: string
+) => {
+  await ctx.db.insert("character_scenes", {
+    character_id: characterId,
+    scene_id: sceneId,
+    notes: notes || "",
+  });
+};
+
+const removeCharacterFromScenes = async (
+  ctx: MutationCtx,
+  characterId: Id<"characters">
+) => {
+  const characterScenes = await ctx.db
+    .query("character_scenes")
+    .withIndex("by_character", (q) => q.eq("character_id", characterId))
+    .collect();
+
+  return await Promise.all(characterScenes.map((cs) => ctx.db.delete(cs._id)));
+};
 
 export const getCharacterById = query({
   args: {
@@ -60,16 +135,11 @@ export const getCharacterById = query({
       await ctx.db.get(args.character_id),
       "character"
     );
-    const characterScenes = await getCharacterScenes(ctx, character._id);
-    const characterScenesWithNotes = characterScenes.map((cs) => ({
-      ...cs,
-      notes: cs.notes || "No notes",
-    }));
-
-    return {
-      ...character,
-      scenes: characterScenesWithNotes,
-    };
+    const characterScenesWithNotes = await getCharacterScenesWithNotes(
+      ctx,
+      character._id
+    );
+    return { ...character, scenes: characterScenesWithNotes };
   },
 });
 
@@ -83,15 +153,12 @@ export const createCharacter = mutation({
   },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
-    const existingCharacter = await ctx.db
-      .query("characters")
-      .withIndex("unique_character_per_script", (q) =>
-        q
-          .eq("script_id", args.script_id)
-          .eq("name", args.name)
-          .eq("type", args.type)
-      )
-      .unique();
+    const existingCharacter = await getCharacterNyUniqName(
+      ctx,
+      args.script_id,
+      args.name,
+      args.type
+    );
 
     if (existingCharacter) {
       throw new ConvexError(`Character ${args.name} already exists`);
@@ -103,15 +170,13 @@ export const createCharacter = mutation({
       "script"
     );
 
-    const characterId = await ctx.db.insert("characters", {
-      script_id: myScript._id,
-      name: args.name,
-      type: args.type,
-      aliases: args.aliases,
-      searchText:
-        [args.name, ...(args.aliases || [])].join(" ").toLowerCase() +
-        ` ${args.type}`,
-    });
+    const characterId = await createNewCharacter(
+      ctx,
+      myScript._id,
+      args.name,
+      args.type,
+      args.aliases
+    );
 
     return characterId;
   },
@@ -128,40 +193,25 @@ export const createCharacterWithScene = mutation({
       "script"
     );
 
-    // Check if the character already exists
-    let characterId;
-    const existingCharacter = await ctx.db
-      .query("characters")
-      .withIndex("unique_character_per_script", (q) =>
-        q
-          .eq("script_id", myScript._id)
-          .eq("name", args.name)
-          .eq("type", args.type)
-      )
-      .unique();
+    // We do not want 2 characters with the same name in the same script
+    const existingCharacter = await getCharacterNyUniqName(
+      ctx,
+      myScript._id,
+      args.name,
+      args.type
+    );
 
-    if (existingCharacter) {
-      characterId = existingCharacter._id;
-    } else {
-      const { name, aliases, type } = args;
-      const searchText =
-        [name, ...(aliases || [])].join(" ").toLowerCase() + ` ${type}`;
+    const characterId = existingCharacter
+      ? existingCharacter._id // TODO handle the potential types difference
+      : await createNewCharacter(
+          ctx,
+          myScript._id,
+          args.name,
+          args.type,
+          args.aliases
+        );
 
-      characterId = await ctx.db.insert("characters", {
-        script_id: myScript._id,
-        name,
-        type,
-        aliases,
-        searchText,
-      });
-    }
-
-    // Create the junction with notes
-    await ctx.db.insert("character_scenes", {
-      character_id: characterId,
-      scene_id: args.scene_id,
-      notes: args.notes,
-    });
+    await addCharacterToScene(ctx, characterId, args.scene_id, args.notes);
 
     return characterId;
   },
@@ -179,11 +229,6 @@ export const getCharactersByScriptId = query({
       await ctx.db.get(script_id),
       "script"
     );
-
-    const allCharacters = await ctx.db
-      .query("characters")
-      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
-      .collect();
 
     const paginatedCharacters = await ctx.db
       .query("characters")
@@ -206,11 +251,60 @@ export const getCharactersByScriptId = query({
     return {
       characters: characterScenes,
       nextCursor: paginatedCharacters.continueCursor,
-      total: allCharacters.length,
+      total: await getCharactersCount(ctx, myScript._id),
     };
   },
 });
 
+export const deleteCharacter = mutation({
+  args: {
+    character_id: v.id("characters"),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
+    const characterToDelete = await requireExists(
+      await ctx.db.get(args.character_id),
+      "character"
+    );
+
+    await removeCharacterFromScenes(ctx, characterToDelete._id);
+
+    await ctx.db.delete(characterToDelete._id);
+  },
+});
+
+export const updateCharacter = mutation({
+  args: {
+    character_id: v.id("characters"),
+    name: v.string(),
+    type: characterTypeValidator,
+    aliases: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
+    const oldCharacter = await requireExists(
+      await ctx.db.get(args.character_id),
+      "character"
+    );
+
+    await ctx.db.patch(oldCharacter._id, {
+      name: args.name,
+      type: args.type,
+      aliases: args.aliases,
+    });
+
+    const updatedCharacter = await requireExists(
+      await ctx.db.get(oldCharacter._id),
+      "character"
+    );
+
+    return updatedCharacter;
+  },
+});
+
+// TODO: review this and rename it to mergeCharacters
 export const deduplicateCharacter = mutation({
   args: {
     duplicated_character_id: v.id("characters"),
@@ -293,65 +387,5 @@ export const deduplicateCharacter = mutation({
 
     // delete character
     await ctx.db.delete(args.duplicated_character_id);
-  },
-});
-
-export const deleteCharacter = mutation({
-  args: {
-    character_id: v.id("characters"),
-  },
-  handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const characterToDelete = await requireExists(
-      await ctx.db.get(args.character_id),
-      "character"
-    );
-
-    // delete join tables rows
-    const characterScenes = await ctx.db
-      .query("character_scenes")
-      .withIndex("by_character", (q) =>
-        q.eq("character_id", characterToDelete._id)
-      )
-      .collect();
-
-    // Batch delete all related records in a single transaction
-    const mutations = [
-      ctx.db.delete(characterToDelete._id),
-      ...characterScenes.map((cs) => ctx.db.delete(cs._id)),
-    ];
-
-    await Promise.all(mutations);
-  },
-});
-
-export const updateCharacter = mutation({
-  args: {
-    character_id: v.id("characters"),
-    name: v.string(),
-    type: characterTypeValidator,
-    aliases: v.optional(v.array(v.string())),
-  },
-  handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const oldCharacter = await requireExists(
-      await ctx.db.get(args.character_id),
-      "character"
-    );
-
-    await ctx.db.patch(oldCharacter._id, {
-      name: args.name,
-      type: args.type,
-      aliases: args.aliases,
-    });
-
-    const updatedCharacter = await requireExists(
-      await ctx.db.get(oldCharacter._id),
-      "character"
-    );
-
-    return updatedCharacter;
   },
 });
