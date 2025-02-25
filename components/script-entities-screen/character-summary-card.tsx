@@ -7,6 +7,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Pencil, Clapperboard, Eye, GitMerge } from "lucide-react";
+import { Id } from "@/convex/_generated/dataModel";
 import {
   Tooltip,
   TooltipContent,

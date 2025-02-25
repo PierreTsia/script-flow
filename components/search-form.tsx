@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { isCharacter } from "@/convex/search";
+
 interface SearchFormProps {
   className?: string;
   onSearch: (term: string) => void;

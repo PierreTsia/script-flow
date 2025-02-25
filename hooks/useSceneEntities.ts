@@ -25,10 +25,6 @@ const useSceneEntities = () => {
 
   const createLocationMutation = useMutation(api.locations.createLocation);
 
-  const deduplicateCharacterMutation = useMutation(
-    api.characters.deduplicateCharacter
-  );
-
   const mergeCharactersMutation = useMutation(api.characters.mergeCharacters);
 
   const updateCharacterMutation = useMutation(api.characters.updateCharacter);
@@ -131,34 +127,6 @@ const useSceneEntities = () => {
       });
       toast({
         title: "Character deleted",
-      });
-    } catch (error) {
-      if (error instanceof ConvexError) {
-        toast({
-          title: error.data.message,
-          variant: "destructive",
-        });
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const deduplicateCharacter = async ({
-    duplicatedCharacterId,
-    targetCharacterId,
-  }: {
-    duplicatedCharacterId: Id<"characters">;
-    targetCharacterId: Id<"characters">;
-  }) => {
-    setIsLoading(true);
-    try {
-      await deduplicateCharacterMutation({
-        duplicated_character_id: duplicatedCharacterId,
-        target_character_id: targetCharacterId,
-      });
-      toast({
-        title: "Character deduplicated",
       });
     } catch (error) {
       if (error instanceof ConvexError) {
@@ -490,7 +458,6 @@ const useSceneEntities = () => {
     addCharacterInScene,
     addLocationInScene,
     addPropInScene,
-    deduplicateCharacter,
     deleteCharacter,
     updateCharacter,
     deleteLocation,
