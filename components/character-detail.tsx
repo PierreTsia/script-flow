@@ -6,14 +6,10 @@ import useCharacter from "@/hooks/useCharacter";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { CharacterTypeIcon } from "./script-entities-screen/scene-summary-card";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
-import { useState } from "react";
-
 import useSceneEntities from "@/hooks/useSceneEntities";
-import { useSearchEntities } from "@/hooks/useSearchEntities";
 import { useRouter } from "next/navigation";
 import { MergeCharacterDialog } from "./merge-character-dialog";
 

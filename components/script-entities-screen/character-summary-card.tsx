@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, Clapperboard, Eye } from "lucide-react";
+import { Pencil, Clapperboard, Eye, GitMerge } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -21,6 +21,7 @@ import ConfirmDeleteDialog from "@/components/script-entities-screen/confirm-del
 import { EditCharacterDialog } from "./edit-character-dialog";
 import { useState } from "react";
 import Link from "next/link";
+import { MergeCharacterDialog } from "@/components/merge-character-dialog";
 
 const CharacterSummaryCard = ({
   character,
@@ -28,8 +29,15 @@ const CharacterSummaryCard = ({
   character: CharactersWithScenes["characters"][number];
 }) => {
   const t = useTranslations("ScriptEntitiesScreen");
-  const { deleteCharacter, isLoading } = useSceneEntities();
+  const { deleteCharacter, mergeCharacters, isLoading } = useSceneEntities();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const handleMerge = async (targetId: Id<"characters">) => {
+    await mergeCharacters({
+      sourceCharacterId: character._id,
+      targetCharacterId: targetId,
+    });
+  };
 
   return (
     <Card>
@@ -91,10 +99,20 @@ const CharacterSummaryCard = ({
           </Button>
         </Link>
 
-        {/*          <DeduplicateCharacterButton
-            character={character}
-            allCharacters={potentialDuplicates}
-          /> */}
+        <MergeCharacterDialog
+          characterId={character._id}
+          scriptId={character.script_id}
+          onMerge={handleMerge}
+        >
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hover:text-green-500 transition-colors"
+            title={t("characterMerge.buttonTitle")}
+          >
+            <GitMerge className="h-4 w-4" />
+          </Button>
+        </MergeCharacterDialog>
 
         <ConfirmDeleteDialog
           entityType="character"

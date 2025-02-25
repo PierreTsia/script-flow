@@ -38,13 +38,13 @@ export const useSearchEntities = (scriptId?: Id<"scripts">) => {
 
   // Type guards for different entity types
   const isCharacterResult = (result: GlobalSearchEntitiesResult[number]) =>
-    isCharacter(result);
+    result.entityType === "character";
   const isLocationResult = (result: GlobalSearchEntitiesResult[number]) =>
-    isLocation(result);
+    result.entityType === "location";
   const isPropResult = (result: GlobalSearchEntitiesResult[number]) =>
-    isProp(result);
+    result.entityType === "prop";
   const isSceneResult = (result: GlobalSearchEntitiesResult[number]) =>
-    isScene(result);
+    result.entityType === "scene";
 
   return {
     results,

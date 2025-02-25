@@ -12,6 +12,8 @@ import { Merge } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Id } from "@/convex/_generated/dataModel";
 import { useSearchEntities } from "@/hooks/useSearchEntities";
+import { useEffect } from "react";
+
 interface MergeCharacterDialogProps {
   children: React.ReactNode;
   onMerge: (targetId: Id<"characters">) => void;
