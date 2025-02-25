@@ -1,7 +1,6 @@
-import { mutation, query } from "./_generated/server";
-import { Infer, v } from "convex/values";
-import { ConvexError } from "convex/values";
-import { Doc } from "./_generated/dataModel";
+import { mutation, query, QueryCtx, MutationCtx } from "./_generated/server";
+import { Infer, v, ConvexError } from "convex/values";
+import { Doc, Id } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { api } from "./_generated/api";
 import {
@@ -9,29 +8,22 @@ import {
   requireExists,
   requireScriptOwnership,
 } from "./model/auth";
-
+import { SceneDocument } from "./scenes";
+// 1. Type Exports
 export type PropDocument = Doc<"props">;
 export type PropSceneDocument = Doc<"prop_scenes">;
-
 export type PropsWithScenes = FunctionReturnType<
   typeof api.props.getPropsByScriptId
 >;
 
-/**
- * Prop Type System
- *
- * Props can change their type based on scene context:
- * - ACTIVE: Used/manipulated by characters
- * - SET: Static background elements
- * - TRANSFORMING: Changes state during scene
- */
+export type PropType = Infer<typeof propTypeValidator>;
+
+// 2. Validators
 export const propTypeValidator = v.union(
   v.literal("ACTIVE"),
   v.literal("SET"),
   v.literal("TRANSFORMING")
 );
-
-export type PropType = Infer<typeof propTypeValidator>;
 
 const createPropValidator = v.object({
   script_id: v.id("scripts"),
@@ -50,17 +42,108 @@ const createPropWithSceneValidator = v.object({
   scene_id: v.id("scenes"),
 });
 
+// 3. Internal Helper Functions
+const checkExistingProp = async (
+  ctx: QueryCtx,
+  scriptId: Id<"scripts">,
+  name: string
+) => {
+  return await ctx.db
+    .query("props")
+    .withIndex("unique_prop_per_script", (q) =>
+      q.eq("script_id", scriptId).eq("name", name)
+    )
+    .first();
+};
+
+const saveNewProp = async (
+  ctx: MutationCtx,
+  args: {
+    script_id: Id<"scripts">;
+    name: string;
+    quantity: number;
+    type: PropType;
+  }
+) => {
+  return await ctx.db.insert("props", {
+    script_id: args.script_id,
+    name: args.name,
+    quantity: args.quantity,
+    type: args.type,
+    searchText: [args.name, args.type].join(" ").toLowerCase(),
+  });
+};
+
+const getPropScenes = async (
+  ctx: QueryCtx,
+  propId: Id<"props">
+): Promise<(SceneDocument & { notes?: string })[]> => {
+  const propScenes = await ctx.db
+    .query("prop_scenes")
+    .withIndex("by_prop", (q) => q.eq("prop_id", propId))
+    .collect();
+
+  return Promise.all(
+    propScenes.map(async (ps) => ({
+      ...(await ctx.db.get(ps.scene_id))!,
+      notes: ps.notes,
+    }))
+  );
+};
+
+const getPropsCount = async (ctx: QueryCtx, scriptId: Id<"scripts">) => {
+  const props = await ctx.db
+    .query("props")
+    .withIndex("by_script", (q) => q.eq("script_id", scriptId))
+    .collect();
+  return props.length;
+};
+
+const addPropToScene = async (
+  ctx: MutationCtx,
+  propId: Id<"props">,
+  sceneId: Id<"scenes">,
+  type: PropType,
+  notes?: string
+) => {
+  const existingLink = await ctx.db
+    .query("prop_scenes")
+    .withIndex("by_prop_scene", (q) =>
+      q.eq("prop_id", propId).eq("scene_id", sceneId)
+    )
+    .first();
+
+  if (!existingLink) {
+    await ctx.db.insert("prop_scenes", {
+      prop_id: propId,
+      scene_id: sceneId,
+      notes,
+      type, // Scene-specific type, may differ from base type
+    });
+  }
+
+  return propId;
+};
+
+const removePropFromScenes = async (ctx: MutationCtx, propId: Id<"props">) => {
+  const propScenes = await ctx.db
+    .query("prop_scenes")
+    .withIndex("by_prop", (q) => q.eq("prop_id", propId))
+    .collect();
+
+  return await Promise.all(propScenes.map((ps) => ctx.db.delete(ps._id)));
+};
+
 export const createProp = mutation({
   args: createPropValidator,
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const existingProp = await ctx.db
-      .query("props")
-      .withIndex("unique_prop_per_script", (q) =>
-        q.eq("script_id", args.script_id).eq("name", args.name)
-      )
-      .first();
+    const existingProp = await checkExistingProp(
+      ctx,
+      args.script_id,
+      args.name
+    );
 
     if (existingProp) {
       throw new ConvexError(
@@ -70,15 +153,12 @@ export const createProp = mutation({
 
     const quantity = args.quantity ?? 1;
 
-    const propId = await ctx.db.insert("props", {
+    return await saveNewProp(ctx, {
       script_id: args.script_id,
       name: args.name,
       quantity,
       type: args.type,
-      searchText: [args.name, args.type].join(" ").toLowerCase(),
     });
-
-    return propId;
   },
 });
 
@@ -88,12 +168,11 @@ export const createPropWithScene = mutation({
     await requireAuth(ctx);
 
     let propId;
-    const existingProp = await ctx.db
-      .query("props")
-      .withIndex("unique_prop_per_script", (q) =>
-        q.eq("script_id", args.script_id).eq("name", args.name)
-      )
-      .first();
+    const existingProp = await checkExistingProp(
+      ctx,
+      args.script_id,
+      args.name
+    );
 
     if (existingProp) {
       propId = existingProp._id;
@@ -101,24 +180,21 @@ export const createPropWithScene = mutation({
       // Create new prop with base type
       const { scene_id, type, name, quantity } = args;
       await requireExists(await ctx.db.get(scene_id), "scene");
-      propId = await ctx.db.insert("props", {
+      propId = await saveNewProp(ctx, {
         script_id: args.script_id,
         name,
         quantity: quantity ?? 1,
-        type, // Base/default type
-        searchText: [name, type].join(" ").toLowerCase(),
+        type,
       });
     }
 
-    // Create scene junction with potentially different type
-    await ctx.db.insert("prop_scenes", {
-      prop_id: propId,
-      scene_id: args.scene_id,
-      notes: args.notes,
-      type: args.type, // Scene-specific type, may differ from base type
-    });
-
-    return propId;
+    return await addPropToScene(
+      ctx,
+      propId,
+      args.scene_id,
+      args.type,
+      args.notes
+    );
   },
 });
 
@@ -149,38 +225,16 @@ export const getPropsByScriptId = query({
 
     // Fetch scenes for each prop
     const propsWithScenes = await Promise.all(
-      paginatedProps.page.map(async (prop) => {
-        const propScenes = await ctx.db
-          .query("prop_scenes")
-          .withIndex("by_prop", (q) => q.eq("prop_id", prop._id))
-          .collect();
-
-        const scenes = await Promise.all(
-          propScenes.map(async (ps) => {
-            const scene = await ctx.db.get(ps.scene_id);
-            return {
-              ...scene!,
-              notes: ps.notes,
-            };
-          })
-        );
-
-        return {
-          ...prop,
-          scenes,
-        };
-      })
+      paginatedProps.page.map(async (prop) => ({
+        ...prop,
+        scenes: await getPropScenes(ctx, prop._id),
+      }))
     );
-
-    const allProps = await ctx.db
-      .query("props")
-      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
-      .collect();
 
     return {
       props: propsWithScenes ?? [],
       nextCursor: paginatedProps.continueCursor,
-      total: allProps.length,
+      total: await getPropsCount(ctx, myScript._id),
     };
   },
 });
@@ -198,25 +252,11 @@ export const getPropById = query({
       "script"
     );
 
-    const propScenes = await ctx.db
-      .query("prop_scenes")
-      .withIndex("by_prop", (q) => q.eq("prop_id", prop_id))
-      .collect();
-
-    // Map scenes with their junction data
-    const scenesWithDetails = await Promise.all(
-      propScenes.map(async (ps) => {
-        const scene = await ctx.db.get(ps.scene_id);
-        return {
-          ...scene,
-          notes: ps.notes, // Include notes from prop_scenes
-        };
-      })
-    );
+    const scenes = await getPropScenes(ctx, prop._id);
 
     return {
       ...prop,
-      scenes: scenesWithDetails,
+      scenes,
     };
   },
 });
@@ -238,6 +278,7 @@ export const updateProp = mutation({
       await ctx.db.get(oldProp.script_id),
       "script"
     );
+
     return await ctx.db.patch(prop_id, { name, quantity, type });
   },
 });
@@ -255,16 +296,7 @@ export const deleteProp = mutation({
       "script"
     );
 
-    const propScenes = await ctx.db
-      .query("prop_scenes")
-      .withIndex("by_prop", (q) => q.eq("prop_id", prop_id))
-      .collect();
-
-    const mutations = [
-      ctx.db.delete(prop_id),
-      ...propScenes.map((ps) => ctx.db.delete(ps._id)),
-    ];
-
-    await Promise.all(mutations);
+    await removePropFromScenes(ctx, prop._id);
+    await ctx.db.delete(prop_id);
   },
 });
