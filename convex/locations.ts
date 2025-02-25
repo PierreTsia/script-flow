@@ -1,7 +1,12 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, MutationCtx, query, QueryCtx } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
-import { locationTypeValidator, timeOfDayValidator } from "./helpers";
-import { Doc } from "./_generated/dataModel";
+import {
+  LocationType,
+  locationTypeValidator,
+  TimeOfDay,
+  timeOfDayValidator,
+} from "./helpers";
+import { Doc, Id } from "./_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { api } from "./_generated/api";
 import {
@@ -10,12 +15,22 @@ import {
   requireExists,
 } from "./model/auth";
 import { generateSearchText } from "./model/search";
+import { SceneDocument } from "./scenes";
+// 1. Type Exports
 export type LocationDocument = Doc<"locations">;
 export type LocationSceneDocument = Doc<"location_scenes">;
-
 export type LocationsWithScenes = FunctionReturnType<
   typeof api.locations.getLocationsByScriptId
 >;
+
+// 2. Validators
+const createLocationValidator = v.object({
+  script_id: v.id("scripts"),
+  name: v.string(),
+  type: locationTypeValidator,
+  time_of_day: timeOfDayValidator,
+});
+
 const createLocationWithSceneValidator = v.object({
   script_id: v.id("scripts"),
   name: v.string(),
@@ -25,13 +40,104 @@ const createLocationWithSceneValidator = v.object({
   notes: v.optional(v.string()),
 });
 
-export const createLocation = mutation({
+// 3. Internal Helper Functions
+const checkExistingLocation = async (
+  ctx: QueryCtx,
+  scriptId: Id<"scripts">,
+  name: string,
+  type: LocationType
+) => {
+  return await ctx.db
+    .query("locations")
+    .withIndex("unique_location_per_script", (q) =>
+      q.eq("script_id", scriptId).eq("name", name).eq("type", type)
+    )
+    .first();
+};
+
+const saveNewLocation = async (
+  ctx: MutationCtx,
   args: {
-    script_id: v.id("scripts"),
-    name: v.string(),
-    type: locationTypeValidator,
-    time_of_day: timeOfDayValidator,
-  },
+    script_id: Id<"scripts">;
+    name: string;
+    type: LocationType;
+    time_of_day: TimeOfDay;
+  }
+) => {
+  return await ctx.db.insert("locations", {
+    ...args,
+    searchText: generateSearchText.location({
+      name: args.name,
+      type: args.type,
+      time_of_day: args.time_of_day,
+    }),
+  });
+};
+
+const addLocationToScene = async (
+  ctx: MutationCtx,
+  locationId: Id<"locations">,
+  sceneId: Id<"scenes">,
+  notes?: string
+) => {
+  const existingLink = await ctx.db
+    .query("location_scenes")
+    .withIndex("by_location_scene", (q) =>
+      q.eq("location_id", locationId).eq("scene_id", sceneId)
+    )
+    .first();
+
+  if (!existingLink) {
+    await ctx.db.insert("location_scenes", {
+      location_id: locationId,
+      scene_id: sceneId,
+      notes,
+    });
+  }
+
+  return locationId;
+};
+
+const getLocationsCount = async (ctx: QueryCtx, scriptId: Id<"scripts">) => {
+  const locations = await ctx.db
+    .query("locations")
+    .withIndex("by_script", (q) => q.eq("script_id", scriptId))
+    .collect();
+  return locations.length;
+};
+
+const getLocationWithScenes = async (
+  ctx: QueryCtx,
+  locationId: Id<"locations">
+): Promise<(SceneDocument & { notes?: string })[]> => {
+  const locationScenes = await ctx.db
+    .query("location_scenes")
+    .withIndex("by_location", (q) => q.eq("location_id", locationId))
+    .collect();
+
+  return Promise.all(
+    locationScenes.map(async (ls) => ({
+      ...(await ctx.db.get(ls.scene_id))!,
+      notes: ls.notes,
+    }))
+  );
+};
+
+const removeLocationFromScenes = async (
+  ctx: MutationCtx,
+  locationId: Id<"locations">
+) => {
+  const locationScenes = await ctx.db
+    .query("location_scenes")
+    .withIndex("by_location", (q) => q.eq("location_id", locationId))
+    .collect();
+
+  return await Promise.all(locationScenes.map((ls) => ctx.db.delete(ls._id)));
+};
+
+// 4. Original Mutations and Queries follow...
+export const createLocation = mutation({
+  args: createLocationValidator,
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
@@ -41,15 +147,12 @@ export const createLocation = mutation({
       "script"
     );
 
-    const existingLocation = await ctx.db
-      .query("locations")
-      .withIndex("unique_location_per_script", (q) =>
-        q
-          .eq("script_id", myScript._id)
-          .eq("name", args.name)
-          .eq("type", args.type)
-      )
-      .first();
+    const existingLocation = await checkExistingLocation(
+      ctx,
+      myScript._id,
+      args.name,
+      args.type
+    );
 
     if (existingLocation) {
       throw new ConvexError(
@@ -57,18 +160,10 @@ export const createLocation = mutation({
       );
     }
 
-    const locationId = await ctx.db.insert("locations", {
-      ...args,
-      searchText: generateSearchText.location({
-        name: args.name,
-        type: args.type,
-        time_of_day: args.time_of_day,
-      }),
-    });
-
-    return locationId;
+    return await saveNewLocation(ctx, args);
   },
 });
+
 export const createLocationWithScene = mutation({
   args: createLocationWithSceneValidator,
   handler: async (ctx, args) => {
@@ -82,54 +177,27 @@ export const createLocationWithScene = mutation({
 
     // Check if the location already exists
     let locationId;
-
-    const existingLocation = await ctx.db
-      .query("locations")
-      .withIndex("unique_location_per_script", (q) =>
-        q
-          .eq("script_id", myScript._id)
-          .eq("name", args.name)
-          .eq("type", args.type)
-      )
-      .first();
+    const existingLocation = await checkExistingLocation(
+      ctx,
+      myScript._id,
+      args.name,
+      args.type
+    );
 
     if (existingLocation) {
       locationId = existingLocation._id;
     } else {
-      // Insert new location
-
       await requireExists(await ctx.db.get(args.scene_id), "scene");
-      locationId = await ctx.db.insert("locations", {
-        name: args.name,
-        type: args.type,
-        time_of_day: args.time_of_day,
-        script_id: myScript._id,
-        searchText: generateSearchText.location({
-          name: args.name,
-          type: args.type,
-          time_of_day: args.time_of_day,
-        }),
+      const { script_id, name, type, time_of_day } = args;
+      locationId = await saveNewLocation(ctx, {
+        script_id,
+        name,
+        type,
+        time_of_day,
       });
     }
 
-    // Check if the location is already linked to the scene
-    const existingLink = await ctx.db
-      .query("location_scenes")
-      .withIndex("by_location_scene", (q) =>
-        q.eq("location_id", locationId).eq("scene_id", args.scene_id)
-      )
-      .first();
-
-    if (!existingLink) {
-      // Link location to the scene if not already linked
-      await ctx.db.insert("location_scenes", {
-        location_id: locationId,
-        scene_id: args.scene_id,
-        notes: args.notes,
-      });
-    }
-
-    return locationId;
+    return await addLocationToScene(ctx, locationId, args.scene_id, args.notes);
   },
 });
 
@@ -176,15 +244,10 @@ export const getLocationsByScriptId = query({
       })
     );
 
-    const allLocations = await ctx.db
-      .query("locations")
-      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
-      .collect();
-
     return {
       locations: locationsWithScenes,
       nextCursor: paginatedLocations.continueCursor,
-      total: allLocations.length,
+      total: await getLocationsCount(ctx, myScript._id),
     };
   },
 });
@@ -199,23 +262,13 @@ export const getLocationById = query({
       "location"
     );
 
-    const locationScenes = await ctx.db
-      .query("location_scenes")
-      .withIndex("by_location", (q) => q.eq("location_id", location._id))
-      .collect();
-
-    const scenes = await Promise.all(
-      locationScenes.map(async (ls) => ({
-        ...(await ctx.db.get(ls.scene_id))!,
-        notes: ls.notes,
-      }))
-    );
-
     await requireScriptOwnership(
       ctx,
       await ctx.db.get(location.script_id),
       "script"
     );
+
+    const scenes = await getLocationWithScenes(ctx, location._id);
 
     return {
       ...location,
@@ -234,15 +287,8 @@ export const deleteLocation = mutation({
       "location"
     );
 
-    const locationScenes = await ctx.db
-      .query("location_scenes")
-      .withIndex("by_location", (q) => q.eq("location_id", location._id))
-      .collect();
-
-    await Promise.all([
-      ...locationScenes.map(async (ls) => await ctx.db.delete(ls._id)),
-      ctx.db.delete(location_id),
-    ]);
+    await removeLocationFromScenes(ctx, location._id);
+    await ctx.db.delete(location_id);
   },
 });
 

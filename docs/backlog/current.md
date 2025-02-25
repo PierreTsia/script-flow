@@ -56,9 +56,9 @@
    - [x] Analysis modal
    **Files:** `src/app/page.tsx`, `src/components/upload.tsx`
 
-</details>
 
-7. **AI Integration 2** (5h)
+
+   7. **AI Integration 2** (5h)
    - [ ] handle preview urls cors issue (using debug logs and allowed origins)
    - [x] costs monitoring using Helidome
    - [x] persist the analysed scenes draft scenes in the database
@@ -84,19 +84,21 @@
      - [x] Add notes field to all junction tables (character_scenes, location_scenes, prop_scenes)
      - [x] Update mutations to handle scene-specific notes
      - [x] Update queries to fetch scene-specific notes
-   - [ ] Optimize query patterns:
-     - [ ] Reduce sequential queries in script entities fetching
-     - [ ] Batch character-scene relationship queries
-   - [ ] Improve internal functions organization:
-     - [ ] Move scene analysis logic to internal actions
-     - [ ] Create dedicated internal functions for common operations
-   - [ ] Add size limits to `.collect()` operations:
-     - [ ] Add default limits where pagination isn't implemented
-     - [ ] Add warning comments for potentially large queries
+   - [x] Optimize query patterns:
+     - [x] Reduce sequential queries in script entities fetching
+     - [x] Batch character-scene relationship queries
+   - [x] Improve internal functions organization:
+     - [x] Move scene analysis logic to internal actions
+     - [x] Create dedicated internal functions for common operations
+   - [x] Add size limits to `.collect()` operations:
+     - [x] Add default limits where pagination isn't implemented
+     - [x] Add warning comments for potentially large queries
    - [x] Error handling improvements:
      - [x] Standardize error messages
      - [x] Implement proper ConvexError usage
 
+
+</details>
 
 
 9. **Script Entities Screen** (4h)
@@ -239,26 +241,26 @@ Technical Notes:
 ## Global Search Implementation (8h)
 
 1. **Command Palette UI** (2.5h)
-   - [ ] Implement CMD+K listener and modal trigger
-   - [ ] Create SearchCommandPalette component with Cmdk
-   - [ ] Add keyboard navigation support
+   - [x] Implement CMD+K listener and modal trigger
+   - [x] Create SearchCommandPalette component with Cmdk
+   - [x] Add keyboard navigation support
    - [ ] Style search results with entity-specific icons
-   - [ ] Add loading states and empty states
-   - [ ] Implement mobile-friendly interface
+   - [x] Add loading states and empty states
+   - [x] Implement mobile-friendly interface
 
 2. **Search Infrastructure** (2h)
-   - [ ] Create search index tables in Convex
+   - [x] Create search index tables in Convex
    - [ ] Implement fuzzy search using n-gram tokenization
    - [ ] Add proper pagination for search results
-   - [ ] Set up debounced search with useStableQuery
+   - [x] Set up debounced search with useStableQuery
    - [ ] Create search history tracking
 
 3. **Entity-Specific Search** (2h)
-   - [ ] Implement search across all entity types:
-     - [ ] Scenes (by content, number, description)
-     - [ ] Characters (by name, type, scenes they appear in)
-     - [ ] Props (by name, type, associated scenes)
-     - [ ] Locations (by name, type, INT/EXT)
+   - [x] Implement search across all entity types:
+     - [x] Scenes (by content, number, description)
+     - [x] Characters (by name, type, scenes they appear in)
+     - [x] Props (by name, type, associated scenes)
+     - [x] Locations (by name, type, INT/EXT)
    - [ ] Add type-ahead suggestions
    - [ ] Create rich preview cards for each entity type
 
