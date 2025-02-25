@@ -106,7 +106,10 @@
    - [x] Script entities screen layout
    - [x] Tabs for Locations, Characters, Props
    - [x] finish crud
-   - [-] finish dedup
+   - [ ] merge enntities actions
+         - [ ] use serach query to get select options
+         - [ ] ensure we propagate all changes (join tables) handling notes etc...
+         - [ ] add a async select in each front end related part (pages and cards)
    - [x] dynamic button in save draft analysis stepper
    - [x] replace buttons in save analysis tabs + review form layout (name + quqntity in one line)
 

@@ -1,14 +1,17 @@
 "use client";
 
 import { Id } from "@/convex/_generated/dataModel";
-import { User, Clapperboard, FileText, Users } from "lucide-react";
+import { User, Clapperboard, FileText, Users, Merge } from "lucide-react";
 import useCharacter from "@/hooks/useCharacter";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { CharacterTypeIcon } from "./script-entities-screen/scene-summary-card";
-
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+
+import useSceneEntities from "@/hooks/useSceneEntities";
+import { useRouter } from "next/navigation";
+import { MergeCharacterDialog } from "./merge-character-dialog";
 
 interface CharacterDetailProps {
   characterId: Id<"characters">;
@@ -16,7 +19,19 @@ interface CharacterDetailProps {
 
 export function CharacterDetail({ characterId }: CharacterDetailProps) {
   const character = useCharacter(characterId);
+  const scriptId = character?.script_id;
   const t = useTranslations("CharacterDetail");
+  const { mergeCharacters } = useSceneEntities();
+
+  const router = useRouter();
+
+  const handleMerge = async (targetId: Id<"characters">) => {
+    await mergeCharacters({
+      sourceCharacterId: characterId,
+      targetCharacterId: targetId,
+    });
+    router.push(`/scripts/${scriptId}/entities/characters/${targetId}`);
+  };
 
   if (!character) return <div>{t("loading")}</div>;
 
@@ -43,7 +58,18 @@ export function CharacterDetail({ characterId }: CharacterDetailProps) {
               )}
             </div>
           </div>
-          <CharacterTypeIcon type={character.type} />
+          <div className="flex items-center gap-2">
+            <MergeCharacterDialog
+              characterId={characterId}
+              scriptId={scriptId!}
+              onMerge={handleMerge}
+            >
+              <Button variant="outline" size="sm">
+                <Merge className="h-4 w-4 mr-2" />
+                {t("merge.button")}
+              </Button>
+            </MergeCharacterDialog>
+          </div>
         </div>
 
         <Separator />

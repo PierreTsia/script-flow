@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogDescription,
 } from "@/components/ui/dialog";
+
 interface SearchFormProps {
   className?: string;
   onSearch: (term: string) => void;
@@ -82,7 +83,8 @@ export function SearchForm({
                       .filter((r) => r.entityType === "character")
                       .map((result) => (
                         <CommandItem
-                          key={result._id}
+                          key={`${result._id}-${result.entityType}`}
+                          value={`${result.name} ${result?.aliases?.join(" ")}`}
                           className="flex items-center gap-2 py-3"
                           onSelect={() => {
                             setOpen(false);
@@ -91,7 +93,10 @@ export function SearchForm({
                             );
                           }}
                         >
-                          {result.preview}
+                          {result.preview}{" "}
+                          {!!result.aliases?.length && (
+                            <>- aka {result.aliases.join(" ")}</>
+                          )}
                         </CommandItem>
                       ))}
                   </CommandGroup>

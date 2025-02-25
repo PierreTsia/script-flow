@@ -129,18 +129,6 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
     );
   });
 
-  const getPotentialDuplicates = (character: CharacterWithScenes) => {
-    return characters
-      .filter((c) => c._id !== character._id)
-      .sort((a, b) => {
-        // Same type characters come first
-        if (a.type === character.type && b.type !== character.type) return -1;
-        if (b.type === character.type && a.type !== character.type) return 1;
-        // Then sort alphabetically by name within each group
-        return a.name.localeCompare(b.name);
-      });
-  };
-
   const getGroupIcon = (group: string) => {
     switch (group) {
       case "PRINCIPAL":
@@ -200,7 +188,6 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
                 <CharacterSummaryCard
                   key={character._id}
                   character={character}
-                  potentialDuplicates={getPotentialDuplicates(character)}
                 />
               ))}
             </div>
