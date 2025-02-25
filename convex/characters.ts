@@ -8,6 +8,7 @@ import {
   requireAuth,
   requireScriptOwnership,
   requireExists,
+  getAuthState,
 } from "./model/auth";
 import { SceneDocument } from "./scenes";
 
@@ -130,16 +131,16 @@ export const getCharacterById = query({
     character_id: v.id("characters"),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
-    const character = await requireExists(
-      await ctx.db.get(args.character_id),
-      "character"
-    );
+    const auth = await getAuthState(ctx);
+    const character = await ctx.db.get(args.character_id);
+    if (!character) return null;
     const characterScenesWithNotes = await getCharacterScenesWithNotes(
       ctx,
       character._id
     );
-    return { ...character, scenes: characterScenesWithNotes };
+    return auth?.userId
+      ? { ...character, scenes: characterScenesWithNotes }
+      : null;
   },
 });
 
@@ -387,5 +388,104 @@ export const deduplicateCharacter = mutation({
 
     // delete character
     await ctx.db.delete(args.duplicated_character_id);
+  },
+});
+
+export const mergeCharacters = mutation({
+  args: {
+    source_character_id: v.id("characters"),
+    target_character_id: v.id("characters"),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
+    // Get both characters and verify they exist
+    const sourceCharacter = await requireExists(
+      await ctx.db.get(args.source_character_id),
+      "source character"
+    );
+    const targetCharacter = await requireExists(
+      await ctx.db.get(args.target_character_id),
+      "target character"
+    );
+
+    // Verify they're from the same script
+    if (sourceCharacter.script_id !== targetCharacter.script_id) {
+      throw new ConvexError("Cannot merge characters from different scripts");
+    }
+
+    // Get all scenes that reference the source character
+    const sourceScenes = await ctx.db
+      .query("character_scenes")
+      .withIndex("by_character", (q) =>
+        q.eq("character_id", args.source_character_id)
+      )
+      .collect();
+
+    // Get all scenes that reference the target character
+    const targetScenes = await ctx.db
+      .query("character_scenes")
+      .withIndex("by_character", (q) =>
+        q.eq("character_id", args.target_character_id)
+      )
+      .collect();
+
+    // Create a map for faster lookups
+    const targetScenesMap = new Map(
+      targetScenes.map((scene) => [scene.scene_id, scene])
+    );
+
+    // First, create all new relationships
+    for (const sourceScene of sourceScenes) {
+      const targetScene = targetScenesMap.get(sourceScene.scene_id);
+
+      if (!targetScene) {
+        // Only source character is in this scene - create new relationship
+        await ctx.db.insert("character_scenes", {
+          character_id: args.target_character_id,
+          scene_id: sourceScene.scene_id,
+          notes: sourceScene.notes || "",
+        });
+      } else {
+        // Both characters are in this scene - merge notes if they exist
+        if (sourceScene.notes || targetScene.notes) {
+          const mergedNotes = targetScene.notes
+            ? `${targetScene.notes}\n[Merged from ${sourceCharacter.name}]: ${sourceScene.notes || ""}`
+            : sourceScene.notes || "";
+
+          await ctx.db.patch(targetScene._id, {
+            notes: mergedNotes,
+          });
+        }
+      }
+    }
+
+    // Update target character with merged data
+    const mergedAliases = Array.from(
+      new Set([
+        ...(targetCharacter.aliases || []),
+        sourceCharacter.name,
+        ...(sourceCharacter.aliases || []),
+      ])
+    )
+      .filter(Boolean)
+      .filter((alias) => alias !== targetCharacter.name);
+
+    await ctx.db.patch(args.target_character_id, {
+      aliases: mergedAliases,
+      searchText:
+        [targetCharacter.name, ...mergedAliases].join(" ").toLowerCase() +
+        ` ${targetCharacter.type}`,
+    });
+
+    // Then delete all old relationships
+    for (const scene of sourceScenes) {
+      await ctx.db.delete(scene._id);
+    }
+
+    // Finally delete the source character
+    await ctx.db.delete(args.source_character_id);
+
+    return await ctx.db.get(args.target_character_id);
   },
 });

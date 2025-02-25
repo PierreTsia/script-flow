@@ -478,6 +478,14 @@
       "featured_extra": "Featured Extra",
       "silent_key": "Silent Key",
       "atmosphere": "Atmosphere"
+    },
+    "merge": {
+      "button": "Merge Character",
+      "title": "Merge with another character",
+      "description": "Search for a character to merge with. This character will be merged into the selected character and then deleted.",
+      "selectLabel": "Select character",
+      "searchPlaceholder": "Search characters...",
+      "noResults": "No characters found"
     }
   }
 }

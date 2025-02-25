@@ -162,7 +162,6 @@
       "featured_extra": "Figurant",
       "silent_key": "Silhouette",
       "atmosphere": "Extra"
-
     },
     "groupedCharacters": {
       "principal": "Personnages Principaux",
@@ -237,7 +236,7 @@
           "set":"Décor",
           "active":"Actif",
           "transforming":"Devient actif"  
-                  }
+        }
       }
     },
     "editCharacterDialog": {
@@ -461,29 +460,37 @@
   "CharacterDetail": {
     "loading": "Chargement...",
     "details": {
-      "title": "Détails du Personnage",
+      "title": "Détails du personnage",
       "type": "Type",
       "aliases": "Alias",
-      "totalAppearances": "Apparitions Totales",
+      "totalAppearances": "Apparitions totales",
       "notSpecified": "Non spécifié",
       "noDescription": "Aucune description disponible",
       "scenes": "{count} scènes"
     },
     "scenes": {
-      "title": "Apparitions dans les Scènes",
+      "title": "Apparitions dans les scènes",
       "scene": "Scène",
       "page": "Page {number}"
     },
     "arc": {
-      "title": "Arc du Personnage",
+      "title": "Arc du personnage",
       "noNotes": "Aucune note sur l'arc du personnage"
     },
     "characterTypes": {
       "principal": "Principal",
       "supporting": "Secondaire",
-      "featured_extra": "Figurant Important",
-      "silent_key": "Silencieux",
-      "atmosphere": "Atmosphère"
+      "featured_extra": "Figurant",
+      "silent_key": "Silhouette",
+      "atmosphere": "Extra"
+    },
+    "merge": {
+      "button": "Fusionner le personnage",
+      "title": "Fusionner avec un autre personnage",
+      "description": "Recherchez un personnage avec lequel fusionner. Ce personnage sera fusionné avec le personnage sélectionné puis supprimé.",
+      "selectLabel": "Sélectionner un personnage",
+      "searchPlaceholder": "Rechercher des personnages...",
+      "noResults": "Aucun personnage trouvé"
     }
   }
 }

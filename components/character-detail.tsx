@@ -1,14 +1,29 @@
 "use client";
 
 import { Id } from "@/convex/_generated/dataModel";
-import { User, Clapperboard, FileText, Users } from "lucide-react";
+import { User, Clapperboard, FileText, Users, Merge } from "lucide-react";
 import useCharacter from "@/hooks/useCharacter";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { CharacterTypeIcon } from "./script-entities-screen/scene-summary-card";
-
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useState, useCallback, useEffect, useMemo } from "react";
+
+import useSceneEntities from "@/hooks/useSceneEntities";
+import { useSearchEntities } from "@/hooks/useSearchEntities";
+import debounce from "lodash.debounce";
+import { Input } from "./ui/input";
+import { isCharacter } from "@/convex/search";
+import { useRouter } from "next/navigation";
 
 interface CharacterDetailProps {
   characterId: Id<"characters">;
@@ -16,7 +31,37 @@ interface CharacterDetailProps {
 
 export function CharacterDetail({ characterId }: CharacterDetailProps) {
   const character = useCharacter(characterId);
+  const scriptId = character?.script_id;
   const t = useTranslations("CharacterDetail");
+  const [isOpen, setIsOpen] = useState(false);
+  const { mergeCharacters } = useSceneEntities();
+  const search = useSearchEntities(scriptId);
+  const router = useRouter();
+  const results = search.results;
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((query: string) => {
+        search.handleSearch(query);
+      }, 300),
+    [search]
+  );
+
+  const handleConfirmMerge = async (targetId: Id<"characters">) => {
+    await mergeCharacters({
+      sourceCharacterId: characterId,
+      targetCharacterId: targetId,
+    });
+    router.push(`/scripts/${scriptId}/entities/characters/${targetId}`);
+    setIsOpen(false);
+  };
+
+  // Clean up debounce on unmount
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
 
   if (!character) return <div>{t("loading")}</div>;
 
@@ -43,7 +88,55 @@ export function CharacterDetail({ characterId }: CharacterDetailProps) {
               )}
             </div>
           </div>
-          <CharacterTypeIcon type={character.type} />
+          <div className="flex items-center gap-2">
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Merge className="h-4 w-4 mr-2" />
+                  {t("merge.button")}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{t("merge.title")}</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <p className="text-sm text-muted-foreground">
+                    {t("merge.description")}
+                  </p>
+                  <Input
+                    className="w-full"
+                    placeholder={t("merge.searchPlaceholder")}
+                    onChange={(e) => debouncedSearch(e.target.value)}
+                  />
+                  {results
+                    ?.filter((result) => isCharacter(result))
+                    .filter((result) => result._id !== characterId)
+                    .map((result) => (
+                      <span
+                        key={result._id}
+                        className="w-full cursor-pointer flex items-center justify-between p-3 hover:bg-accent rounded-md transition-colors"
+                        onClick={() => handleConfirmMerge(result._id)}
+                      >
+                        <div className="flex items-center gap-2 text-sm ">
+                          <CharacterTypeIcon type={result.type} />
+                          <div className="flex flex-col items-start text-left">
+                            <span className="font-medium">{result.name}</span>
+                            {!!result?.aliases?.length && (
+                              <span className="text-xs text-muted-foreground">
+                                aka {result.aliases.join(", ")}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <Merge className="h-4 w-4 text-muted-foreground" />
+                      </span>
+                    ))}
+                </div>
+              </DialogContent>
+            </Dialog>
+            <CharacterTypeIcon type={character.type} />
+          </div>
         </div>
 
         <Separator />

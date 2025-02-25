@@ -29,6 +29,8 @@ const useSceneEntities = () => {
     api.characters.deduplicateCharacter
   );
 
+  const mergeCharactersMutation = useMutation(api.characters.mergeCharacters);
+
   const updateCharacterMutation = useMutation(api.characters.updateCharacter);
 
   const updateLocationMutation = useMutation(api.locations.updateLocation);
@@ -157,6 +159,34 @@ const useSceneEntities = () => {
       });
       toast({
         title: "Character deduplicated",
+      });
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        toast({
+          title: error.data.message,
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const mergeCharacters = async ({
+    sourceCharacterId,
+    targetCharacterId,
+  }: {
+    sourceCharacterId: Id<"characters">;
+    targetCharacterId: Id<"characters">;
+  }) => {
+    setIsLoading(true);
+    try {
+      await mergeCharactersMutation({
+        source_character_id: sourceCharacterId,
+        target_character_id: targetCharacterId,
+      });
+      toast({
+        title: "Characters merged",
       });
     } catch (error) {
       if (error instanceof ConvexError) {
@@ -469,6 +499,7 @@ const useSceneEntities = () => {
     deleteProp,
     updateProp,
     createNewProp,
+    mergeCharacters,
     isLoading,
   };
 };
