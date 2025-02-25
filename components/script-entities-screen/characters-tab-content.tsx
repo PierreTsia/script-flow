@@ -200,7 +200,6 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
                 <CharacterSummaryCard
                   key={character._id}
                   character={character}
-                  potentialDuplicates={getPotentialDuplicates(character)}
                 />
               ))}
             </div>

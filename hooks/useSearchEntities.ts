@@ -4,7 +4,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useState, useMemo } from "react";
 import debounce from "lodash.debounce";
 import { GlobalSearchEntitiesResult } from "@/convex/search";
-
+import { isCharacter, isLocation, isProp, isScene } from "@/convex/search";
 export const useSearchEntities = (scriptId?: Id<"scripts">) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
@@ -38,13 +38,13 @@ export const useSearchEntities = (scriptId?: Id<"scripts">) => {
 
   // Type guards for different entity types
   const isCharacterResult = (result: GlobalSearchEntitiesResult[number]) =>
-    result.entityType === "character";
+    isCharacter(result);
   const isLocationResult = (result: GlobalSearchEntitiesResult[number]) =>
-    result.entityType === "location";
+    isLocation(result);
   const isPropResult = (result: GlobalSearchEntitiesResult[number]) =>
-    result.entityType === "prop";
+    isProp(result);
   const isSceneResult = (result: GlobalSearchEntitiesResult[number]) =>
-    result.entityType === "scene";
+    isScene(result);
 
   return {
     results,

@@ -16,7 +16,6 @@ import {
 import { useTranslations } from "next-intl";
 
 import { CharactersWithScenes } from "@/convex/characters";
-import DeduplicateCharacterButton from "@/components/script-entities-screen/deduplicate-character-button";
 import useSceneEntities from "@/hooks/useSceneEntities";
 import ConfirmDeleteDialog from "@/components/script-entities-screen/confirm-delete-dialog";
 import { EditCharacterDialog } from "./edit-character-dialog";
@@ -25,10 +24,8 @@ import Link from "next/link";
 
 const CharacterSummaryCard = ({
   character,
-  potentialDuplicates,
 }: {
   character: CharactersWithScenes["characters"][number];
-  potentialDuplicates?: CharactersWithScenes["characters"][number][];
 }) => {
   const t = useTranslations("ScriptEntitiesScreen");
   const { deleteCharacter, isLoading } = useSceneEntities();
@@ -94,12 +91,10 @@ const CharacterSummaryCard = ({
           </Button>
         </Link>
 
-        {potentialDuplicates && (
-          <DeduplicateCharacterButton
+        {/*          <DeduplicateCharacterButton
             character={character}
             allCharacters={potentialDuplicates}
-          />
-        )}
+          /> */}
 
         <ConfirmDeleteDialog
           entityType="character"
