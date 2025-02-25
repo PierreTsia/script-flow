@@ -65,6 +65,27 @@ type SearchResults = {
   scenes: Doc<"scenes">[];
 };
 
+// Add specific type for character search result
+type CharacterSearchResult = Doc<"characters"> & {
+  entityType: "character";
+  preview: string;
+};
+
+type PropSearchResult = Doc<"props"> & {
+  entityType: "prop";
+  preview: string;
+};
+
+type LocationSearchResult = Doc<"locations"> & {
+  entityType: "location";
+  preview: string;
+};
+
+type SceneSearchResult = Doc<"scenes"> & {
+  entityType: "scene";
+  preview: string;
+};
+
 // Helper to get preview text based on entity type
 const getPreviewText = (entity: SearchableEntity): string => {
   if (isCharacter(entity)) return entity.name;
@@ -111,6 +132,7 @@ export const searchEntities = query({
     };
 
     const normalizedSearch = searchTerm.toLowerCase();
+
     const typesToSearch = entityTypes || [
       "character",
       "prop",
@@ -168,18 +190,44 @@ export const searchEntities = query({
       })
     );
 
-    // Format results with type safety
+    // Format results with better type safety
     const formattedResults = Object.entries(searchResults).flatMap(
-      ([type, results]) =>
-        results.map((result) => ({
-          entityType: type.slice(0, -1) as
-            | "character"
-            | "prop"
-            | "location"
-            | "scene",
-          preview: getPreviewText(result),
-          ...result,
-        }))
+      ([type, results]): Array<
+        | CharacterSearchResult
+        | PropSearchResult
+        | LocationSearchResult
+        | SceneSearchResult
+      > => {
+        switch (type) {
+          case "characters":
+            return results.map((result) => ({
+              entityType: "character" as const,
+              preview: getPreviewText(result),
+              ...result,
+            })) as CharacterSearchResult[];
+
+          case "props":
+            return results.map((result) => ({
+              entityType: "prop" as const,
+              preview: getPreviewText(result),
+              ...result,
+            })) as PropSearchResult[];
+
+          case "locations":
+            return results.map((result) => ({
+              entityType: "location" as const,
+              preview: getPreviewText(result),
+              ...result,
+            })) as LocationSearchResult[];
+
+          default:
+            return results.map((result) => ({
+              entityType: "scene" as const,
+              preview: getPreviewText(result),
+              ...result,
+            })) as SceneSearchResult[];
+        }
+      }
     );
 
     return formattedResults;

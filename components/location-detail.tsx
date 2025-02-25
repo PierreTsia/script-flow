@@ -107,9 +107,9 @@ export function LocationDetail({ locationId }: LocationDetailProps) {
             </CardHeader>
             <CardContent>
               <div className="divide-y">
-                {location.scenes?.map((scene) => (
+                {location.scenes?.map((scene, index) => (
                   <div
-                    key={scene._id}
+                    key={`${scene._id}-${index}`}
                     className="flex items-start justify-between py-3 first:pt-0 last:pb-0"
                   >
                     <div className="flex flex-col gap-1">
