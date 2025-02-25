@@ -101,7 +101,7 @@ export const createPropWithScene = mutation({
       // Create new prop with base type
       const { scene_id, type, name, quantity } = args;
       await requireExists(await ctx.db.get(scene_id), "scene");
-      return await ctx.db.insert("props", {
+      propId = await ctx.db.insert("props", {
         script_id: args.script_id,
         name,
         quantity: quantity ?? 1,
