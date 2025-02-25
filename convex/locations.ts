@@ -188,7 +188,13 @@ export const createLocationWithScene = mutation({
       locationId = existingLocation._id;
     } else {
       await requireExists(await ctx.db.get(args.scene_id), "scene");
-      locationId = await saveNewLocation(ctx, args);
+      const { script_id, name, type, time_of_day } = args;
+      locationId = await saveNewLocation(ctx, {
+        script_id,
+        name,
+        type,
+        time_of_day,
+      });
     }
 
     return await addLocationToScene(ctx, locationId, args.scene_id, args.notes);
