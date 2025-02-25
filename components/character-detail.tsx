@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import useSceneEntities from "@/hooks/useSceneEntities";
 import { useSearchEntities } from "@/hooks/useSearchEntities";
