@@ -26,7 +26,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CharactersWithScenes } from "@/convex/characters";
 import { Badge } from "../ui/badge";
-import { Star, Users, User, UserCog, Settings2 } from "lucide-react";
+import {
+  Star,
+  Users,
+  User,
+  UserCog,
+  Settings2,
+  ArrowUpDown,
+} from "lucide-react";
 import { CursorPagination } from "@/components/ui/cursor-pagination/cursor-pagination";
 import { useTranslations } from "next-intl";
 import {
@@ -41,53 +48,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 type Character = CharactersWithScenes["characters"][number];
-
-const columns: ColumnDef<Character>[] = [
-  {
-    accessorKey: "name",
-    header: "Name",
-    cell: ({ row }) => {
-      const character = row.original;
-      return (
-        <div className="flex items-center gap-2">
-          {character.type === "PRINCIPAL" && <Star className="h-4 w-4" />}
-          {character.type === "SUPPORTING" && <Users className="h-4 w-4" />}
-          {character.type === "FEATURED_EXTRA" && (
-            <UserCog className="h-4 w-4" />
-          )}
-          {character.type === "SILENT_KEY" && <User className="h-4 w-4" />}
-          {character.type === "ATMOSPHERE" && <Users className="h-4 w-4" />}
-          <span>{character.name}</span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "type",
-    header: "Type",
-    cell: ({ row }) => (
-      <Badge variant="secondary">{row.getValue("type")}</Badge>
-    ),
-  },
-  {
-    accessorKey: "aliases",
-    header: "Aliases",
-    cell: ({ row }) => {
-      const aliases = row.getValue("aliases") as string[];
-      return aliases?.length ? aliases.join(", ") : "-";
-    },
-  },
-  {
-    accessorKey: "scenes",
-    header: "Scenes",
-    cell: ({ row }) => {
-      const scenes = row.original.scenes;
-      return <Badge variant="outline">{scenes.length}</Badge>;
-    },
-  },
-];
 
 interface CharactersTableProps {
   data: Character[];
@@ -96,7 +59,10 @@ interface CharactersTableProps {
   cursors: string[];
   nextCursor?: string | null;
   totalPages: number;
+  sortBy: "name" | "type";
+  sortOrder: "asc" | "desc";
   onPageChange: (page: number, cursors: string[]) => void;
+  onSortChange: (sortBy: "name" | "type", sortOrder: "asc" | "desc") => void;
 }
 
 export function CharactersTable({
@@ -106,10 +72,96 @@ export function CharactersTable({
   cursors,
   nextCursor,
   totalPages,
+  sortBy,
+  sortOrder,
   onPageChange,
+  onSortChange,
 }: CharactersTableProps) {
   const t = useTranslations("ScriptEntitiesScreen");
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+
+  const columns: ColumnDef<Character>[] = [
+    {
+      accessorKey: "name",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const newOrder =
+                sortBy === "name" && sortOrder === "asc" ? "desc" : "asc";
+              onSortChange("name", newOrder);
+            }}
+            className="flex items-center gap-1"
+          >
+            Name
+            {sortBy === "name" && (
+              <ArrowUpDown
+                className={cn("h-4 w-4", sortOrder === "desc" && "rotate-180")}
+              />
+            )}
+          </Button>
+        );
+      },
+      cell: ({ row }) => {
+        const character = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            {character.type === "PRINCIPAL" && <Star className="h-4 w-4" />}
+            {character.type === "SUPPORTING" && <Users className="h-4 w-4" />}
+            {character.type === "FEATURED_EXTRA" && (
+              <UserCog className="h-4 w-4" />
+            )}
+            {character.type === "SILENT_KEY" && <User className="h-4 w-4" />}
+            {character.type === "ATMOSPHERE" && <Users className="h-4 w-4" />}
+            <span>{character.name}</span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "type",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const newOrder =
+                sortBy === "type" && sortOrder === "asc" ? "desc" : "asc";
+              onSortChange("type", newOrder);
+            }}
+            className="flex items-center gap-1"
+          >
+            Type
+            {sortBy === "type" && (
+              <ArrowUpDown
+                className={cn("h-4 w-4", sortOrder === "desc" && "rotate-180")}
+              />
+            )}
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <Badge variant="secondary">{row.getValue("type")}</Badge>
+      ),
+    },
+    {
+      accessorKey: "aliases",
+      header: "Aliases",
+      cell: ({ row }) => {
+        const aliases = row.getValue("aliases") as string[];
+        return aliases?.length ? aliases.join(", ") : "-";
+      },
+    },
+    {
+      accessorKey: "scenes",
+      header: "Scenes",
+      cell: ({ row }) => {
+        const scenes = row.original.scenes;
+        return <Badge variant="outline">{scenes.length}</Badge>;
+      },
+    },
+  ];
 
   const table = useReactTable({
     data,

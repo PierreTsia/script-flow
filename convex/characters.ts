@@ -226,7 +226,10 @@ export const getCharactersByScriptId = query({
     sortBy: v.optional(v.union(v.literal("name"), v.literal("type"))),
     sortOrder: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
   },
-  handler: async (ctx, { script_id, limit, cursor }) => {
+  handler: async (
+    ctx,
+    { script_id, limit, cursor, sortBy = "type", sortOrder = "desc" }
+  ) => {
     const auth = await getAuthState(ctx);
     const script = await requireExists(await ctx.db.get(script_id), "script");
 
@@ -241,6 +244,7 @@ export const getCharactersByScriptId = query({
       "SILENT_KEY",
       "ATMOSPHERE",
     ] as const;
+
     const pageSize = limit || 25;
 
     const paginatedCharacters = await ctx.db
@@ -250,10 +254,15 @@ export const getCharactersByScriptId = query({
       .paginate({ numItems: pageSize, cursor: cursor || null });
 
     const sortedCharacters = paginatedCharacters.page.sort((a, b) => {
-      if (a.type !== b.type) {
-        return typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type);
+      if (sortBy === "type" && a.type !== b.type) {
+        return sortOrder === "asc"
+          ? typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type)
+          : typeOrder.indexOf(b.type) - typeOrder.indexOf(a.type);
+      } else {
+        return sortOrder === "asc"
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
       }
-      return a.name.localeCompare(b.name);
     });
 
     const characterScenes = await Promise.all(

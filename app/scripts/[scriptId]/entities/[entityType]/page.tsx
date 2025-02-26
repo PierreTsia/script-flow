@@ -6,7 +6,7 @@ import PropsTabContent from "@/components/script-entities-screen/props-tab-conte
 import ScenesTabContent from "@/components/script-entities-screen/scenes-tab-content";
 import { ClientPageWrapper } from "@/components/client-page-wrapper";
 interface PageProps {
-  params: { scriptId: Id<"scripts">; entityType: string };
+  params: Promise<{ scriptId: Id<"scripts">; entityType: string }>;
 }
 
 export default async function EntityTypePage({ params }: PageProps) {

@@ -33,7 +33,9 @@ const ScriptSceneEntitiesScreen = ({
   }
 
   const handleTabChange = (tab: string) => {
-    router.push(`/scripts/${scriptId}/entities/${tab}`);
+    router.push(
+      `/scripts/${scriptId}/entities/${tab}?sortBy=name&sortOrder=desc`
+    );
   };
 
   return (

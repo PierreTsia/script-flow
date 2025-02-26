@@ -13,17 +13,10 @@ import CharacterForm from "./character-form";
 import useSceneEntities from "@/hooks/useSceneEntities";
 import { CharacterFormSchema } from "./character-form";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
-
 import { CharactersTable } from "./characters-table";
 import { ViewToggle } from "./view-toggle";
 import { CursorPagination } from "@/components/ui/cursor-pagination/cursor-pagination";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 interface CreateCharacterDialogProps {
   scriptId: Id<"scripts">;
@@ -76,23 +69,42 @@ const CreateCharacterDialog = ({
   );
 };
 
-const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
-
 const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const t = useTranslations("ScriptEntitiesScreen");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const [page, setPage] = useState(1);
   const [cursors, setCursors] = useState<string[]>([]);
   const [view, setView] = useState<"table" | "grid">("table");
-  const [pageSize, setPageSize] = useState(25);
-
-  const { useGetCharactersByScriptId } = useScene();
-  const result = useGetCharactersByScriptId(
-    scriptId,
-    pageSize,
-    page === 1 ? undefined : cursors[page - 2]
+  const [pageSize] = useState(25);
+  const [sortBy, setSortBy] = useState<"name" | "type">(
+    (searchParams.get("sortBy") as "name" | "type") || "type"
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(
+    (searchParams.get("sortOrder") as "asc" | "desc") || "desc"
   );
 
+  const { useGetCharactersByScriptId } = useScene();
+  const result = useGetCharactersByScriptId({
+    scriptId,
+    limit: pageSize,
+    cursor: page === 1 ? undefined : cursors[page - 2],
+    sortBy,
+    sortOrder,
+  });
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const updateUrlWithSort = (
+    newSortBy: "name" | "type",
+    newSortOrder: "asc" | "desc"
+  ) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("sortBy", newSortBy);
+    params.set("sortOrder", newSortOrder);
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   if (!result) {
     return <EntityScreenSkeleton />;
@@ -147,6 +159,15 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
           page={page}
           cursors={cursors}
           nextCursor={result.nextCursor}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSortChange={(newSortBy, newSortOrder) => {
+            setSortBy(newSortBy);
+            setSortOrder(newSortOrder);
+            setPage(1);
+            setCursors([]);
+            updateUrlWithSort(newSortBy, newSortOrder);
+          }}
           onPageChange={(newPage, newCursors) => {
             setPage(newPage);
             setCursors(newCursors);

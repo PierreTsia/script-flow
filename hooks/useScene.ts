@@ -47,15 +47,21 @@ export const useScene = () => {
     });
   };
 
-  const useGetCharactersByScriptId = (
-    scriptId: Id<"scripts">,
-    limit = 25,
-    cursor?: string
-  ) => {
+  interface GetCharactersParams {
+    scriptId: Id<"scripts">;
+    limit?: number;
+    cursor?: string;
+    sortBy?: "name" | "type";
+    sortOrder?: "asc" | "desc";
+  }
+
+  const useGetCharactersByScriptId = (params: GetCharactersParams) => {
     return useStableQuery(api.characters.getCharactersByScriptId, {
-      script_id: scriptId,
-      limit,
-      cursor,
+      script_id: params.scriptId,
+      limit: params.limit,
+      cursor: params.cursor,
+      sortBy: params.sortBy,
+      sortOrder: params.sortOrder,
     });
   };
 
