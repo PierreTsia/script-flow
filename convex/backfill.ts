@@ -1,8 +1,6 @@
 import { mutation } from "./_generated/server";
 import { generateSearchText } from "./model/search";
 
-import { v } from "convex/values";
-
 export const backfillSearchText = mutation({
   args: {},
   handler: async (ctx) => {
