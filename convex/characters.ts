@@ -85,7 +85,7 @@ const getCharacterNyUniqName = async (
 ): Promise<CharacterDocument | null> => {
   const character = await ctx.db
     .query("characters")
-    .withIndex("unique_character_per_script", (q) =>
+    .withIndex("by_script_and_type", (q) =>
       q.eq("script_id", scriptId).eq("name", name).eq("type", type)
     )
     .unique();
@@ -222,32 +222,46 @@ export const getCharactersByScriptId = query({
   args: {
     script_id: v.id("scripts"),
     limit: v.optional(v.number()),
-    cursor: v.optional(v.string()),
+    cursor: v.optional(v.union(v.string(), v.null())),
+    sortBy: v.optional(v.union(v.literal("name"), v.literal("type"))),
+    sortOrder: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
   },
   handler: async (ctx, { script_id, limit, cursor }) => {
     const auth = await getAuthState(ctx);
-
     const script = await requireExists(await ctx.db.get(script_id), "script");
 
-    const paginatedCharacters = auth?.userId
-      ? await ctx.db
-          .query("characters")
-          .withIndex("by_script", (q) => q.eq("script_id", script._id))
-          .order("asc")
-          .paginate({
-            numItems: limit || 25,
-            cursor: cursor || null,
-          })
-      : { page: [], continueCursor: null };
+    if (!auth?.userId) {
+      return { characters: [], nextCursor: null, total: 0 };
+    }
+
+    const typeOrder = [
+      "PRINCIPAL",
+      "SUPPORTING",
+      "FEATURED_EXTRA",
+      "SILENT_KEY",
+      "ATMOSPHERE",
+    ] as const;
+    const pageSize = limit || 25;
+
+    const paginatedCharacters = await ctx.db
+      .query("characters")
+      .withIndex("by_script", (q) => q.eq("script_id", script._id))
+      .order("asc")
+      .paginate({ numItems: pageSize, cursor: cursor || null });
+
+    const sortedCharacters = paginatedCharacters.page.sort((a, b) => {
+      if (a.type !== b.type) {
+        return typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type);
+      }
+      return a.name.localeCompare(b.name);
+    });
 
     const characterScenes = await Promise.all(
-      paginatedCharacters.page.map(async (character) => ({
+      sortedCharacters.map(async (character) => ({
         ...character,
         scenes: await getCharacterScenes(ctx, character._id),
       }))
     );
-
-    // Fetch character-scene relationships with notes
 
     return {
       characters: characterScenes,

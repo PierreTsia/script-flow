@@ -77,7 +77,8 @@ export default defineSchema({
     searchText: v.string(),
   })
     .index("by_script", ["script_id"])
-    .index("unique_character_per_script", ["script_id", "name", "type"])
+    .index("unique_character_per_script", ["script_id", "name"])
+    .index("by_script_and_type", ["script_id", "type"])
     .searchIndex("search_characters", {
       searchField: "searchText",
       filterFields: ["script_id", "type"],
