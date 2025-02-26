@@ -146,9 +146,6 @@ dependencies:
   recharts:
     specifier: ^2.15.1
     version: 2.15.1(react-dom@19.0.0)(react@19.0.0)
-  table:
-    specifier: github:tanstack/react-table
-    version: git@github.com+tanstack/react-table/db745afdb867511ddd04a79150f89d3894a03532
   tailwind-merge:
     specifier: ^3.0.1
     version: 3.0.2
@@ -6552,11 +6549,4 @@ packages:
       '@types/react': 19.0.10
       react: 19.0.0
       use-sync-external-store: 1.4.0(react@19.0.0)
-    dev: false
-
-  git@github.com+tanstack/react-table/db745afdb867511ddd04a79150f89d3894a03532:
-    resolution: {commit: db745afdb867511ddd04a79150f89d3894a03532, repo: git@github.com:tanstack/react-table.git, type: git}
-    name: table
-    version: 0.0.0
-    requiresBuild: true
     dev: false

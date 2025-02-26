@@ -59,7 +59,6 @@
     "react-hotkeys-hook": "^4.6.1",
     "react-use-form": "^0.1.0",
     "recharts": "^2.15.1",
-    "table": "github:tanstack/react-table",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.2"
