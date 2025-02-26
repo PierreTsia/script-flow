@@ -85,7 +85,7 @@ const getCharacterNyUniqName = async (
 ): Promise<CharacterDocument | null> => {
   const character = await ctx.db
     .query("characters")
-    .withIndex("by_script_and_type", (q) =>
+    .withIndex("by_script_name_type", (q) =>
       q.eq("script_id", scriptId).eq("name", name).eq("type", type)
     )
     .unique();

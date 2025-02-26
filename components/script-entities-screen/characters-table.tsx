@@ -41,13 +41,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { cn } from "@/lib/utils";
 
 type Character = CharactersWithScenes["characters"][number];
@@ -83,7 +77,7 @@ export function CharactersTable({
   const columns: ColumnDef<Character>[] = [
     {
       accessorKey: "name",
-      header: ({ column }) => {
+      header: () => {
         return (
           <Button
             variant="ghost"
@@ -121,7 +115,7 @@ export function CharactersTable({
     },
     {
       accessorKey: "type",
-      header: ({ column }) => {
+      header: () => {
         return (
           <Button
             variant="ghost"
