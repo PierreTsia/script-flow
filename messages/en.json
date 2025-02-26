@@ -130,6 +130,15 @@
     "addProp": "Add Prop"
   },
   "ScriptEntitiesScreen": {
+    "table": {
+      "columns": {
+        "toggle": "Show/Hide Columns",
+        "name": "Name",
+        "type": "Type",
+        "aliases": "Aliases",
+        "scenes": "Scenes"
+      }
+    },
     "createNew": "Create new",
     "propsTitle": "Props",
     "locationsTitle": "Locations",

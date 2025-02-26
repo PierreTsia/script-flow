@@ -1,12 +1,11 @@
+"use client";
+
 import { useTranslations } from "next-intl";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Id } from "@/convex/_generated/dataModel";
 import { useScene } from "@/hooks/useScene";
 import EntityScreenSkeleton from "./entity-screen-skeleton";
 import CharacterSummaryCard from "./character-summary-card";
-import { CharactersWithScenes } from "@/convex/characters";
-import { Badge } from "@/components/ui/badge";
-import { Star, Users, User, Plus, UserCog } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { CreateEntityDialog } from "./create-entity-dialog";
@@ -14,16 +13,16 @@ import CharacterForm from "./character-form";
 import useSceneEntities from "@/hooks/useSceneEntities";
 import { CharacterFormSchema } from "./character-form";
 import { AlertDialogFooter } from "@/components/ui/alert-dialog";
-import { CharacterType } from "@/convex/helpers";
+import { CharactersTable } from "./characters-table";
+import { ViewToggle } from "./view-toggle";
 import { CursorPagination } from "@/components/ui/cursor-pagination/cursor-pagination";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 interface CreateCharacterDialogProps {
   scriptId: Id<"scripts">;
   isOpen: boolean;
   onClose: () => void;
 }
-
-type CharacterWithScenes = CharactersWithScenes["characters"][number];
 
 const CreateCharacterDialog = ({
   scriptId,
@@ -70,103 +69,80 @@ const CreateCharacterDialog = ({
   );
 };
 
-const ITEMS_PER_PAGE = 12;
-
 const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const t = useTranslations("ScriptEntitiesScreen");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const [page, setPage] = useState(1);
   const [cursors, setCursors] = useState<string[]>([]);
-  const { useGetCharactersByScriptId } = useScene();
-
-  const result = useGetCharactersByScriptId(
-    scriptId,
-    ITEMS_PER_PAGE,
-    page === 1 ? undefined : cursors[page - 2]
+  const [view, setView] = useState<"table" | "grid">("table");
+  const [pageSize] = useState(25);
+  const [sortBy, setSortBy] = useState<"name" | "type">(
+    (searchParams.get("sortBy") as "name" | "type") || "type"
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(
+    (searchParams.get("sortOrder") as "asc" | "desc") || "desc"
   );
 
+  const { useGetCharactersByScriptId } = useScene();
+  const result = useGetCharactersByScriptId({
+    scriptId,
+    limit: pageSize,
+    cursor: page === 1 ? undefined : cursors[page - 2],
+    sortBy,
+    sortOrder,
+  });
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const updateUrlWithSort = (
+    newSortBy: "name" | "type",
+    newSortOrder: "asc" | "desc"
+  ) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("sortBy", newSortBy);
+    params.set("sortOrder", newSortOrder);
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   if (!result) {
     return <EntityScreenSkeleton />;
   }
 
-  const { characters, nextCursor, total } = result;
-  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
-
-  const partitionCharactersByType = (characters: CharacterWithScenes[]) => {
-    return characters.reduce(
-      (acc, char) => {
-        if (char.type === "PRINCIPAL") {
-          acc.PRINCIPAL.push(char);
-        } else if (char.type === "SUPPORTING") {
-          acc.SUPPORTING.push(char);
-        } else if (char.type === "FEATURED_EXTRA") {
-          acc.FEATURED_EXTRA.push(char);
-        } else if (char.type === "SILENT_KEY") {
-          acc.SILENT_KEY.push(char);
-        } else if (char.type === "ATMOSPHERE") {
-          acc.ATMOSPHERE.push(char);
-        }
-        return acc;
-      },
-      {
-        PRINCIPAL: [],
-        SUPPORTING: [],
-        FEATURED_EXTRA: [],
-        SILENT_KEY: [],
-        ATMOSPHERE: [],
-      } as Record<CharacterType, CharacterWithScenes[]>
-    );
-  };
-
-  // Group characters by type
-  const groupedCharacters = partitionCharactersByType(characters);
-
-  // Sort each group by number of scenes
-  Object.keys(groupedCharacters).forEach((key) => {
-    groupedCharacters[key as keyof typeof groupedCharacters].sort(
-      (a, b) => b.scenes.length - a.scenes.length
-    );
-  });
-
-  const getGroupIcon = (group: string) => {
-    switch (group) {
-      case "PRINCIPAL":
-        return <Star className="h-4 w-4" />;
-      case "SUPPORTING":
-        return <Users className="h-4 w-4" />;
-      case "FEATURED_EXTRA":
-        return <UserCog className="h-4 w-4" />;
-      case "SILENT_KEY":
-        return <User className="h-4 w-4" />;
-      case "ATMOSPHERE":
-        return <Users className="h-4 w-4" />;
-    }
-  };
-
-  const getGroupTitle = (group: string) => {
-    switch (group) {
-      case "PRINCIPAL":
-        return t("groupedCharacters.principal");
-      case "SUPPORTING":
-        return t("groupedCharacters.supporting");
-      case "FEATURED_EXTRA":
-        return t("groupedCharacters.featured_extra");
-      case "SILENT_KEY":
-        return t("groupedCharacters.silent_key");
-      case "ATMOSPHERE":
-        return t("groupedCharacters.atmosphere");
-    }
-  };
+  const paginationFooter = (
+    <div className="flex items-center justify-between py-4">
+      <div className="flex items-center gap-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {result.total} total characters
+        </div>
+      </div>
+      <CursorPagination
+        state={{
+          page,
+          cursors,
+          totalPages: Math.ceil(result.total / pageSize),
+          nextCursor: result.nextCursor ?? undefined,
+        }}
+        onPageChange={(newPage, newCursors) => {
+          setPage(newPage);
+          setCursors(newCursors);
+        }}
+      />
+    </div>
+  );
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">{t("charactersTitle")}</h2>
-        <Button onClick={() => setIsCreateModalOpen(true)} size="sm">
-          <Plus className="h-4 w-4 mr-2" />
-          {t("createNew")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <ViewToggle view={view} onViewChange={setView} />
+          <Button onClick={() => setIsCreateModalOpen(true)} size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            {t("createNew")}
+          </Button>
+        </div>
       </div>
 
       <CreateCharacterDialog
@@ -175,38 +151,38 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
         onClose={() => setIsCreateModalOpen(false)}
       />
 
-      <ScrollArea className="h-[calc(100vh-220px)]">
-        {Object.entries(groupedCharacters).map(([group, chars]) => (
-          <div key={group} className="mb-8">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              {getGroupIcon(group)}
-              {getGroupTitle(group)}
-              <Badge variant="secondary">{chars.length}</Badge>
-            </h3>
-            <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-              {chars.map((character) => (
-                <CharacterSummaryCard
-                  key={character._id}
-                  character={character}
-                />
-              ))}
-            </div>
+      {view === "table" ? (
+        <CharactersTable
+          data={result.characters}
+          total={result.total}
+          totalPages={Math.ceil(result.total / pageSize)}
+          page={page}
+          cursors={cursors}
+          nextCursor={result.nextCursor}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSortChange={(newSortBy, newSortOrder) => {
+            setSortBy(newSortBy);
+            setSortOrder(newSortOrder);
+            setPage(1);
+            setCursors([]);
+            updateUrlWithSort(newSortBy, newSortOrder);
+          }}
+          onPageChange={(newPage, newCursors) => {
+            setPage(newPage);
+            setCursors(newCursors);
+          }}
+        />
+      ) : (
+        <div className="space-y-4">
+          <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+            {result.characters.map((character) => (
+              <CharacterSummaryCard key={character._id} character={character} />
+            ))}
           </div>
-        ))}
-      </ScrollArea>
-
-      <CursorPagination
-        state={{
-          page,
-          cursors,
-          totalPages,
-          nextCursor,
-        }}
-        onPageChange={(newPage, newCursors) => {
-          setPage(newPage);
-          setCursors(newCursors);
-        }}
-      />
+          {paginationFooter}
+        </div>
+      )}
     </div>
   );
 };

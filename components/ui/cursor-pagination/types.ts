@@ -2,7 +2,7 @@ export interface CursorPaginationState {
   page: number;
   cursors: string[];
   totalPages: number;
-  nextCursor?: string;
+  nextCursor?: string | null;
 }
 
 export interface CursorPaginationProps {

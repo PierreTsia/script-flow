@@ -4,6 +4,7 @@ import {
   requireAuth,
   getAuthState,
   requireScriptOwnership,
+  requireExists,
 } from "./model/auth";
 
 export const getUploadUrl = mutation({
@@ -91,23 +92,20 @@ export const getScriptEntities = query({
     cursor: v.optional(v.string()),
   },
   handler: async (ctx, { scriptId, limit, cursor }) => {
-    await requireAuth(ctx);
-
-    const myScript = await requireScriptOwnership(
-      ctx,
-      await ctx.db.get(scriptId),
-      "script"
-    );
+    const auth = await getAuthState(ctx);
+    const script = await requireExists(await ctx.db.get(scriptId), "script");
 
     // Paginate scenes query
-    const paginatedScenes = await ctx.db
-      .query("scenes")
-      .withIndex("by_script_and_sort", (q) => q.eq("script_id", myScript._id))
-      .order("asc")
-      .paginate({
-        numItems: limit ?? 10,
-        cursor: cursor ?? null,
-      });
+    const paginatedScenes = auth?.userId
+      ? await ctx.db
+          .query("scenes")
+          .withIndex("by_script_and_sort", (q) => q.eq("script_id", script._id))
+          .order("asc")
+          .paginate({
+            numItems: limit ?? 10,
+            cursor: cursor ?? null,
+          })
+      : { page: [], continueCursor: null };
 
     const scenes = paginatedScenes.page;
 
@@ -178,7 +176,7 @@ export const getScriptEntities = query({
       .collect();
 
     return {
-      script: myScript,
+      script,
       scenes: scenesWithEntities,
       nextCursor: paginatedScenes.continueCursor,
       total: allScenes.length,

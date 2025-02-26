@@ -2,32 +2,41 @@
 
 import { useScripts } from "@/hooks/useScripts";
 import { Id } from "@/convex/_generated/dataModel";
-import { TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TabsPageMenu } from "./tabs-page-menu";
-import { useState } from "react";
-import ScenesTabContent from "./scenes-tab-content";
-import CharactersTabContent from "./characters-tab-content";
-import LocationsTabContent from "./locations-tab-content";
-import PropsTabContent from "./props-tab-content";
-import { useAuth } from "@clerk/nextjs";
+import { usePathname, useRouter } from "next/navigation";
 import ScriptTopBar from "../script-top-bar";
+import { useAuth } from "@clerk/nextjs";
+
 const ScriptSceneEntitiesScreen = ({
   scriptId,
+  children,
 }: {
   scriptId: Id<"scripts">;
+  children: React.ReactNode;
 }) => {
   const { isLoaded: authLoaded } = useAuth();
   const { useGetScriptEntities } = useScripts();
   const entities = useGetScriptEntities(scriptId, 6);
+  const pathname = usePathname();
+  const router = useRouter();
 
-  const [currentTab, setCurrentTab] = useState<
-    "scenes" | "characters" | "locations" | "props"
-  >("scenes");
+  const currentTab = pathname.split("/").pop() as
+    | "characters"
+    | "locations"
+    | "props"
+    | "scenes"
+    | undefined;
 
   if (!authLoaded || !entities) {
     return <EntityScreenSkeleton />;
   }
+
+  const handleTabChange = (tab: string) => {
+    router.push(
+      `/scripts/${scriptId}/entities/${tab}?sortBy=name&sortOrder=desc`
+    );
+  };
 
   return (
     <div className="flex flex-col w-full bg-background min-h-[100vh]">
@@ -39,21 +48,11 @@ const ScriptSceneEntitiesScreen = ({
         />
       </div>
       <div className="flex-1 p-6 gap-6">
-        <TabsPageMenu currentTab={currentTab} setCurrentTab={setCurrentTab}>
-          {/* Scenes Tab */}
-          <TabsContent value="scenes" className="flex-1">
-            <ScenesTabContent scriptId={scriptId} />
-          </TabsContent>
-          {/* Other tabs would be implemented similarly */}
-          <TabsContent value="characters" className="flex-1">
-            <CharactersTabContent scriptId={scriptId} />
-          </TabsContent>
-          <TabsContent value="locations" className="flex-1">
-            <LocationsTabContent scriptId={scriptId} />
-          </TabsContent>
-          <TabsContent value="props" className="flex-1">
-            <PropsTabContent scriptId={scriptId} />
-          </TabsContent>
+        <TabsPageMenu
+          currentTab={currentTab || "scenes"}
+          setCurrentTab={handleTabChange}
+        >
+          {children}
         </TabsPageMenu>
       </div>
     </div>

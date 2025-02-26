@@ -92,7 +92,10 @@ const EditSceneDialog = ({
     useGetPropsByScriptId,
   } = useScene();
 
-  const characterResult = useGetCharactersByScriptId(scriptId, 25);
+  const characterResult = useGetCharactersByScriptId({
+    scriptId,
+    limit: 25,
+  });
   const locationResult = useGetLocationsByScriptId(scriptId);
   const propsResult = useGetPropsByScriptId(scriptId, 25);
   const form = useForm<z.infer<typeof formSchema>>({
