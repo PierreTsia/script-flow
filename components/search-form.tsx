@@ -84,7 +84,6 @@ export function SearchForm({
                       .map((result) => (
                         <CommandItem
                           key={`${result._id}-${result.entityType}`}
-                          value={`${result.name} ${result?.aliases?.join(" ")}`}
                           className="flex items-center gap-2 py-3"
                           onSelect={() => {
                             setOpen(false);
