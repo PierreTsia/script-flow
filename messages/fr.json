@@ -131,6 +131,15 @@
     }
   },
   "ScriptEntitiesScreen": {
+    "table": {
+      "columns": {
+        "toggle": "Afficher/Masquer les colonnes",
+        "name": "Nom",
+        "type": "Type",
+        "aliases": "Alias",
+        "scenes": "Scènes"
+      }
+    },
     "createNew": "Créer un nouveau",
     "propsTitle": "Accessoires",
     "locationsTitle": "Lieux",

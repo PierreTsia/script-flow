@@ -225,20 +225,20 @@ export const getCharactersByScriptId = query({
     cursor: v.optional(v.string()),
   },
   handler: async (ctx, { script_id, limit, cursor }) => {
-    const myScript = await requireScriptOwnership(
-      ctx,
-      await ctx.db.get(script_id),
-      "script"
-    );
+    const auth = await getAuthState(ctx);
 
-    const paginatedCharacters = await ctx.db
-      .query("characters")
-      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
-      .order("asc")
-      .paginate({
-        numItems: limit || 25,
-        cursor: cursor || null,
-      });
+    const script = await requireExists(await ctx.db.get(script_id), "script");
+
+    const paginatedCharacters = auth?.userId
+      ? await ctx.db
+          .query("characters")
+          .withIndex("by_script", (q) => q.eq("script_id", script._id))
+          .order("asc")
+          .paginate({
+            numItems: limit || 25,
+            cursor: cursor || null,
+          })
+      : { page: [], continueCursor: null };
 
     const characterScenes = await Promise.all(
       paginatedCharacters.page.map(async (character) => ({
@@ -252,7 +252,7 @@ export const getCharactersByScriptId = query({
     return {
       characters: characterScenes,
       nextCursor: paginatedCharacters.continueCursor,
-      total: await getCharactersCount(ctx, myScript._id),
+      total: await getCharactersCount(ctx, script._id),
     };
   },
 });

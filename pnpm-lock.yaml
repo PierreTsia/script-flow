@@ -44,6 +44,9 @@ dependencies:
   '@radix-ui/react-label':
     specifier: ^2.1.2
     version: 2.1.2(@types/react-dom@19.0.3)(@types/react@19.0.9)(react-dom@19.0.0)(react@19.0.0)
+  '@radix-ui/react-menubar':
+    specifier: ^1.1.6
+    version: 1.1.6(@types/react-dom@19.0.3)(@types/react@19.0.9)(react-dom@19.0.0)(react@19.0.0)
   '@radix-ui/react-navigation-menu':
     specifier: ^1.2.5
     version: 1.2.5(@types/react-dom@19.0.3)(@types/react@19.0.9)(react-dom@19.0.0)(react@19.0.0)
@@ -80,6 +83,9 @@ dependencies:
   '@radix-ui/react-tooltip':
     specifier: ^1.1.8
     version: 1.1.8(@types/react-dom@19.0.3)(@types/react@19.0.9)(react-dom@19.0.0)(react@19.0.0)
+  '@tanstack/react-table':
+    specifier: ^8.21.2
+    version: 8.21.2(react-dom@19.0.0)(react@19.0.0)
   '@types/lodash.debounce':
     specifier: ^4.0.9
     version: 4.0.9
@@ -140,6 +146,9 @@ dependencies:
   recharts:
     specifier: ^2.15.1
     version: 2.15.1(react-dom@19.0.0)(react@19.0.0)
+  table:
+    specifier: github:tanstack/react-table
+    version: git/github.com+tanstack/react-table/db745afdb867511ddd04a79150f89d3894a03532
   tailwind-merge:
     specifier: ^3.0.1
     version: 3.0.1
@@ -1908,6 +1917,35 @@ packages:
       react-remove-scroll: 2.6.3(@types/react@19.0.9)(react@19.0.0)
     dev: false
 
+  /@radix-ui/react-menubar@1.1.6(@types/react-dom@19.0.3)(@types/react@19.0.9)(react-dom@19.0.0)(react@19.0.0):
+    resolution: {integrity: sha512-FHq7+3DlXwh/7FOM4i0G4bC4vPjiq89VEEvNF4VMLchGnaUuUbE5uKXMUCjdKaOghEEMeiKa5XCa2Pk4kteWmg==, tarball: https://registry.npmjs.org/@radix-ui/react-menubar/-/react-menubar-1.1.6.tgz}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@radix-ui/primitive': 1.1.1
+      '@radix-ui/react-collection': 1.1.2(@types/react-dom@19.0.3)(@types/react@19.0.9)(react-dom@19.0.0)(react@19.0.0)
+      '@radix-ui/react-compose-refs': 1.1.1(@types/react@19.0.9)(react@19.0.0)
+      '@radix-ui/react-context': 1.1.1(@types/react@19.0.9)(react@19.0.0)
+      '@radix-ui/react-direction': 1.1.0(@types/react@19.0.9)(react@19.0.0)
+      '@radix-ui/react-id': 1.1.0(@types/react@19.0.9)(react@19.0.0)
+      '@radix-ui/react-menu': 2.1.6(@types/react-dom@19.0.3)(@types/react@19.0.9)(react-dom@19.0.0)(react@19.0.0)
+      '@radix-ui/react-primitive': 2.0.2(@types/react-dom@19.0.3)(@types/react@19.0.9)(react-dom@19.0.0)(react@19.0.0)
+      '@radix-ui/react-roving-focus': 1.1.2(@types/react-dom@19.0.3)(@types/react@19.0.9)(react-dom@19.0.0)(react@19.0.0)
+      '@radix-ui/react-use-controllable-state': 1.1.0(@types/react@19.0.9)(react@19.0.0)
+      '@types/react': 19.0.9
+      '@types/react-dom': 19.0.3(@types/react@19.0.9)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    dev: false
+
   /@radix-ui/react-navigation-menu@1.2.5(@types/react-dom@19.0.3)(@types/react@19.0.9)(react-dom@19.0.0)(react@19.0.0):
     resolution: {integrity: sha512-myMHHQUZ3ZLTi8W381/Vu43Ia0NqakkQZ2vzynMmTUtQQ9kNkjzhOwkZC9TAM5R07OZUVIQyHC06f/9JZJpvvA==, tarball: https://registry.npmjs.org/@radix-ui/react-navigation-menu/-/react-navigation-menu-1.2.5.tgz}
     peerDependencies:
@@ -2783,6 +2821,23 @@ packages:
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==, tarball: https://registry.npmjs.org/@swc/helpers/-/helpers-0.5.15.tgz}
     dependencies:
       tslib: 2.8.1
+    dev: false
+
+  /@tanstack/react-table@8.21.2(react-dom@19.0.0)(react@19.0.0):
+    resolution: {integrity: sha512-11tNlEDTdIhMJba2RBH+ecJ9l1zgS2kjmexDPAraulc8jeNA4xocSNeyzextT0XJyASil4XsCYlJmf5jEWAtYg==, tarball: https://registry.npmjs.org/@tanstack/react-table/-/react-table-8.21.2.tgz}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
+    dependencies:
+      '@tanstack/table-core': 8.21.2
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    dev: false
+
+  /@tanstack/table-core@8.21.2:
+    resolution: {integrity: sha512-uvXk/U4cBiFMxt+p9/G7yUWI/UbHYbyghLCjlpWZ3mLeIZiUBSKcUnw9UnKkdRz7Z/N4UBuFLWQdJCjUe7HjvA==, tarball: https://registry.npmjs.org/@tanstack/table-core/-/table-core-8.21.2.tgz}
+    engines: {node: '>=12'}
     dev: false
 
   /@types/d3-array@3.2.1:
@@ -6500,4 +6555,11 @@ packages:
       '@types/react': 19.0.9
       react: 19.0.0
       use-sync-external-store: 1.4.0(react@19.0.0)
+    dev: false
+
+  git/github.com+tanstack/react-table/db745afdb867511ddd04a79150f89d3894a03532:
+    resolution: {commit: db745afdb867511ddd04a79150f89d3894a03532, repo: git@github.com:tanstack/react-table.git, type: git}
+    name: table
+    version: 0.0.0
+    requiresBuild: true
     dev: false

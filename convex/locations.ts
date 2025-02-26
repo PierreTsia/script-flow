@@ -13,6 +13,7 @@ import {
   requireAuth,
   requireScriptOwnership,
   requireExists,
+  getAuthState,
 } from "./model/auth";
 import { generateSearchText } from "./model/search";
 import { SceneDocument } from "./scenes";
@@ -208,20 +209,19 @@ export const getLocationsByScriptId = query({
     cursor: v.optional(v.string()),
   },
   handler: async (ctx, { script_id, limit, cursor }) => {
-    await requireAuth(ctx);
+    const auth = await getAuthState(ctx);
 
-    const myScript = await requireScriptOwnership(
-      ctx,
-      await ctx.db.get(script_id),
-      "script"
-    );
-    const paginatedLocations = await ctx.db
-      .query("locations")
-      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
-      .paginate({
-        numItems: limit || 25,
-        cursor: cursor || null,
-      });
+    const script = await requireExists(await ctx.db.get(script_id), "script");
+
+    const paginatedLocations = auth?.userId
+      ? await ctx.db
+          .query("locations")
+          .withIndex("by_script", (q) => q.eq("script_id", script._id))
+          .paginate({
+            numItems: limit || 25,
+            cursor: cursor || null,
+          })
+      : { page: [], continueCursor: null };
 
     const locationsWithScenes = await Promise.all(
       paginatedLocations.page.map(async (location) => {
@@ -247,7 +247,7 @@ export const getLocationsByScriptId = query({
     return {
       locations: locationsWithScenes,
       nextCursor: paginatedLocations.continueCursor,
-      total: await getLocationsCount(ctx, myScript._id),
+      total: await getLocationsCount(ctx, script._id),
     };
   },
 });

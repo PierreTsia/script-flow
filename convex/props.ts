@@ -7,6 +7,7 @@ import {
   requireAuth,
   requireExists,
   requireScriptOwnership,
+  getAuthState,
 } from "./model/auth";
 import { SceneDocument } from "./scenes";
 // 1. Type Exports
@@ -205,23 +206,21 @@ export const getPropsByScriptId = query({
     cursor: v.optional(v.string()),
   },
   handler: async (ctx, { script_id, limit, cursor }) => {
-    await requireAuth(ctx);
+    const auth = await getAuthState(ctx);
 
-    const myScript = await requireScriptOwnership(
-      ctx,
-      await ctx.db.get(script_id),
-      "script"
-    );
+    const script = await requireExists(await ctx.db.get(script_id), "script");
 
     // Get all props for this script
-    const paginatedProps = await ctx.db
-      .query("props")
-      .withIndex("by_script", (q) => q.eq("script_id", myScript._id))
-      .order("desc")
-      .paginate({
-        numItems: limit ?? 10,
-        cursor: cursor ?? null,
-      });
+    const paginatedProps = auth?.userId
+      ? await ctx.db
+          .query("props")
+          .withIndex("by_script", (q) => q.eq("script_id", script._id))
+          .order("desc")
+          .paginate({
+            numItems: limit ?? 10,
+            cursor: cursor ?? null,
+          })
+      : { page: [], continueCursor: null };
 
     // Fetch scenes for each prop
     const propsWithScenes = await Promise.all(
@@ -234,7 +233,7 @@ export const getPropsByScriptId = query({
     return {
       props: propsWithScenes ?? [],
       nextCursor: paginatedProps.continueCursor,
-      total: await getPropsCount(ctx, myScript._id),
+      total: await getPropsCount(ctx, script._id),
     };
   },
 });
