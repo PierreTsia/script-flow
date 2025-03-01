@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "../ui/badge";
-import { ArrowUpDown, MoreVertical } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import { EntityTable } from "../common/entity-table";
@@ -14,6 +14,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SceneWithEntities } from "./scene-summary-card";
+import { useState } from "react";
+import ConfirmDeleteDialog from "./confirm-delete-dialog";
+import { useScene } from "@/hooks/useScene";
+import EditSceneDialog from "./edit-scene-dialog";
 
 interface ScenesTableProps {
   data: SceneWithEntities[];
@@ -43,6 +47,30 @@ export function ScenesTable({
 }: ScenesTableProps) {
   const t = useTranslations("ScriptEntitiesScreen");
   const router = useRouter();
+  const { deleteScene } = useScene();
+  const [selectedScene, setSelectedScene] = useState<SceneWithEntities | null>(
+    null
+  );
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const handleDelete = (scene: SceneWithEntities) => {
+    setSelectedScene(scene);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleEdit = (scene: SceneWithEntities) => {
+    setSelectedScene(scene);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (selectedScene) {
+      await deleteScene(selectedScene._id);
+      setIsDeleteDialogOpen(false);
+      setSelectedScene(null);
+    }
+  };
 
   const columns: ColumnDef<SceneWithEntities>[] = [
     {
@@ -115,19 +143,31 @@ export function ScenesTable({
                 <span className="sr-only">
                   {t("table.columns.actions.openMenu")}
                 </span>
-                <MoreVertical className="h-4 w-4" />
+                <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 className="cursor-pointer"
+                onClick={() => handleEdit(row.original)}
+              >
+                {t("table.columns.actions.edit")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
                 onClick={() => {
                   router.push(
-                    `/scripts/${row.original.script_id}/scenes/${row.original._id}`
+                    `/scripts/${row.original.script_id}/entities/scenes/${row.original._id}`
                   );
                 }}
               >
                 {t("table.columns.actions.viewDetails")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-destructive cursor-pointer"
+                onClick={() => handleDelete(row.original)}
+              >
+                {t("table.columns.actions.delete")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -137,16 +177,40 @@ export function ScenesTable({
   ];
 
   return (
-    <EntityTable
-      data={data}
-      columns={columns}
-      pagination={{
-        page,
-        cursors,
-        totalPages,
-        nextCursor,
-      }}
-      onPageChange={onPageChange}
-    />
+    <>
+      <EntityTable
+        data={data}
+        columns={columns}
+        pagination={{
+          page,
+          cursors,
+          totalPages,
+          nextCursor,
+        }}
+        onPageChange={onPageChange}
+      />
+
+      {selectedScene && (
+        <>
+          <EditSceneDialog
+            scene={selectedScene}
+            scriptId={selectedScene.script_id}
+            isOpen={isEditDialogOpen}
+            onClose={() => {
+              setIsEditDialogOpen(false);
+              setSelectedScene(null);
+            }}
+          />
+          <ConfirmDeleteDialog
+            entityType="scene"
+            entityName={`Scene ${selectedScene?.scene_number}`}
+            isOpen={isDeleteDialogOpen}
+            setIsOpen={setIsDeleteDialogOpen}
+            onDelete={handleConfirmDelete}
+            isLoading={false}
+          />
+        </>
+      )}
+    </>
   );
 }
