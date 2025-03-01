@@ -17,15 +17,19 @@ const ConfirmDeleteDialog = ({
   entityType,
   entityName,
   isLoading = false,
+  isOpen,
+  setIsOpen,
 }: {
   onDelete: () => Promise<void>;
   entityType: "character" | "location" | "prop" | "scene";
   entityName: string;
   isLoading: boolean;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 }) => {
   const t = useTranslations("ScriptEntitiesScreen");
   return (
-    <AlertDialog>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
         <Button
           variant="ghost"

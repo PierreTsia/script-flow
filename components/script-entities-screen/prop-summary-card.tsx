@@ -22,6 +22,7 @@ import { EditPropDialog } from "./edit-prop-dialog";
 import { useState } from "react";
 import PropBadge from "../ui/prop-badge";
 import Link from "next/link";
+
 export default function PropSummaryCard({
   prop,
 }: {
@@ -30,7 +31,7 @@ export default function PropSummaryCard({
   const t = useTranslations("ScriptEntitiesScreen");
   const { deleteProp, isLoading } = useSceneEntities();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   return (
     <Card>
       <CardHeader>
@@ -72,6 +73,8 @@ export default function PropSummaryCard({
           entityType="prop"
           entityName={prop.name}
           isLoading={isLoading}
+          isOpen={isDeleteDialogOpen}
+          setIsOpen={setIsDeleteDialogOpen}
           onDelete={async () => {
             await deleteProp({ propId: prop._id });
           }}

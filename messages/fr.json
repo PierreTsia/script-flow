@@ -137,7 +137,15 @@
         "name": "Nom",
         "type": "Type",
         "aliases": "Alias",
-        "scenes": "Scènes"
+        "scenes": "Scènes",
+        "scenesCount": "Nombre de scènes",
+        "description": "Description",
+        "actions": {
+          "openMenu": "Ouvrir le menu",
+          "edit": "Modifier",
+          "viewDetails": "Voir les détails",
+          "delete": "Supprimer"
+        }
       }
     },
     "createNew": "Créer un nouveau",
@@ -186,7 +194,6 @@
       "confirmDescription": "Le personnage {source} sera fusionné avec {target}. Après la fusion, {target} aura {source} comme alias. Cette action ne peut pas être annulée.",
       "mergeButton": "Fusionner les personnages"
     },
-    "scenesCount": "{count, plural, one {# scène} other {# scènes}}",
     "props": "Accessoires",
     "propsDetails": {
       "recurring": "Accessoires Récurrents",
@@ -339,6 +346,10 @@
         "label": "Type d'accessoire",
         "placeholder": "Sélectionner un type"
       }
+    },
+    "stats": {
+      "charactersTotal": "{count, plural, =1 {# personnage au total} other {# personnages au total}}",
+      "propsTotal": "{count, plural, =1 {# accessoire au total} other {# accessoires au total}}"
     }
   },
   "EditSceneDialog": {

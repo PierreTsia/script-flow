@@ -68,12 +68,16 @@ export const useScene = () => {
   const useGetPropsByScriptId = (
     scriptId: Id<"scripts">,
     limit = 25,
-    cursor?: string
+    cursor?: string,
+    sortBy?: "name" | "scenesCount",
+    sortOrder?: "asc" | "desc"
   ) => {
     return useStableQuery(api.props.getPropsByScriptId, {
       script_id: scriptId,
       limit,
       cursor,
+      sortBy,
+      sortOrder,
     });
   };
 

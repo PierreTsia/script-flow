@@ -60,6 +60,7 @@ const LocationSummaryCard = ({
   location: LocationsWithScenes["locations"][number];
 }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { deleteLocation, isLoading } = useSceneEntities();
 
   return (
@@ -97,6 +98,8 @@ const LocationSummaryCard = ({
             </Button>
           </Link>
           <ConfirmDeleteDialog
+            isOpen={isDeleteDialogOpen}
+            setIsOpen={setIsDeleteDialogOpen}
             entityType="location"
             entityName={location.name}
             isLoading={isLoading}

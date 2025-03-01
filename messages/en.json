@@ -136,7 +136,15 @@
         "name": "Name",
         "type": "Type",
         "aliases": "Aliases",
-        "scenes": "Scenes"
+        "scenes": "Scenes",
+        "scenesCount": "Scenes Count",
+        "description": "Description",
+        "actions": {
+          "openMenu": "Open menu",
+          "edit": "Edit",
+          "viewDetails": "View details",
+          "delete": "Delete"
+        }
       }
     },
     "createNew": "Create new",
@@ -334,6 +342,10 @@
           "TRANSFORMING": "Transforming Prop"
         }
       }
+    },
+    "stats": {
+      "charactersTotal": "{count, plural, =1 {# character total} other {# characters total}}",
+      "propsTotal": "{count, plural, =1 {# prop total} other {# props total}}"
     }
   },
   "EditSceneDialog": {
