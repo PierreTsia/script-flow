@@ -85,6 +85,7 @@ const SceneSummaryCard = ({
 }) => {
   const t = useTranslations("ScriptEntitiesScreen");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { deleteScene, isLoading } = useScene();
   return (
     <Card key={`scene-${scene._id}`} className="flex flex-col">
@@ -239,6 +240,8 @@ const SceneSummaryCard = ({
           entityType="scene"
           entityName={scene.scene_number}
           isLoading={isLoading}
+          isOpen={isDeleteDialogOpen}
+          setIsOpen={setIsDeleteDialogOpen}
           onDelete={async () => {
             await deleteScene(scene._id);
           }}

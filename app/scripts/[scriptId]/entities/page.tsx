@@ -7,5 +7,7 @@ interface PageProps {
 
 export default async function EntitiesPage({ params }: PageProps) {
   const { scriptId } = await params;
-  redirect(`/scripts/${scriptId}/entities/scenes?sortBy=name&sortOrder=desc`);
+  redirect(
+    `/scripts/${scriptId}/entities/scenes?sortBy=scene_number&sortOrder=asc`
+  );
 }

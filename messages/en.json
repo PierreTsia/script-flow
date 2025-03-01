@@ -130,13 +130,35 @@
     "addProp": "Add Prop"
   },
   "ScriptEntitiesScreen": {
+    "scenesTitle": "Scenes",
+    "stats": {
+      "charactersTotal": "{count, plural, =1 {# character total} other {# characters total}}",
+      "propsTotal": "{count, plural, =1 {# prop total} other {# props total}}",
+      "locationsTotal": "{count, plural, =1 {# location total} other {# locations total}}",
+      "scenesTotal": "{count, plural, =1 {# scene total} other {# scenes total}}"
+    },
     "table": {
       "columns": {
         "toggle": "Show/Hide Columns",
         "name": "Name",
         "type": "Type",
+        "timeOfDay": "Time of Day",
         "aliases": "Aliases",
-        "scenes": "Scenes"
+        "scenes": "Scenes",
+        "scenesCount": "Scenes Count",
+        "description": "Description",
+        "summary": "Summary",
+        "sceneNumber": "Scene Number",
+        "number": "Number",
+        "location": "Location",
+        "characters": "Characters",
+        "scene_number": "Scene Number",
+        "actions": {
+          "openMenu": "Open menu",
+          "edit": "Edit",
+          "viewDetails": "View details",
+          "delete": "Delete"
+        }
       }
     },
     "createNew": "Create new",
@@ -401,7 +423,11 @@
       "title": "Details",
       "duration": "Duration",
       "timeOfDay": "Time of Day",
-      "notSpecified": "Not specified"
+      "notSpecified": "Not specified",
+      "sceneText": "Scene Text",
+      "noSceneText": "No scene text available",
+      "showMore": "Show more",
+      "showLess": "Show less"
     },
     "timeOfDay": {
       "day": "Day",

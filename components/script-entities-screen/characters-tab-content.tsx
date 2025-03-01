@@ -110,32 +110,15 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
     return <EntityScreenSkeleton />;
   }
 
-  const paginationFooter = (
-    <div className="flex items-center justify-between py-4">
-      <div className="flex items-center gap-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {result.total} total characters
-        </div>
-      </div>
-      <CursorPagination
-        state={{
-          page,
-          cursors,
-          totalPages: Math.ceil(result.total / pageSize),
-          nextCursor: result.nextCursor ?? undefined,
-        }}
-        onPageChange={(newPage, newCursors) => {
-          setPage(newPage);
-          setCursors(newCursors);
-        }}
-      />
-    </div>
-  );
-
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">{t("charactersTitle")}</h2>
+      <div className="flex justify-between items-start">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold">{t("charactersTitle")}</h2>
+          <p className="text-sm text-muted-foreground">
+            {t("stats.charactersTotal", { count: result.total })}
+          </p>
+        </div>
         <div className="flex items-center gap-2">
           <ViewToggle view={view} onViewChange={setView} />
           <Button onClick={() => setIsCreateModalOpen(true)} size="sm">
@@ -154,7 +137,6 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
       {view === "table" ? (
         <CharactersTable
           data={result.characters}
-          total={result.total}
           totalPages={Math.ceil(result.total / pageSize)}
           page={page}
           cursors={cursors}
@@ -180,7 +162,18 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
               <CharacterSummaryCard key={character._id} character={character} />
             ))}
           </div>
-          {paginationFooter}
+          <CursorPagination
+            state={{
+              page,
+              cursors,
+              totalPages: Math.ceil(result.total / pageSize),
+              nextCursor: result.nextCursor ?? undefined,
+            }}
+            onPageChange={(newPage, newCursors) => {
+              setPage(newPage);
+              setCursors(newCursors);
+            }}
+          />
         </div>
       )}
     </div>

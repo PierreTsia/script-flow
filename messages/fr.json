@@ -131,13 +131,29 @@
     }
   },
   "ScriptEntitiesScreen": {
+    "scenesTitle": "Scènes",
     "table": {
       "columns": {
         "toggle": "Afficher/Masquer les colonnes",
         "name": "Nom",
         "type": "Type",
+        "timeOfDay": "Moment de la journée",
         "aliases": "Alias",
-        "scenes": "Scènes"
+        "scenes": "Scènes",
+        "scenesCount": "Nombre de scènes",
+        "description": "Description",
+        "summary": "Résumé",
+        "sceneNumber": "Numéro de scène",
+        "number": "Numéro",
+        "location": "Lieu",
+        "characters": "Personnages",
+        "scene_number": "Numéro de scène",
+        "actions": {
+          "openMenu": "Ouvrir le menu",
+          "edit": "Modifier",
+          "viewDetails": "Voir les détails",
+          "delete": "Supprimer"
+        }
       }
     },
     "createNew": "Créer un nouveau",
@@ -152,6 +168,8 @@
     "locations": "Lieux",
     "edit": "Modifier",
     "delete": "Supprimer",
+    "scenesCount": "{count, plural, one {# scene} other {# scenes}}",
+
     "sceneInfo": {
       "page": "Page",
       "scene": "Scène"
@@ -186,7 +204,6 @@
       "confirmDescription": "Le personnage {source} sera fusionné avec {target}. Après la fusion, {target} aura {source} comme alias. Cette action ne peut pas être annulée.",
       "mergeButton": "Fusionner les personnages"
     },
-    "scenesCount": "{count, plural, one {# scène} other {# scènes}}",
     "props": "Accessoires",
     "propsDetails": {
       "recurring": "Accessoires Récurrents",
@@ -339,6 +356,16 @@
         "label": "Type d'accessoire",
         "placeholder": "Sélectionner un type"
       }
+    },
+    "stats": {
+      "charactersTotal": "{count, plural, =1 {# personnage au total} other {# personnages au total}}",
+      "propsTotal": "{count, plural, =1 {# accessoire au total} other {# accessoires au total}}",
+      "locationsTotal": "{count, plural, =1 {# lieu au total} other {# lieux au total}}",
+      "scenesTotal": "{count, plural, =1 {# scène au total} other {# scènes au total}}"
+    },
+    "locationTypes": {
+      "int": "Intérieur",
+      "ext": "Extérieur"
     }
   },
   "EditSceneDialog": {
@@ -406,7 +433,11 @@
       "title": "Détails",
       "duration": "Durée",
       "timeOfDay": "Moment de la journée",
-      "notSpecified": "Non spécifié"
+      "notSpecified": "Non spécifié",
+      "sceneText": "Texte de la scène",
+      "noSceneText": "Aucun texte de scène disponible",
+      "showMore": "Voir plus",
+      "showLess": "Voir moins"
     },
     "timeOfDay": {
       "day": "Jour",

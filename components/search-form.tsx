@@ -47,6 +47,8 @@ export function SearchForm({
     return () => document.removeEventListener("keydown", down);
   }, []);
 
+  const characterResults = results?.filter((r) => r.entityType === "character");
+
   return (
     <div className="relative ml-auto">
       <Button
@@ -79,25 +81,24 @@ export function SearchForm({
               {results.length > 0 ? (
                 <>
                   <CommandGroup heading="Characters">
-                    {results
-                      .filter((r) => r.entityType === "character")
-                      .map((result) => (
-                        <CommandItem
-                          key={`${result._id}-${result.entityType}`}
-                          className="flex items-center gap-2 py-3"
-                          onSelect={() => {
-                            setOpen(false);
-                            router.push(
-                              `/scripts/${scriptId}/entities/characters/${result._id}`
-                            );
-                          }}
-                        >
-                          {result.preview}{" "}
-                          {!!result.aliases?.length && (
-                            <>- aka {result.aliases.join(" ")}</>
-                          )}
-                        </CommandItem>
-                      ))}
+                    {characterResults?.map((result) => (
+                      <CommandItem
+                        key={result._id}
+                        value={result.searchText}
+                        className="flex items-center gap-2 py-3"
+                        onSelect={() => {
+                          setOpen(false);
+                          router.push(
+                            `/scripts/${scriptId}/entities/characters/${result._id}`
+                          );
+                        }}
+                      >
+                        {result.preview}{" "}
+                        {!!result.aliases?.length && (
+                          <>- aka {result.aliases.join(" ")}</>
+                        )}
+                      </CommandItem>
+                    ))}
                   </CommandGroup>
 
                   <CommandGroup heading="Locations">
@@ -106,6 +107,7 @@ export function SearchForm({
                       .map((result) => (
                         <CommandItem
                           key={result._id}
+                          value={result.searchText}
                           className="flex items-center gap-2 py-3"
                           onSelect={() => {
                             setOpen(false);
@@ -124,6 +126,7 @@ export function SearchForm({
                       .map((result) => (
                         <CommandItem
                           key={result._id}
+                          value={result.searchText}
                           className="flex items-center gap-2 py-3"
                           onSelect={() => {
                             setOpen(false);
@@ -142,6 +145,7 @@ export function SearchForm({
                       .map((result) => (
                         <CommandItem
                           key={result._id}
+                          value={result.searchText}
                           className="flex items-center gap-2 py-3"
                           onSelect={() => {
                             setOpen(false);

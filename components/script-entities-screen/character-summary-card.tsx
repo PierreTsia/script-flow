@@ -34,7 +34,7 @@ const CharacterSummaryCard = ({
   const t = useTranslations("ScriptEntitiesScreen");
   const { deleteCharacter, mergeCharacters, isLoading } = useSceneEntities();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const handleMerge = async (targetId: Id<"characters">) => {
     await mergeCharacters({
       sourceCharacterId: character._id,
@@ -121,6 +121,8 @@ const CharacterSummaryCard = ({
           entityType="character"
           entityName={character.name}
           isLoading={isLoading}
+          isOpen={isDeleteDialogOpen}
+          setIsOpen={setIsDeleteDialogOpen}
           onDelete={async () => {
             await deleteCharacter({ characterId: character._id });
           }}

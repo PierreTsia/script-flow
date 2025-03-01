@@ -1,16 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { CharactersWithScenes } from "@/convex/characters";
 import { Badge } from "../ui/badge";
-import {
-  Star,
-  Users,
-  User,
-  UserCog,
-  ArrowUpDown,
-  MoreVertical,
-} from "lucide-react";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import { EntityTable } from "../common/entity-table";
@@ -21,26 +13,28 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SceneWithEntities } from "./scene-summary-card";
 import { useState } from "react";
-import { EditCharacterDialog } from "./edit-character-dialog";
 import ConfirmDeleteDialog from "./confirm-delete-dialog";
-import useSceneEntities from "@/hooks/useSceneEntities";
+import { useScene } from "@/hooks/useScene";
+import EditSceneDialog from "./edit-scene-dialog";
 
-type Character = CharactersWithScenes["characters"][number];
-
-interface CharactersTableProps {
-  data: Character[];
+interface ScenesTableProps {
+  data: SceneWithEntities[];
   page: number;
   cursors: string[];
   nextCursor?: string | null;
   totalPages: number;
-  sortBy: "name" | "type";
+  sortBy: "scene_number" | "characters_count";
   sortOrder: "asc" | "desc";
   onPageChange: (page: number, cursors: string[]) => void;
-  onSortChange: (sortBy: "name" | "type", sortOrder: "asc" | "desc") => void;
+  onSortChange: (
+    sortBy: "scene_number" | "characters_count",
+    sortOrder: "asc" | "desc"
+  ) => void;
 }
 
-export function CharactersTable({
+export function ScenesTable({
   data,
   page,
   cursors,
@@ -50,95 +44,93 @@ export function CharactersTable({
   sortOrder,
   onPageChange,
   onSortChange,
-}: CharactersTableProps) {
+}: ScenesTableProps) {
   const t = useTranslations("ScriptEntitiesScreen");
   const router = useRouter();
-  const { deleteCharacter, isLoading } = useSceneEntities();
-  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
+  const { deleteScene } = useScene();
+  const [selectedScene, setSelectedScene] = useState<SceneWithEntities | null>(
     null
   );
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  const handleEdit = (character: Character) => {
-    setSelectedCharacter(character);
-    setIsEditDialogOpen(true);
-  };
-
-  const handleDelete = (character: Character) => {
-    setSelectedCharacter(character);
+  const handleDelete = (scene: SceneWithEntities) => {
+    setSelectedScene(scene);
     setIsDeleteDialogOpen(true);
   };
 
-  const columns: ColumnDef<Character>[] = [
+  const handleEdit = (scene: SceneWithEntities) => {
+    setSelectedScene(scene);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (selectedScene) {
+      await deleteScene(selectedScene._id);
+      setIsDeleteDialogOpen(false);
+      setSelectedScene(null);
+    }
+  };
+
+  const columns: ColumnDef<SceneWithEntities>[] = [
     {
-      accessorKey: "name",
+      accessorKey: "scene_number",
       header: () => (
         <Button
           variant="ghost"
           onClick={() => {
             const newOrder =
-              sortBy === "name" && sortOrder === "asc" ? "desc" : "asc";
-            onSortChange("name", newOrder);
+              sortBy === "scene_number" && sortOrder === "asc" ? "desc" : "asc";
+            onSortChange("scene_number", newOrder);
           }}
           className="h-8 text-left font-medium flex items-center gap-1"
         >
-          {t("table.columns.name")}
+          {t("table.columns.sceneNumber")}
           <ArrowUpDown className="h-4 w-4 ml-2" />
         </Button>
       ),
       cell: ({ row }) => {
-        const character = row.original;
-        return (
-          <div className="flex items-center gap-2">
-            {character.type === "PRINCIPAL" && <Star className="h-4 w-4" />}
-            {character.type === "SUPPORTING" && <Users className="h-4 w-4" />}
-            {character.type === "FEATURED_EXTRA" && (
-              <UserCog className="h-4 w-4" />
-            )}
-            {character.type === "SILENT_KEY" && <User className="h-4 w-4" />}
-            {character.type === "ATMOSPHERE" && <Users className="h-4 w-4" />}
-            <span>{character.name}</span>
-          </div>
-        );
+        return <Badge variant="outline">{row.original.scene_number}</Badge>;
       },
     },
     {
-      accessorKey: "type",
+      accessorKey: "summary",
+      header: t("table.columns.summary"),
+      cell: ({ row }) => (
+        <div className="max-w-[400px] whitespace-normal break-words">
+          {row.original.summary || "-"}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "location",
+      header: t("table.columns.location"),
+      cell: ({ row }) => {
+        const location = row.original.locations[0];
+        return location ? location.name : "-";
+      },
+    },
+    {
+      accessorKey: "characters",
       header: () => (
         <Button
           variant="ghost"
           onClick={() => {
             const newOrder =
-              sortBy === "type" && sortOrder === "asc" ? "desc" : "asc";
-            onSortChange("type", newOrder);
+              sortBy === "characters_count" && sortOrder === "asc"
+                ? "desc"
+                : "asc";
+            onSortChange("characters_count", newOrder);
           }}
           className="h-8 text-left font-medium flex items-center gap-1"
         >
-          {t("table.columns.type")}
+          {t("table.columns.characters")}
           <ArrowUpDown className="h-4 w-4 ml-2" />
         </Button>
       ),
       cell: ({ row }) => {
-        const type = row.getValue("type") as string;
-        const translatedType = t(`characterTypes.${type.toLowerCase()}`);
-        return <Badge variant="secondary">{translatedType}</Badge>;
-      },
-    },
-    {
-      accessorKey: "aliases",
-      header: "Aliases",
-      cell: ({ row }) => {
-        const aliases = row.getValue("aliases") as string[];
-        return aliases?.length ? aliases.join(", ") : "-";
-      },
-    },
-    {
-      accessorKey: "scenes",
-      header: "Scenes",
-      cell: ({ row }) => {
-        const scenes = row.original.scenes;
-        return <Badge variant="outline">{scenes.length}</Badge>;
+        const characters = row.original.characters;
+        return <Badge variant="outline">{characters.length}</Badge>;
       },
     },
     {
@@ -151,7 +143,7 @@ export function CharactersTable({
                 <span className="sr-only">
                   {t("table.columns.actions.openMenu")}
                 </span>
-                <MoreVertical className="h-4 w-4" />
+                <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -165,7 +157,7 @@ export function CharactersTable({
                 className="cursor-pointer"
                 onClick={() => {
                   router.push(
-                    `/scripts/${row.original.script_id}/entities/characters/${row.original._id}`
+                    `/scripts/${row.original.script_id}/entities/scenes/${row.original._id}`
                   );
                 }}
               >
@@ -198,27 +190,24 @@ export function CharactersTable({
         onPageChange={onPageChange}
       />
 
-      {selectedCharacter && (
+      {selectedScene && (
         <>
-          <EditCharacterDialog
-            character={selectedCharacter}
+          <EditSceneDialog
+            scene={selectedScene}
+            scriptId={selectedScene.script_id}
             isOpen={isEditDialogOpen}
             onClose={() => {
               setIsEditDialogOpen(false);
-              setSelectedCharacter(null);
+              setSelectedScene(null);
             }}
           />
           <ConfirmDeleteDialog
-            entityType="character"
-            entityName={selectedCharacter.name}
+            entityType="scene"
+            entityName={`Scene ${selectedScene?.scene_number}`}
             isOpen={isDeleteDialogOpen}
-            isLoading={isLoading}
             setIsOpen={setIsDeleteDialogOpen}
-            onDelete={async () => {
-              await deleteCharacter({ characterId: selectedCharacter._id });
-              setIsDeleteDialogOpen(false);
-              setSelectedCharacter(null);
-            }}
+            onDelete={handleConfirmDelete}
+            isLoading={false}
           />
         </>
       )}

@@ -203,24 +203,29 @@ export const getPropsByScriptId = query({
   args: {
     script_id: v.id("scripts"),
     limit: v.optional(v.number()),
-    cursor: v.optional(v.string()),
+    cursor: v.optional(v.union(v.string(), v.null())),
+    sortBy: v.optional(v.union(v.literal("name"), v.literal("scenesCount"))),
+    sortOrder: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
   },
-  handler: async (ctx, { script_id, limit, cursor }) => {
+  handler: async (
+    ctx,
+    { script_id, limit, cursor, sortBy = "scenesCount", sortOrder = "desc" }
+  ) => {
     const auth = await getAuthState(ctx);
-
     const script = await requireExists(await ctx.db.get(script_id), "script");
 
-    // Get all props for this script
-    const paginatedProps = auth?.userId
-      ? await ctx.db
-          .query("props")
-          .withIndex("by_script", (q) => q.eq("script_id", script._id))
-          .order("desc")
-          .paginate({
-            numItems: limit ?? 10,
-            cursor: cursor ?? null,
-          })
-      : { page: [], continueCursor: null };
+    if (!auth?.userId) {
+      return { props: [], nextCursor: null, total: 0 };
+    }
+
+    const pageSize = limit || 25;
+
+    // Keep the exact same query structure for cursor pagination to work
+    const paginatedProps = await ctx.db
+      .query("props")
+      .withIndex("by_script", (q) => q.eq("script_id", script._id))
+      .order("desc") // Keep this constant
+      .paginate({ numItems: pageSize, cursor: cursor || null });
 
     // Fetch scenes for each prop
     const propsWithScenes = await Promise.all(
@@ -230,8 +235,23 @@ export const getPropsByScriptId = query({
       }))
     );
 
+    // Apply sorting in memory after fetching all data
+    const sortedProps = [...propsWithScenes].sort((a, b) => {
+      if (sortBy === "scenesCount") {
+        const aCount = a.scenes?.length || 0;
+        const bCount = b.scenes?.length || 0;
+
+        return sortOrder === "asc" ? aCount - bCount : bCount - aCount;
+      } else {
+        // name sorting
+        return sortOrder === "asc"
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      }
+    });
+
     return {
-      props: propsWithScenes ?? [],
+      props: sortedProps,
       nextCursor: paginatedProps.continueCursor,
       total: await getPropsCount(ctx, script._id),
     };

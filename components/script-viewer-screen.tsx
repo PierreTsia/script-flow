@@ -4,7 +4,7 @@ import { usePdfViewer } from "@/hooks/usePdfViewer";
 import { useState, useCallback, useEffect } from "react";
 import { FloatingTextSelectButton } from "./floating-text-select-button";
 import SelectedTextDialog from "./selected-text-dialog";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import SceneAnalysisConfirmDialog from "./scene-analysis-confirm-dialog";
 
 const ScriptViewerScreen = ({
@@ -17,6 +17,7 @@ const ScriptViewerScreen = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectionRect, setSelectionRect] = useState<DOMRect | null>(null);
   const { isLoading, analyseAndSaveDraft } = useScene();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const pageParam = searchParams.get("page");
   const router = useRouter();
@@ -107,10 +108,11 @@ const ScriptViewerScreen = ({
       const pageNumberParam = parseInt(pageParam, 10);
       if (!isNaN(pageNumberParam)) {
         pdfSlick.gotoPage(pageNumberParam);
-        router.push(window.location.pathname);
+        const params = new URLSearchParams(searchParams);
+        router.replace(`${pathname}?${params.toString()}`);
       }
     }
-  }, [pdfSlick, pageParam, router, pageNumber]);
+  }, [pdfSlick, pageParam, router, pathname, searchParams, pageNumber]);
 
   return (
     <div className="flex flex-col w-full bg-background flex-1">
