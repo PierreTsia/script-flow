@@ -131,16 +131,22 @@
     }
   },
   "ScriptEntitiesScreen": {
+    "scenesTitle": "Scènes",
     "table": {
       "columns": {
         "toggle": "Afficher/Masquer les colonnes",
         "name": "Nom",
         "type": "Type",
-        "time_of_day": "Moment de la journée",
+        "timeOfDay": "Moment de la journée",
         "aliases": "Alias",
         "scenes": "Scènes",
         "scenesCount": "Nombre de scènes",
         "description": "Description",
+        "summary": "Résumé",
+        "sceneNumber": "Numéro de scène",
+        "number": "Numéro",
+        "location": "Lieu",
+        "characters": "Personnages",
         "actions": {
           "openMenu": "Ouvrir le menu",
           "edit": "Modifier",
@@ -353,7 +359,8 @@
     "stats": {
       "charactersTotal": "{count, plural, =1 {# personnage au total} other {# personnages au total}}",
       "propsTotal": "{count, plural, =1 {# accessoire au total} other {# accessoires au total}}",
-      "locationsTotal": "{count, plural, =1 {# lieu au total} other {# lieux au total}}"
+      "locationsTotal": "{count, plural, =1 {# lieu au total} other {# lieux au total}}",
+      "scenesTotal": "{count, plural, =1 {# scène au total} other {# scènes au total}}"
     },
     "locationTypes": {
       "int": "Intérieur",

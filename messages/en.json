@@ -130,6 +130,13 @@
     "addProp": "Add Prop"
   },
   "ScriptEntitiesScreen": {
+    "scenesTitle": "Scenes",
+    "stats": {
+      "charactersTotal": "{count, plural, =1 {# character total} other {# characters total}}",
+      "propsTotal": "{count, plural, =1 {# prop total} other {# props total}}",
+      "locationsTotal": "{count, plural, =1 {# location total} other {# locations total}}",
+      "scenesTotal": "{count, plural, =1 {# scene total} other {# scenes total}}"
+    },
     "table": {
       "columns": {
         "toggle": "Show/Hide Columns",
@@ -140,6 +147,11 @@
         "scenes": "Scenes",
         "scenesCount": "Scenes Count",
         "description": "Description",
+        "summary": "Summary",
+        "sceneNumber": "Scene Number",
+        "number": "Number",
+        "location": "Location",
+        "characters": "Characters",
         "actions": {
           "openMenu": "Open menu",
           "edit": "Edit",
@@ -343,15 +355,6 @@
           "TRANSFORMING": "Transforming Prop"
         }
       }
-    },
-    "stats": {
-      "charactersTotal": "{count, plural, =1 {# character total} other {# characters total}}",
-      "propsTotal": "{count, plural, =1 {# prop total} other {# props total}}",
-      "locationsTotal": "{count, plural, =1 {# location total} other {# locations total}}"
-    },
-    "locationTypes": {
-      "int": "Interior",
-      "ext": "Exterior"
     }
   },
   "EditSceneDialog": {
