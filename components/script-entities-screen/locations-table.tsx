@@ -30,11 +30,11 @@ interface LocationsTableProps {
   cursors: string[];
   nextCursor?: string | null;
   totalPages: number;
-  sortBy: "name" | "scenesCount";
+  sortBy: "name" | "type" | "scenesCount";
   sortOrder: "asc" | "desc";
   onPageChange: (page: number, cursors: string[]) => void;
   onSortChange: (
-    sortBy: "name" | "scenesCount",
+    sortBy: "name" | "type" | "scenesCount",
     sortOrder: "asc" | "desc"
   ) => void;
 }
@@ -98,7 +98,20 @@ export function LocationsTable({
     },
     {
       accessorKey: "type",
-      header: t("table.columns.type"),
+      header: () => (
+        <Button
+          variant="ghost"
+          onClick={() => {
+            const newOrder =
+              sortBy === "type" && sortOrder === "asc" ? "desc" : "asc";
+            onSortChange("type", newOrder);
+          }}
+          className="h-8 text-left font-medium flex items-center gap-1"
+        >
+          {t("table.columns.type")}
+          <ArrowUpDown className="h-4 w-4 ml-2" />
+        </Button>
+      ),
       cell: ({ row }) => {
         const type = row.getValue("type") as string;
         const translatedType = t(`locationTypes.${type.toLowerCase()}`);

@@ -207,20 +207,28 @@ export const getLocationsByScriptId = query({
     script_id: v.id("scripts"),
     limit: v.optional(v.number()),
     cursor: v.optional(v.string()),
+    sortBy: v.optional(
+      v.union(v.literal("name"), v.literal("type"), v.literal("scenesCount"))
+    ),
+    sortOrder: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
   },
-  handler: async (ctx, { script_id, limit, cursor }) => {
+  handler: async (
+    ctx,
+    { script_id, limit, cursor, sortBy = "name", sortOrder = "asc" }
+  ) => {
     const auth = await getAuthState(ctx);
 
     const script = await requireExists(await ctx.db.get(script_id), "script");
 
+    const query = ctx.db
+      .query("locations")
+      .withIndex("by_script", (q) => q.eq("script_id", script._id));
+
     const paginatedLocations = auth?.userId
-      ? await ctx.db
-          .query("locations")
-          .withIndex("by_script", (q) => q.eq("script_id", script._id))
-          .paginate({
-            numItems: limit || 25,
-            cursor: cursor || null,
-          })
+      ? await query.paginate({
+          numItems: limit || 25,
+          cursor: cursor || null,
+        })
       : { page: [], continueCursor: null };
 
     const locationsWithScenes = await Promise.all(
@@ -244,8 +252,23 @@ export const getLocationsByScriptId = query({
       })
     );
 
+    // Apply in-memory sorting for all fields since we can't rely on database ordering
+    const sortedLocations = [...locationsWithScenes].sort((a, b) => {
+      if (sortBy === "name") {
+        const comparison = a.name.localeCompare(b.name);
+        return sortOrder === "asc" ? comparison : -comparison;
+      } else if (sortBy === "type") {
+        const comparison = a.type.localeCompare(b.type);
+        return sortOrder === "asc" ? comparison : -comparison;
+      } else if (sortBy === "scenesCount") {
+        const diff = a.scenes.length - b.scenes.length;
+        return sortOrder === "asc" ? diff : -diff;
+      }
+      return 0;
+    });
+
     return {
-      locations: locationsWithScenes,
+      locations: sortedLocations,
       nextCursor: paginatedLocations.continueCursor,
       total: await getLocationsCount(ctx, script._id),
     };

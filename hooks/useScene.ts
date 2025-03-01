@@ -38,12 +38,16 @@ export const useScene = () => {
   const useGetLocationsByScriptId = (
     scriptId: Id<"scripts">,
     limit = 25,
-    cursor?: string
+    cursor?: string,
+    sortBy?: "name" | "type" | "scenesCount",
+    sortOrder?: "asc" | "desc"
   ) => {
     return useStableQuery(api.locations.getLocationsByScriptId, {
       script_id: scriptId,
       limit,
       cursor,
+      sortBy,
+      sortOrder,
     });
   };
 

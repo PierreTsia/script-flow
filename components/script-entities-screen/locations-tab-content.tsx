@@ -37,7 +37,9 @@ const LocationsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const result = useGetLocationsByScriptId(
     scriptId,
     ITEMS_PER_PAGE,
-    page === 1 ? undefined : cursors[page - 2]
+    page === 1 ? undefined : cursors[page - 2],
+    sortBy,
+    sortOrder
   );
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
