@@ -244,23 +244,23 @@ export const getCharactersByScriptId = query({
 
     const pageSize = limit || 25;
 
+    // Build query with all conditions upfront
     const paginatedCharacters = await ctx.db
       .query("characters")
-      .withIndex("by_script", (q) => q.eq("script_id", script._id))
-      .order("asc")
+      .withIndex("by_script_name_type", (q) => q.eq("script_id", script._id))
+      // Use database-level sort for both name and type
+      .order(sortOrder)
       .paginate({ numItems: pageSize, cursor: cursor || null });
 
-    const sortedCharacters = paginatedCharacters.page.sort((a, b) => {
-      if (sortBy === "type" && a.type !== b.type) {
-        return sortOrder === "asc"
-          ? typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type)
-          : typeOrder.indexOf(b.type) - typeOrder.indexOf(a.type);
-      } else {
-        return sortOrder === "asc"
-          ? a.name.localeCompare(b.name)
-          : b.name.localeCompare(a.name);
-      }
-    });
+    // For type sorting, we need to sort in memory due to custom type order
+    let sortedCharacters = paginatedCharacters.page;
+    if (sortBy === "type") {
+      sortedCharacters = [...paginatedCharacters.page].sort((a, b) => {
+        const comparison =
+          typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type);
+        return sortOrder === "asc" ? comparison : -comparison;
+      });
+    }
 
     const characterScenes = await Promise.all(
       sortedCharacters.map(async (character) => ({

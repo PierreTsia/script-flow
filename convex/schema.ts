@@ -120,14 +120,14 @@ export default defineSchema({
     script_id: v.id("scripts"),
     name: v.string(),
     quantity: v.number(),
-    /** Base type for general classification and search. Can be overridden per scene */
+    /** Base type for general classification and search */
     type: propTypeValidator,
     /** Searchable text combining name and type for filtered queries */
     searchText: v.string(),
   })
     .index("by_script", ["script_id"])
     .index("by_type", ["type"]) // For type-based queries
-    .index("unique_prop_per_script", ["script_id", "name"])
+    .index("unique_prop_per_script", ["script_id", "name"]) // Used for uniqueness check and name sorting
     .searchIndex("search_props", {
       searchField: "searchText",
       filterFields: ["script_id", "type"],
