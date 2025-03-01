@@ -26,8 +26,8 @@ const LocationsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const [page, setPage] = useState(1);
   const [cursors, setCursors] = useState<string[]>([]);
   const [view, setView] = useState<"table" | "grid">("table");
-  const [sortBy, setSortBy] = useState<"name" | "scenesCount">(
-    (searchParams.get("sortBy") as "name" | "scenesCount") || "name"
+  const [sortBy, setSortBy] = useState<"name" | "scenesCount" | "type">(
+    (searchParams.get("sortBy") as "name" | "scenesCount" | "type") || "name"
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">(
     (searchParams.get("sortOrder") as "asc" | "desc") || "asc"
@@ -45,7 +45,7 @@ const LocationsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const updateUrlWithSort = (
-    newSortBy: "name" | "scenesCount",
+    newSortBy: "name" | "scenesCount" | "type",
     newSortOrder: "asc" | "desc"
   ) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -93,7 +93,10 @@ const LocationsTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
           nextCursor={nextCursor}
           sortBy={sortBy}
           sortOrder={sortOrder}
-          onSortChange={(newSortBy, newSortOrder) => {
+          onSortChange={(
+            newSortBy: "name" | "scenesCount" | "type",
+            newSortOrder: "asc" | "desc"
+          ) => {
             setSortBy(newSortBy);
             setSortOrder(newSortOrder);
             setPage(1);

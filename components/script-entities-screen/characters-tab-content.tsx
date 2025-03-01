@@ -137,7 +137,6 @@ const CharactersTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
       {view === "table" ? (
         <CharactersTable
           data={result.characters}
-          total={result.total}
           totalPages={Math.ceil(result.total / pageSize)}
           page={page}
           cursors={cursors}

@@ -30,7 +30,6 @@ type Character = CharactersWithScenes["characters"][number];
 
 interface CharactersTableProps {
   data: Character[];
-  total: number;
   page: number;
   cursors: string[];
   nextCursor?: string | null;
@@ -43,7 +42,6 @@ interface CharactersTableProps {
 
 export function CharactersTable({
   data,
-  total,
   page,
   cursors,
   nextCursor,
