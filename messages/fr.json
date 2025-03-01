@@ -138,6 +138,7 @@
         "name": "Nom",
         "type": "Type",
         "timeOfDay": "Moment de la journée",
+        "time_of_day": "Moment de la journée",
         "aliases": "Alias",
         "scenes": "Scènes",
         "scenesCount": "Nombre de scènes",

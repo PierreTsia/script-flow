@@ -120,7 +120,7 @@ export function LocationsTable({
     },
     {
       accessorKey: "time_of_day",
-      header: t("table.columns.time_of_day"),
+      header: t("table.columns.timeOfDay"),
       cell: ({ row }) => {
         const timeOfDay = row.getValue("time_of_day") as TimeOfDay;
         return (

@@ -123,7 +123,7 @@ const CharactersForm = ({
     }
   };
   return (
-    <div className="space-y-6 px-6">
+    <div className="space-y-6 px-0 md:px-6">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} id="character-form">
           <div className="space-y-4">
@@ -141,7 +141,7 @@ const CharactersForm = ({
                   <Trash2Icon className="w-4 h-4" />
                 </Button>
 
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <FormField
                     control={form.control}
                     name={`characters.${index}.name`}
@@ -159,7 +159,7 @@ const CharactersForm = ({
                     control={form.control}
                     name={`characters.${index}.type`}
                     render={({ field }) => (
-                      <FormItem className="w-[200px]">
+                      <FormItem className="w-full sm:w-[200px]">
                         <FormLabel>{t("character.type")}</FormLabel>
                         <FormControl>
                           <Select
@@ -219,7 +219,7 @@ const CharactersForm = ({
         {t("addCharacter")}
       </Button>
 
-      <AlertDialogFooter>
+      <AlertDialogFooter className="flex justify-end gap-2">
         <Button type="submit" form="character-form" disabled={isLoading}>
           {t("confirmSave.characters")}
         </Button>

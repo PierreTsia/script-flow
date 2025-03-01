@@ -114,7 +114,7 @@ const PropsForm = ({
     }
   };
   return (
-    <div className="space-y-6 px-6">
+    <div className="space-y-6 px-0 md:px-6">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} id="character-form">
           <div className="space-y-4">
@@ -228,7 +228,7 @@ const PropsForm = ({
         {t("addProp")}
       </Button>
 
-      <AlertDialogFooter>
+      <AlertDialogFooter className="flex justify-end gap-2">
         <Button type="submit" form="character-form" disabled={isLoading}>
           {t("confirmSave.props")}
         </Button>
