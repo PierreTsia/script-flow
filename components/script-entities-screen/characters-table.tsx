@@ -3,10 +3,28 @@
 import { Button } from "@/components/ui/button";
 import { CharactersWithScenes } from "@/convex/characters";
 import { Badge } from "../ui/badge";
-import { Star, Users, User, UserCog, ArrowUpDown } from "lucide-react";
+import {
+  Star,
+  Users,
+  User,
+  UserCog,
+  ArrowUpDown,
+  MoreVertical,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import { EntityTable } from "../common/entity-table";
+import { useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+import { EditCharacterDialog } from "./edit-character-dialog";
+import ConfirmDeleteDialog from "./confirm-delete-dialog";
+import useSceneEntities from "@/hooks/useSceneEntities";
 
 type Character = CharactersWithScenes["characters"][number];
 
@@ -36,6 +54,23 @@ export function CharactersTable({
   onSortChange,
 }: CharactersTableProps) {
   const t = useTranslations("ScriptEntitiesScreen");
+  const router = useRouter();
+  const { deleteCharacter, isLoading } = useSceneEntities();
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
+    null
+  );
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const handleEdit = (character: Character) => {
+    setSelectedCharacter(character);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDelete = (character: Character) => {
+    setSelectedCharacter(character);
+    setIsDeleteDialogOpen(true);
+  };
 
   const columns: ColumnDef<Character>[] = [
     {
@@ -108,20 +143,88 @@ export function CharactersTable({
         return <Badge variant="outline">{scenes.length}</Badge>;
       },
     },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <div className="text-right">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">
+                  {t("table.columns.actions.openMenu")}
+                </span>
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => handleEdit(row.original)}
+              >
+                {t("table.columns.actions.edit")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => {
+                  router.push(
+                    `/scripts/${row.original.script_id}/entities/characters/${row.original._id}`
+                  );
+                }}
+              >
+                {t("table.columns.actions.viewDetails")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-destructive cursor-pointer"
+                onClick={() => handleDelete(row.original)}
+              >
+                {t("table.columns.actions.delete")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      ),
+    },
   ];
 
   return (
-    <EntityTable
-      data={data}
-      columns={columns}
-      pagination={{
-        page,
-        cursors,
-        totalPages,
-        nextCursor,
-      }}
-      onPageChange={onPageChange}
-      totalItems={total}
-    />
+    <>
+      <EntityTable
+        data={data}
+        columns={columns}
+        pagination={{
+          page,
+          cursors,
+          totalPages,
+          nextCursor,
+        }}
+        onPageChange={onPageChange}
+        totalItems={total}
+      />
+
+      {selectedCharacter && (
+        <>
+          <EditCharacterDialog
+            character={selectedCharacter}
+            isOpen={isEditDialogOpen}
+            onClose={() => {
+              setIsEditDialogOpen(false);
+              setSelectedCharacter(null);
+            }}
+          />
+          <ConfirmDeleteDialog
+            entityType="character"
+            entityName={selectedCharacter.name}
+            isOpen={isDeleteDialogOpen}
+            isLoading={isLoading}
+            setIsOpen={setIsDeleteDialogOpen}
+            onDelete={async () => {
+              await deleteCharacter({ characterId: selectedCharacter._id });
+              setIsDeleteDialogOpen(false);
+              setSelectedCharacter(null);
+            }}
+          />
+        </>
+      )}
+    </>
   );
 }
