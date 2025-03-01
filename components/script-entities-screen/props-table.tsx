@@ -1,15 +1,6 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreVertical } from "lucide-react";
 import { PropsWithScenes } from "@/convex/props";
-import { CursorPagination } from "@/components/ui/cursor-pagination/cursor-pagination";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +13,8 @@ import { useState } from "react";
 import { EditPropDialog } from "./edit-prop-dialog";
 import ConfirmDeleteDialog from "./confirm-delete-dialog";
 import useSceneEntities from "@/hooks/useSceneEntities";
+import { ColumnDef } from "@tanstack/react-table";
+import { EntityTable } from "../common/entity-table";
 
 interface PropsTableProps {
   data: PropsWithScenes["props"];
@@ -76,83 +69,96 @@ export function PropsTable({
     setIsDeleteDialogOpen(true);
   };
 
+  const columns: ColumnDef<Prop>[] = [
+    {
+      accessorKey: "name",
+      header: () => (
+        <Button
+          variant="ghost"
+          onClick={() => toggleSort("name")}
+          className="h-8 text-left font-medium"
+        >
+          {t("table.columns.name")}
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+    },
+    {
+      accessorKey: "scenesCount",
+      header: () => (
+        <Button
+          variant="ghost"
+          onClick={() => toggleSort("scenesCount")}
+          className="h-8 text-left font-medium"
+        >
+          {t("table.columns.scenesCount")}
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => row.original.scenes?.length || 0,
+    },
+    {
+      accessorKey: "description",
+      header: t("table.columns.description"),
+      cell: ({ row }) =>
+        row.original.scenes.map((scene) => scene.notes).join(", ") || "-",
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <div className="text-right">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">
+                  {t("table.columns.actions.openMenu")}
+                </span>
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => handleEdit(row.original)}
+              >
+                {t("table.columns.actions.edit")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => {
+                  router.push(
+                    `/scripts/${row.original.script_id}/entities/props/${row.original._id}`
+                  );
+                }}
+              >
+                {t("table.columns.actions.viewDetails")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-destructive cursor-pointer"
+                onClick={() => handleDelete(row.original)}
+              >
+                {t("table.columns.actions.delete")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="space-y-4">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>
-              <Button
-                variant="ghost"
-                onClick={() => toggleSort("name")}
-                className="h-8 text-left font-medium"
-              >
-                {t("table.columns.name")}
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button
-                variant="ghost"
-                onClick={() => toggleSort("scenesCount")}
-                className="h-8 text-left font-medium"
-              >
-                {t("table.columns.scenesCount")}
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>{t("table.columns.description")}</TableHead>
-            <TableHead className="w-[50px]"></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((prop) => (
-            <TableRow key={prop._id}>
-              <TableCell>{prop.name}</TableCell>
-              <TableCell>{prop.scenes?.length || 0}</TableCell>
-              <TableCell>
-                {prop.scenes.map((scene) => scene.notes).join(", ") || "-"}
-              </TableCell>
-              <TableCell className="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <span className="sr-only">
-                        {t("table.columns.actions.openMenu")}
-                      </span>
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      className="cursor-pointer"
-                      onClick={() => handleEdit(prop)}
-                    >
-                      {t("table.columns.actions.edit")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="cursor-pointer"
-                      onClick={() => {
-                        router.push(
-                          `/scripts/${prop.script_id}/entities/props/${prop._id}`
-                        );
-                      }}
-                    >
-                      {t("table.columns.actions.viewDetails")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-destructive cursor-pointer"
-                      onClick={() => handleDelete(prop)}
-                    >
-                      {t("table.columns.actions.delete")}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <>
+      <EntityTable
+        data={data}
+        columns={columns}
+        pagination={{
+          page,
+          cursors,
+          totalPages,
+          nextCursor,
+        }}
+        onPageChange={onPageChange}
+      />
 
       {selectedProp && (
         <>
@@ -178,18 +184,6 @@ export function PropsTable({
           />
         </>
       )}
-
-      <div className="flex items-center justify-between py-4">
-        <CursorPagination
-          state={{
-            page,
-            cursors,
-            totalPages,
-            nextCursor: nextCursor ?? undefined,
-          }}
-          onPageChange={onPageChange}
-        />
-      </div>
-    </div>
+    </>
   );
 }

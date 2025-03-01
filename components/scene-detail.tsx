@@ -13,6 +13,7 @@ import {
   Sunset,
   Home,
   Building,
+  BookOpen,
 } from "lucide-react";
 import { useScene } from "@/hooks/useScene";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +29,11 @@ import {
 } from "@/components/ui/tooltip";
 import { useTranslations } from "next-intl";
 import PropBadge from "./ui/prop-badge";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+
+import { SceneText } from "./scene-detail/scene-text";
+
 interface SceneDetailProps {
   sceneId: Id<"scenes">;
 }
@@ -82,6 +88,8 @@ export function SceneDetail({ sceneId }: SceneDetailProps) {
   const { useGetSceneById } = useScene();
   const t = useTranslations("SceneDetail");
   const scene = useGetSceneById(sceneId);
+  const params = useParams();
+  const scriptId = params.scriptId as string;
 
   if (!scene) return <div>{t("loading")}</div>;
 
@@ -95,10 +103,15 @@ export function SceneDetail({ sceneId }: SceneDetailProps) {
               <Clapperboard className="h-6 w-6 text-primary" />
               Scene {scene.scene_number}
             </h1>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Clock className="h-4 w-4" />
-              <span>{t("pageNumber", { number: scene.page_number })}</span>
-            </div>
+            <Link
+              href={`/scripts/${scriptId}/viewer?page=${scene.page_number}`}
+              className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+            >
+              <Badge className="flex items-center gap-1 text-xs">
+                <BookOpen className="h-4 w-4" />
+                {t("pageNumber", { number: scene.page_number })}
+              </Badge>
+            </Link>
           </div>
         </div>
 
@@ -132,6 +145,8 @@ export function SceneDetail({ sceneId }: SceneDetailProps) {
             </span>
             <span>{t("details.notSpecified")}</span>
           </div>
+          <Separator className="my-4" />
+          <SceneText text={scene.text} />
         </CardContent>
       </Card>
 
@@ -258,6 +273,8 @@ export function SceneDetail({ sceneId }: SceneDetailProps) {
                 </span>
                 <span>{t("details.notSpecified")}</span>
               </div>
+              <Separator className="my-4" />
+              <SceneText text={scene.text} />
             </CardContent>
           </Card>
         </div>

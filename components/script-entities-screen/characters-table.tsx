@@ -1,48 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { CharactersWithScenes } from "@/convex/characters";
 import { Badge } from "../ui/badge";
-import {
-  Star,
-  Users,
-  User,
-  UserCog,
-  Settings2,
-  ArrowUpDown,
-} from "lucide-react";
-import { CursorPagination } from "@/components/ui/cursor-pagination/cursor-pagination";
+import { Star, Users, User, UserCog, ArrowUpDown } from "lucide-react";
 import { useTranslations } from "next-intl";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-
-import { cn } from "@/lib/utils";
+import { ColumnDef } from "@tanstack/react-table";
+import { EntityTable } from "../common/entity-table";
 
 type Character = CharactersWithScenes["characters"][number];
 
@@ -72,31 +36,24 @@ export function CharactersTable({
   onSortChange,
 }: CharactersTableProps) {
   const t = useTranslations("ScriptEntitiesScreen");
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   const columns: ColumnDef<Character>[] = [
     {
       accessorKey: "name",
-      header: () => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => {
-              const newOrder =
-                sortBy === "name" && sortOrder === "asc" ? "desc" : "asc";
-              onSortChange("name", newOrder);
-            }}
-            className="flex items-center gap-1"
-          >
-            Name
-            {sortBy === "name" && (
-              <ArrowUpDown
-                className={cn("h-4 w-4", sortOrder === "desc" && "rotate-180")}
-              />
-            )}
-          </Button>
-        );
-      },
+      header: () => (
+        <Button
+          variant="ghost"
+          onClick={() => {
+            const newOrder =
+              sortBy === "name" && sortOrder === "asc" ? "desc" : "asc";
+            onSortChange("name", newOrder);
+          }}
+          className="h-8 text-left font-medium flex items-center gap-1"
+        >
+          {t("table.columns.name")}
+          <ArrowUpDown className="h-4 w-4 ml-2" />
+        </Button>
+      ),
       cell: ({ row }) => {
         const character = row.original;
         return (
@@ -115,29 +72,25 @@ export function CharactersTable({
     },
     {
       accessorKey: "type",
-      header: () => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => {
-              const newOrder =
-                sortBy === "type" && sortOrder === "asc" ? "desc" : "asc";
-              onSortChange("type", newOrder);
-            }}
-            className="flex items-center gap-1"
-          >
-            Type
-            {sortBy === "type" && (
-              <ArrowUpDown
-                className={cn("h-4 w-4", sortOrder === "desc" && "rotate-180")}
-              />
-            )}
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <Badge variant="secondary">{row.getValue("type")}</Badge>
+      header: () => (
+        <Button
+          variant="ghost"
+          onClick={() => {
+            const newOrder =
+              sortBy === "type" && sortOrder === "asc" ? "desc" : "asc";
+            onSortChange("type", newOrder);
+          }}
+          className="h-8 text-left font-medium flex items-center gap-1"
+        >
+          {t("table.columns.type")}
+          <ArrowUpDown className="h-4 w-4 ml-2" />
+        </Button>
       ),
+      cell: ({ row }) => {
+        const type = row.getValue("type") as string;
+        const translatedType = t(`characterTypes.${type.toLowerCase()}`);
+        return <Badge variant="secondary">{translatedType}</Badge>;
+      },
     },
     {
       accessorKey: "aliases",
@@ -157,110 +110,18 @@ export function CharactersTable({
     },
   ];
 
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    state: {
-      columnVisibility,
-    },
-  });
-
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-end gap-2">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Settings2 className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {table
-                  .getAllColumns()
-                  .filter((column) => column.getCanHide())
-                  .map((column) => (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {t(`table.columns.${column.id}`)}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </TooltipTrigger>
-          <TooltipContent>{t("table.columns.toggle")}</TooltipContent>
-        </Tooltip>
-      </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {total} total characters
-        </div>
-        <CursorPagination
-          state={{
-            page,
-            cursors,
-            totalPages,
-            nextCursor,
-          }}
-          onPageChange={onPageChange}
-        />
-      </div>
-    </div>
+    <EntityTable
+      data={data}
+      columns={columns}
+      pagination={{
+        page,
+        cursors,
+        totalPages,
+        nextCursor,
+      }}
+      onPageChange={onPageChange}
+      totalItems={total}
+    />
   );
 }

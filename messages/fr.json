@@ -160,6 +160,8 @@
     "locations": "Lieux",
     "edit": "Modifier",
     "delete": "Supprimer",
+    "scenesCount": "{count, plural, one {# scene} other {# scenes}}",
+
     "sceneInfo": {
       "page": "Page",
       "scene": "Scène"
@@ -417,7 +419,11 @@
       "title": "Détails",
       "duration": "Durée",
       "timeOfDay": "Moment de la journée",
-      "notSpecified": "Non spécifié"
+      "notSpecified": "Non spécifié",
+      "sceneText": "Texte de la scène",
+      "noSceneText": "Aucun texte de scène disponible",
+      "showMore": "Voir plus",
+      "showLess": "Voir moins"
     },
     "timeOfDay": {
       "day": "Jour",

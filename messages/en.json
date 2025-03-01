@@ -413,7 +413,11 @@
       "title": "Details",
       "duration": "Duration",
       "timeOfDay": "Time of Day",
-      "notSpecified": "Not specified"
+      "notSpecified": "Not specified",
+      "sceneText": "Scene Text",
+      "noSceneText": "No scene text available",
+      "showMore": "Show more",
+      "showLess": "Show less"
     },
     "timeOfDay": {
       "day": "Day",
