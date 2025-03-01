@@ -121,10 +121,10 @@
       "notes": "Notes"
     },
     "timeOfDay": {
-      "day": "Jour",
-      "night": "Nuit",
-      "dawn": "Aube",
-      "dusk": "Crépuscule",
+      "day": "Day",
+      "night": "Night",
+      "dawn": "Dawn",
+      "dusk": "Dusk",
       "unspecified": "Unspecified"
     },
     "addProp": "Add Prop"
