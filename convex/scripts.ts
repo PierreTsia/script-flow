@@ -90,12 +90,19 @@ export const getScriptEntities = query({
     scriptId: v.id("scripts"),
     limit: v.optional(v.number()),
     cursor: v.optional(v.string()),
+    sortBy: v.optional(
+      v.union(v.literal("scene_number"), v.literal("characters_count"))
+    ),
+    sortOrder: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
   },
-  handler: async (ctx, { scriptId, limit, cursor }) => {
+  handler: async (
+    ctx,
+    { scriptId, limit, cursor, sortBy = "scene_number", sortOrder = "asc" }
+  ) => {
     const auth = await getAuthState(ctx);
     const script = await requireExists(await ctx.db.get(scriptId), "script");
 
-    // Paginate scenes query
+    // Paginate scenes query - keep the same order for pagination to work
     const paginatedScenes = auth?.userId
       ? await ctx.db
           .query("scenes")
@@ -153,7 +160,7 @@ export const getScriptEntities = query({
       .collect();
 
     // Construct the nested structure for paginated scenes
-    const scenesWithEntities = scenes.map((scene) => ({
+    let scenesWithEntities = scenes.map((scene) => ({
       ...scene,
       characters: characterLinks
         .filter((link) => link.scene_id === scene._id)
@@ -169,6 +176,24 @@ export const getScriptEntities = query({
         .filter((link) => link.scene_id === scene._id)
         .map((link) => props.find((prop) => prop._id === link.prop_id)),
     }));
+
+    // Apply sorting in memory
+    scenesWithEntities = [...scenesWithEntities].sort((a, b) => {
+      if (sortBy === "scene_number") {
+        return sortOrder === "asc"
+          ? a.sortKey.localeCompare(b.sortKey)
+          : b.sortKey.localeCompare(a.sortKey);
+      } else if (sortBy === "characters_count") {
+        const aCount = a.characters.filter(Boolean).length;
+        const bCount = b.characters.filter(Boolean).length;
+        return sortOrder === "asc" ? aCount - bCount : bCount - aCount;
+      } else {
+        // scenes_count - for consistency with the UI, though this might not make much sense for scenes
+        const aCount = 1;
+        const bCount = 1;
+        return sortOrder === "asc" ? aCount - bCount : bCount - aCount;
+      }
+    });
 
     const allScenes = await ctx.db
       .query("scenes")

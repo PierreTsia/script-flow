@@ -147,6 +147,7 @@
         "number": "Numéro",
         "location": "Lieu",
         "characters": "Personnages",
+        "scene_number": "Numéro de scène",
         "actions": {
           "openMenu": "Ouvrir le menu",
           "edit": "Modifier",

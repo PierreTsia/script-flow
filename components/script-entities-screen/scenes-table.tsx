@@ -21,10 +21,13 @@ interface ScenesTableProps {
   cursors: string[];
   nextCursor?: string | null;
   totalPages: number;
-  sortBy: "name" | "number";
+  sortBy: "scene_number" | "characters_count";
   sortOrder: "asc" | "desc";
   onPageChange: (page: number, cursors: string[]) => void;
-  onSortChange: (sortBy: "name" | "number", sortOrder: "asc" | "desc") => void;
+  onSortChange: (
+    sortBy: "scene_number" | "characters_count",
+    sortOrder: "asc" | "desc"
+  ) => void;
 }
 
 export function ScenesTable({
@@ -43,14 +46,14 @@ export function ScenesTable({
 
   const columns: ColumnDef<SceneWithEntities>[] = [
     {
-      accessorKey: "number",
+      accessorKey: "scene_number",
       header: () => (
         <Button
           variant="ghost"
           onClick={() => {
             const newOrder =
-              sortBy === "number" && sortOrder === "asc" ? "desc" : "asc";
-            onSortChange("number", newOrder);
+              sortBy === "scene_number" && sortOrder === "asc" ? "desc" : "asc";
+            onSortChange("scene_number", newOrder);
           }}
           className="h-8 text-left font-medium flex items-center gap-1"
         >
@@ -81,7 +84,22 @@ export function ScenesTable({
     },
     {
       accessorKey: "characters",
-      header: t("table.columns.characters"),
+      header: () => (
+        <Button
+          variant="ghost"
+          onClick={() => {
+            const newOrder =
+              sortBy === "characters_count" && sortOrder === "asc"
+                ? "desc"
+                : "asc";
+            onSortChange("characters_count", newOrder);
+          }}
+          className="h-8 text-left font-medium flex items-center gap-1"
+        >
+          {t("table.columns.characters")}
+          <ArrowUpDown className="h-4 w-4 ml-2" />
+        </Button>
+      ),
       cell: ({ row }) => {
         const characters = row.original.characters;
         return <Badge variant="outline">{characters.length}</Badge>;

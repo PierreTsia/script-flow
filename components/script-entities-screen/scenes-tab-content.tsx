@@ -24,8 +24,9 @@ const ScenesTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const [page, setPage] = useState(1);
   const [cursors, setCursors] = useState<string[]>([]);
   const [view, setView] = useState<"table" | "grid">("table");
-  const [sortBy, setSortBy] = useState<"name" | "number">(
-    (searchParams.get("sortBy") as "name" | "number") || "number"
+  const [sortBy, setSortBy] = useState<"scene_number" | "characters_count">(
+    (searchParams.get("sortBy") as "scene_number" | "characters_count") ||
+      "scene_number"
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">(
     (searchParams.get("sortOrder") as "asc" | "desc") || "asc"
@@ -35,11 +36,13 @@ const ScenesTabContent = ({ scriptId }: { scriptId: Id<"scripts"> }) => {
   const result = useGetScriptEntities(
     scriptId,
     ITEMS_PER_PAGE,
-    page === 1 ? undefined : cursors[page - 2]
+    page === 1 ? undefined : cursors[page - 2],
+    sortBy,
+    sortOrder
   );
 
   const updateUrlWithSort = (
-    newSortBy: "name" | "number",
+    newSortBy: "scene_number" | "characters_count",
     newSortOrder: "asc" | "desc"
   ) => {
     const params = new URLSearchParams(searchParams.toString());

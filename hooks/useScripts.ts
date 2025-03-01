@@ -18,12 +18,16 @@ export const useScripts = () => {
   const useGetScriptEntities = (
     scriptId: Id<"scripts">,
     limit: number,
-    cursor?: string
+    cursor?: string,
+    sortBy?: "scene_number" | "characters_count",
+    sortOrder?: "asc" | "desc"
   ) =>
     useStableQuery(api.scripts.getScriptEntities, {
       scriptId,
       limit,
       cursor,
+      sortBy,
+      sortOrder,
     });
   const uploadFile = async (file: File, url: string) => {
     const result = await fetch(url, {

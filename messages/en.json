@@ -152,6 +152,7 @@
         "number": "Number",
         "location": "Location",
         "characters": "Characters",
+        "scene_number": "Scene Number",
         "actions": {
           "openMenu": "Open menu",
           "edit": "Edit",
