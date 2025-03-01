@@ -41,7 +41,6 @@ export interface EntityTableProps<TData> {
     nextCursor?: string | null;
   };
   onPageChange: (page: number, cursors: string[]) => void;
-  totalItems?: number;
   hideableColumns?: boolean;
   renderCustomActions?: () => React.ReactNode;
 }
@@ -51,7 +50,6 @@ export function EntityTable<TData>({
   columns,
   pagination,
   onPageChange,
-  totalItems,
   hideableColumns = true,
   renderCustomActions,
 }: EntityTableProps<TData>) {
@@ -154,11 +152,6 @@ export function EntityTable<TData>({
       </div>
 
       <div className="flex items-center justify-between py-4">
-        {totalItems && (
-          <div className="flex-1 text-sm text-muted-foreground">
-            {totalItems} total items
-          </div>
-        )}
         <CursorPagination
           state={{
             page: pagination.page,

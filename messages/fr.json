@@ -136,6 +136,7 @@
         "toggle": "Afficher/Masquer les colonnes",
         "name": "Nom",
         "type": "Type",
+        "time_of_day": "Moment de la journée",
         "aliases": "Alias",
         "scenes": "Scènes",
         "scenesCount": "Nombre de scènes",
@@ -351,7 +352,12 @@
     },
     "stats": {
       "charactersTotal": "{count, plural, =1 {# personnage au total} other {# personnages au total}}",
-      "propsTotal": "{count, plural, =1 {# accessoire au total} other {# accessoires au total}}"
+      "propsTotal": "{count, plural, =1 {# accessoire au total} other {# accessoires au total}}",
+      "locationsTotal": "{count, plural, =1 {# lieu au total} other {# lieux au total}}"
+    },
+    "locationTypes": {
+      "int": "Intérieur",
+      "ext": "Extérieur"
     }
   },
   "EditSceneDialog": {

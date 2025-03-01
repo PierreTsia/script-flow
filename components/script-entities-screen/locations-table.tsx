@@ -1,16 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { CharactersWithScenes } from "@/convex/characters";
+import { LocationsWithScenes } from "@/convex/locations";
 import { Badge } from "../ui/badge";
-import {
-  Star,
-  Users,
-  User,
-  UserCog,
-  ArrowUpDown,
-  MoreVertical,
-} from "lucide-react";
+import { MapPin, ArrowUpDown, MoreVertical } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import { EntityTable } from "../common/entity-table";
@@ -22,28 +15,32 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { EditCharacterDialog } from "./edit-character-dialog";
+import { EditLocationDialog } from "./edit-location-dialog";
 import ConfirmDeleteDialog from "./confirm-delete-dialog";
 import useSceneEntities from "@/hooks/useSceneEntities";
+import { TimeOfDayIcon } from "./time-of-day-icon";
+import { TimeOfDay } from "@/convex/helpers";
 
-type Character = CharactersWithScenes["characters"][number];
+type Location = LocationsWithScenes["locations"][number];
 
-interface CharactersTableProps {
-  data: Character[];
+interface LocationsTableProps {
+  data: Location[];
   total: number;
   page: number;
   cursors: string[];
   nextCursor?: string | null;
   totalPages: number;
-  sortBy: "name" | "type";
+  sortBy: "name" | "scenesCount";
   sortOrder: "asc" | "desc";
   onPageChange: (page: number, cursors: string[]) => void;
-  onSortChange: (sortBy: "name" | "type", sortOrder: "asc" | "desc") => void;
+  onSortChange: (
+    sortBy: "name" | "scenesCount",
+    sortOrder: "asc" | "desc"
+  ) => void;
 }
 
-export function CharactersTable({
+export function LocationsTable({
   data,
-  total,
   page,
   cursors,
   nextCursor,
@@ -52,27 +49,27 @@ export function CharactersTable({
   sortOrder,
   onPageChange,
   onSortChange,
-}: CharactersTableProps) {
+}: LocationsTableProps) {
   const t = useTranslations("ScriptEntitiesScreen");
   const router = useRouter();
-  const { deleteCharacter, isLoading } = useSceneEntities();
-  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
+  const { deleteLocation, isLoading } = useSceneEntities();
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
     null
   );
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const handleEdit = (character: Character) => {
-    setSelectedCharacter(character);
+  const handleEdit = (location: Location) => {
+    setSelectedLocation(location);
     setIsEditDialogOpen(true);
   };
 
-  const handleDelete = (character: Character) => {
-    setSelectedCharacter(character);
+  const handleDelete = (location: Location) => {
+    setSelectedLocation(location);
     setIsDeleteDialogOpen(true);
   };
 
-  const columns: ColumnDef<Character>[] = [
+  const columns: ColumnDef<Location>[] = [
     {
       accessorKey: "name",
       header: () => (
@@ -90,54 +87,53 @@ export function CharactersTable({
         </Button>
       ),
       cell: ({ row }) => {
-        const character = row.original;
+        const location = row.original;
         return (
           <div className="flex items-center gap-2">
-            {character.type === "PRINCIPAL" && <Star className="h-4 w-4" />}
-            {character.type === "SUPPORTING" && <Users className="h-4 w-4" />}
-            {character.type === "FEATURED_EXTRA" && (
-              <UserCog className="h-4 w-4" />
-            )}
-            {character.type === "SILENT_KEY" && <User className="h-4 w-4" />}
-            {character.type === "ATMOSPHERE" && <Users className="h-4 w-4" />}
-            <span>{character.name}</span>
+            <MapPin className="h-4 w-4" />
+            <span>{location.name}</span>
           </div>
         );
       },
     },
     {
       accessorKey: "type",
+      header: t("table.columns.type"),
+      cell: ({ row }) => {
+        const type = row.getValue("type") as string;
+        const translatedType = t(`locationTypes.${type.toLowerCase()}`);
+        return <Badge variant="secondary">{translatedType}</Badge>;
+      },
+    },
+    {
+      accessorKey: "time_of_day",
+      header: t("table.columns.time_of_day"),
+      cell: ({ row }) => {
+        const timeOfDay = row.getValue("time_of_day") as TimeOfDay;
+        return (
+          <div className="flex items-center gap-2">
+            <TimeOfDayIcon timeOfDay={timeOfDay} />
+            <span>{t(`timeOfDay.${timeOfDay.toLowerCase()}`)}</span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "scenes",
       header: () => (
         <Button
           variant="ghost"
           onClick={() => {
             const newOrder =
-              sortBy === "type" && sortOrder === "asc" ? "desc" : "asc";
-            onSortChange("type", newOrder);
+              sortBy === "scenesCount" && sortOrder === "asc" ? "desc" : "asc";
+            onSortChange("scenesCount", newOrder);
           }}
           className="h-8 text-left font-medium flex items-center gap-1"
         >
-          {t("table.columns.type")}
+          {t("table.columns.scenesCount")}
           <ArrowUpDown className="h-4 w-4 ml-2" />
         </Button>
       ),
-      cell: ({ row }) => {
-        const type = row.getValue("type") as string;
-        const translatedType = t(`characterTypes.${type.toLowerCase()}`);
-        return <Badge variant="secondary">{translatedType}</Badge>;
-      },
-    },
-    {
-      accessorKey: "aliases",
-      header: "Aliases",
-      cell: ({ row }) => {
-        const aliases = row.getValue("aliases") as string[];
-        return aliases?.length ? aliases.join(", ") : "-";
-      },
-    },
-    {
-      accessorKey: "scenes",
-      header: "Scenes",
       cell: ({ row }) => {
         const scenes = row.original.scenes;
         return <Badge variant="outline">{scenes.length}</Badge>;
@@ -167,7 +163,7 @@ export function CharactersTable({
                 className="cursor-pointer"
                 onClick={() => {
                   router.push(
-                    `/scripts/${row.original.script_id}/entities/characters/${row.original._id}`
+                    `/scripts/${row.original.script_id}/entities/locations/${row.original._id}`
                   );
                 }}
               >
@@ -200,26 +196,26 @@ export function CharactersTable({
         onPageChange={onPageChange}
       />
 
-      {selectedCharacter && (
+      {selectedLocation && (
         <>
-          <EditCharacterDialog
-            character={selectedCharacter}
+          <EditLocationDialog
+            location={selectedLocation}
             isOpen={isEditDialogOpen}
             onClose={() => {
               setIsEditDialogOpen(false);
-              setSelectedCharacter(null);
+              setSelectedLocation(null);
             }}
           />
           <ConfirmDeleteDialog
-            entityType="character"
-            entityName={selectedCharacter.name}
+            entityType="location"
+            entityName={selectedLocation.name}
             isOpen={isDeleteDialogOpen}
             isLoading={isLoading}
             setIsOpen={setIsDeleteDialogOpen}
             onDelete={async () => {
-              await deleteCharacter({ characterId: selectedCharacter._id });
+              await deleteLocation({ locationId: selectedLocation._id });
               setIsDeleteDialogOpen(false);
-              setSelectedCharacter(null);
+              setSelectedLocation(null);
             }}
           />
         </>

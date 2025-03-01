@@ -7,15 +7,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Sun,
-  Moon,
-  Clapperboard,
-  Sunrise,
-  Sunset,
-  Clock,
-  Eye,
-} from "lucide-react";
+import { Clapperboard, Eye } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -29,30 +21,8 @@ import { useState } from "react";
 import { Pencil } from "lucide-react";
 import useSceneEntities from "@/hooks/useSceneEntities";
 import { EditLocationDialog } from "./edit-location-dialog";
-import { useTranslations } from "next-intl";
-import { TimeOfDay } from "@/convex/helpers";
 import Link from "next/link";
-const TimeOfDayIcon = ({ timeOfDay }: { timeOfDay: TimeOfDay }) => {
-  const t = useTranslations("ScriptEntitiesScreen");
-  const iconMap: Record<TimeOfDay, React.ReactNode> = {
-    DAY: <Sun className="h-4 w-4" />,
-    NIGHT: <Moon className="h-4 w-4" />,
-    DAWN: <Sunrise className="h-4 w-4" />,
-    DUSK: <Sunset className="h-4 w-4" />,
-    UNSPECIFIED: <Clock className="h-4 w-4" />,
-  };
-
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div>{iconMap[timeOfDay]}</div>
-      </TooltipTrigger>
-      <TooltipContent>
-        {t(`timeOfDay.${timeOfDay.toLowerCase()}`)}
-      </TooltipContent>
-    </Tooltip>
-  );
-};
+import { TimeOfDayIcon } from "./time-of-day-icon";
 
 const LocationSummaryCard = ({
   location,
