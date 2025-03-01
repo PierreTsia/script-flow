@@ -80,13 +80,12 @@ const createNewCharacter = async (
 const getCharacterNyUniqName = async (
   ctx: QueryCtx,
   scriptId: Id<"scripts">,
-  name: string,
-  type: CharacterType
+  name: string
 ): Promise<CharacterDocument | null> => {
   const character = await ctx.db
     .query("characters")
     .withIndex("by_script_name_type", (q) =>
-      q.eq("script_id", scriptId).eq("name", name).eq("type", type)
+      q.eq("script_id", scriptId).eq("name", name)
     )
     .unique();
 
@@ -157,8 +156,7 @@ export const createCharacter = mutation({
     const existingCharacter = await getCharacterNyUniqName(
       ctx,
       args.script_id,
-      args.name,
-      args.type
+      args.name
     );
 
     if (existingCharacter) {
@@ -198,8 +196,7 @@ export const createCharacterWithScene = mutation({
     const existingCharacter = await getCharacterNyUniqName(
       ctx,
       myScript._id,
-      args.name,
-      args.type
+      args.name
     );
 
     const characterId = existingCharacter

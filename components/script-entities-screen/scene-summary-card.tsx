@@ -208,7 +208,6 @@ const SceneSummaryCard = ({
             </div>
 
             {/* Props */}
-
             <SceneSummaryCardProps props={scene?.props} />
           </div>
         </div>
