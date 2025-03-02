@@ -220,14 +220,19 @@ export const getPropsByScriptId = query({
 
     const pageSize = limit || 25;
 
-    // Keep the exact same query structure for cursor pagination to work
+    // Use database-level pagination with the appropriate index
     const paginatedProps = await ctx.db
       .query("props")
-      .withIndex("by_script", (q) => q.eq("script_id", script._id))
-      .order("desc") // Keep this constant
+      .withIndex(
+        // Use unique_prop_per_script for name sorting since it has script_id and name
+        sortBy === "name" ? "unique_prop_per_script" : "by_script",
+        (q) => q.eq("script_id", script._id)
+      )
+      // Use database sorting for name, asc for scenesCount
+      .order(sortBy === "name" ? sortOrder : "asc")
       .paginate({ numItems: pageSize, cursor: cursor || null });
 
-    // Fetch scenes for each prop
+    // Fetch scenes for paginated props
     const propsWithScenes = await Promise.all(
       paginatedProps.page.map(async (prop) => ({
         ...prop,
@@ -235,20 +240,15 @@ export const getPropsByScriptId = query({
       }))
     );
 
-    // Apply sorting in memory after fetching all data
-    const sortedProps = [...propsWithScenes].sort((a, b) => {
-      if (sortBy === "scenesCount") {
-        const aCount = a.scenes?.length || 0;
-        const bCount = b.scenes?.length || 0;
-
-        return sortOrder === "asc" ? aCount - bCount : bCount - aCount;
-      } else {
-        // name sorting
-        return sortOrder === "asc"
-          ? a.name.localeCompare(b.name)
-          : b.name.localeCompare(a.name);
-      }
-    });
+    // Only apply in-memory sort for scenesCount
+    const sortedProps =
+      sortBy === "scenesCount"
+        ? [...propsWithScenes].sort((a, b) => {
+            const aCount = a.scenes?.length || 0;
+            const bCount = b.scenes?.length || 0;
+            return sortOrder === "asc" ? aCount - bCount : bCount - aCount;
+          })
+        : propsWithScenes; // name sorting is handled by the database
 
     return {
       props: sortedProps,

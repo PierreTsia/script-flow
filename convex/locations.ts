@@ -217,12 +217,14 @@ export const getLocationsByScriptId = query({
     { script_id, limit, cursor, sortBy = "name", sortOrder = "asc" }
   ) => {
     const auth = await getAuthState(ctx);
-
     const script = await requireExists(await ctx.db.get(script_id), "script");
 
+    // Build query with all conditions upfront
     const query = ctx.db
       .query("locations")
-      .withIndex("by_script", (q) => q.eq("script_id", script._id));
+      .withIndex("by_script", (q) => q.eq("script_id", script._id))
+      // Apply database-level sort for name
+      .order(sortBy !== "scenesCount" ? sortOrder : "asc");
 
     const paginatedLocations = auth?.userId
       ? await query.paginate({
@@ -252,23 +254,27 @@ export const getLocationsByScriptId = query({
       })
     );
 
-    // Apply in-memory sorting for all fields since we can't rely on database ordering
-    const sortedLocations = [...locationsWithScenes].sort((a, b) => {
-      if (sortBy === "name") {
-        const comparison = a.name.localeCompare(b.name);
-        return sortOrder === "asc" ? comparison : -comparison;
-      } else if (sortBy === "type") {
-        const comparison = a.type.localeCompare(b.type);
-        return sortOrder === "asc" ? comparison : -comparison;
-      } else if (sortBy === "scenesCount") {
-        const diff = a.scenes.length - b.scenes.length;
-        return sortOrder === "asc" ? diff : -diff;
-      }
-      return 0;
-    });
+    // Apply in-memory sort for type and scenesCount
+    if (sortBy === "type" || sortBy === "scenesCount") {
+      const sortedLocations = [...locationsWithScenes].sort((a, b) => {
+        if (sortBy === "type") {
+          const comparison = a.type.localeCompare(b.type);
+          return sortOrder === "asc" ? comparison : -comparison;
+        } else {
+          const diff = a.scenes.length - b.scenes.length;
+          return sortOrder === "asc" ? diff : -diff;
+        }
+      });
+      return {
+        locations: sortedLocations,
+        nextCursor: paginatedLocations.continueCursor,
+        total: await getLocationsCount(ctx, script._id),
+      };
+    }
 
+    // For name sorting, return the database-sorted results directly
     return {
-      locations: sortedLocations,
+      locations: locationsWithScenes,
       nextCursor: paginatedLocations.continueCursor,
       total: await getLocationsCount(ctx, script._id),
     };

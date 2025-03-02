@@ -102,12 +102,13 @@ export const getScriptEntities = query({
     const auth = await getAuthState(ctx);
     const script = await requireExists(await ctx.db.get(scriptId), "script");
 
-    // Paginate scenes query - keep the same order for pagination to work
+    // Build the query with all conditions upfront
     const paginatedScenes = auth?.userId
       ? await ctx.db
           .query("scenes")
           .withIndex("by_script_and_sort", (q) => q.eq("script_id", script._id))
-          .order("asc")
+          // Always use sortKey order for consistent pagination
+          .order(sortBy === "scene_number" ? sortOrder : "asc")
           .paginate({
             numItems: limit ?? 10,
             cursor: cursor ?? null,
@@ -177,23 +178,14 @@ export const getScriptEntities = query({
         .map((link) => props.find((prop) => prop._id === link.prop_id)),
     }));
 
-    // Apply sorting in memory
-    scenesWithEntities = [...scenesWithEntities].sort((a, b) => {
-      if (sortBy === "scene_number") {
-        return sortOrder === "asc"
-          ? a.sortKey.localeCompare(b.sortKey)
-          : b.sortKey.localeCompare(a.sortKey);
-      } else if (sortBy === "characters_count") {
+    // Only apply in-memory sort for characters_count
+    if (sortBy === "characters_count") {
+      scenesWithEntities = [...scenesWithEntities].sort((a, b) => {
         const aCount = a.characters.filter(Boolean).length;
         const bCount = b.characters.filter(Boolean).length;
         return sortOrder === "asc" ? aCount - bCount : bCount - aCount;
-      } else {
-        // scenes_count - for consistency with the UI, though this might not make much sense for scenes
-        const aCount = 1;
-        const bCount = 1;
-        return sortOrder === "asc" ? aCount - bCount : bCount - aCount;
-      }
-    });
+      });
+    }
 
     const allScenes = await ctx.db
       .query("scenes")
